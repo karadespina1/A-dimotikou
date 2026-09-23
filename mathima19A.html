@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 19: Μαθαίνω το ποντίκι του υπολογιστή</title>
+  <style>
+    :root {
+      --primary-color: #8c3230;
+      --primary-hover: #722725;
+      --bg-color: #fdf5f4;
+      --card-bg: #ffffff;
+      --text-color: #3b2322;
+      --border-color: #e8c6c4;
+      --accent-green: #4CAF50;
+      --accent-blue: #2196F3;
+      --accent-yellow: #FFC107;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Comic Sans MS', 'Comfortaa', 'Segoe UI', Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header-container {
+      width: 100%;
+      max-width: 860px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      font-size: 2.4rem;
+      margin: 0 0 6px 0;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      color: #795548;
+      font-size: 1.15rem;
+      margin-bottom: 22px;
+    }
+
+    /* Tabs Navigation */
+    .tabs-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      background-color: var(--card-bg);
+      border: 2px solid var(--border-color);
+      color: var(--primary-color);
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn:hover {
+      background-color: #fae8e7;
+    }
+
+    .tab-btn.active {
+      background-color: var(--primary-color);
+      color: #fff;
+      border-color: var(--primary-color);
+    }
+
+    /* Main Activity Card */
+    .activity-card {
+      background: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 24px;
+      padding: 28px;
+      width: 100%;
+      max-width: 860px;
+      box-shadow: 0 8px 24px rgba(140, 50, 48, 0.08);
+      position: relative;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      color: var(--primary-color);
+      font-size: 1.8rem;
+      margin: 0 0 8px 0;
+      font-weight: 700;
+    }
+
+    .instruction {
+      font-size: 1.25rem;
+      margin: 0;
+      color: #555;
+    }
+
+    .speak-btn {
+      background: #f8d7da;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .speak-btn:hover {
+      transform: scale(1.08);
+      background-color: #f1b0b7;
+    }
+
+    /* Interactive Stage */
+    .stage {
+      margin-top: 20px;
+      background: #fafafa;
+      border: 2px dashed #ddd;
+      border-radius: 18px;
+      min-height: 320px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* SVG Mouse Styles */
+    .mouse-svg {
+      width: 190px;
+      height: auto;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12));
+      cursor: pointer;
+    }
+
+    .interactive-part {
+      transition: fill 0.3s, transform 0.15s;
+    }
+
+    .interactive-part:hover {
+      opacity: 0.85;
+    }
+
+    .feedback-box {
+      margin-top: 18px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      min-height: 40px;
+      color: var(--primary-color);
+    }
+
+    /* Activity specific elements */
+    .btn-action {
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1.15rem;
+      border-radius: 12px;
+      cursor: pointer;
+      margin: 8px;
+      font-weight: bold;
+    }
+
+    .btn-action:hover {
+      background: var(--primary-hover);
+    }
+
+    .item-box {
+      border: 3px solid #ccc;
+      border-radius: 16px;
+      padding: 15px 25px;
+      font-size: 1.2rem;
+      background: #fff;
+      cursor: pointer;
+      user-select: none;
+      margin: 10px;
+      display: inline-block;
+      transition: all 0.2s;
+    }
+
+    .item-box:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-3px);
+    }
+
+    .scroll-box {
+      width: 220px;
+      height: 150px;
+      border: 3px solid #666;
+      border-radius: 12px;
+      overflow-y: scroll;
+      background: #fff;
+      padding: 10px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-container">
+    <h1>Το ποντίκι του υπολογιστή</h1>
+    <div class="subtitle">Μάθημα 19: Μαθαίνω το ποντίκι του υπολογιστή (Α΄ Δημοτικού)</div>
+
+    <!-- Ταμπλό πλοήγησης δραστηριοτήτων -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="loadActivity(1)">Α. Αριστερό Πλήκτρο</button>
+      <button class="tab-btn" onclick="loadActivity(2)">Β. Δεξί Πλήκτρο</button>
+      <button class="tab-btn" onclick="loadActivity(3)">Γ. Ροδέλα Κύλισης</button>
+      <button class="tab-btn" onclick="loadActivity(4)">Δ. Επιφάνεια & Mousepad</button>
+      <button class="tab-btn" onclick="loadActivity(5)">Ε. Πώς το Κρατάω;</button>
+      <button class="tab-btn" onclick="loadActivity(6)">ΣΤ. Βρες το Μέρος</button>
+    </div>
+  </div>
+
+  <!-- Κεντρική Κάρτα Δραστηριότητας -->
+  <div class="activity-card">
+    <div class="card-header">
+      <div>
+        <div id="actTitle" class="card-title">Πάτα το αριστερό πλήκτρο</div>
+        <p id="actDesc" class="instruction">Κάνε κλικ στο αριστερό πλήκτρο του ποντικιού με τον δείκτη σου!</p>
+      </div>
+      <button class="speak-btn" onclick="speakCurrentInstruction()" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+
+    <!-- Χώρος Διαδραστικού Περιεχομένου -->
+    <div id="stageArea" class="stage">
+      <!-- Δημιουργείται δυναμικά με JS -->
+    </div>
+
+    <div id="feedback" class="feedback-box"></div>
+  </div>
+
+  <script>
+    // Ορισμός δεδομένων 6 δραστηριοτήτων
+    const activities = {
+      1: {
+        title: "Α. Το Αριστερό Πλήκτρο",
+        desc: "Κάνε κλικ στο ΑΡΙΣΤΕΡΟ πλήκτρο (πράσινο) για να επιλέξεις το αντικείμενο!",
+        speech: "Κάνε κλικ στο αριστερό πλήκτρο του ποντικιού με τον δείκτη σου για να επιλέξεις το ζωάκι!",
+        render: () => `
+          <svg class="mouse-svg" viewBox="0 0 200 300">
+            <path d="M 30,120 A 70,70 0 0 1 170,120 L 170,200 A 70,70 0 0 1 30,200 Z" fill="#fff" stroke="#333" stroke-width="6"/>
+            <!-- Left Button -->
+            <path id="leftBtn" class="interactive-part" d="M 32,118 A 68,68 0 0 1 95,52 L 95,120 L 32,120 Z" fill="#81C784" stroke="#333" stroke-width="4" onclick="act1Click()"/>
+            <!-- Right Button -->
+            <path d="M 105,120 L 105,52 A 68,68 0 0 1 168,118 L 105,120 Z" fill="#E0E0E0" stroke="#333" stroke-width="4"/>
+            <!-- Scroll Wheel -->
+            <rect x="94" y="80" width="12" height="35" rx="6" fill="#90CAF9" stroke="#333" stroke-width="3"/>
+          </svg>
+          <div style="margin-top:15px;">
+            <span style="font-size: 3rem;" id="starAnim">🐱</span>
+          </div>
+        `
+      },
+      2: {
+        title: "Β. Το Δεξί Πλήκτρο",
+        desc: "Κάνε κλικ στο ΔΕΞΙ πλήκτρο (κόκκινο) για να εμφανιστεί το μενού επιλογών!",
+        speech: "Πάτησε το δεξί πλήκτρο του ποντικιού για να δεις τι κρύβεται στο μενού επιλογών!",
+        render: () => `
+          <svg class="mouse-svg" viewBox="0 0 200 300">
+            <path d="M 30,120 A 70,70 0 0 1 170,120 L 170,200 A 70,70 0 0 1 30,200 Z" fill="#fff" stroke="#333" stroke-width="6"/>
+            <!-- Left Button -->
+            <path d="M 32,118 A 68,68 0 0 1 95,52 L 95,120 L 32,120 Z" fill="#E0E0E0" stroke="#333" stroke-width="4"/>
+            <!-- Right Button -->
+            <path id="rightBtn" class="interactive-part" d="M 105,120 L 105,52 A 68,68 0 0 1 168,118 L 105,120 Z" fill="#E57373" stroke="#333" stroke-width="4" onclick="act2Click()"/>
+            <!-- Scroll Wheel -->
+            <rect x="94" y="80" width="12" height="35" rx="6" fill="#90CAF9" stroke="#333" stroke-width="3"/>
+          </svg>
+          <div id="menuBox" style="display:none; margin-top: 15px; background: white; border: 2px solid #333; border-radius: 8px; padding: 10px; width: 160px; text-align: left; box-shadow: 3px 3px 10px rgba(0,0,0,0.2);">
+            📄 Άνοιγμα<br>
+            ✂️ Αντιγραφή<br>
+            🗑️ Διαγραφή
+          </div>
+        `
+      },
+      3: {
+        title: "Γ. Η Ροδέλα Κύλισης",
+        desc: "Κύλησε τη ροδέλα του ποντικιού σου για να δεις όλη τη σελίδα μέχρι κάτω!",
+        speech: "Χρησιμοποίησε τη ροδέλα στο ποντίκι σου για να κυλήσεις τη λίστα και να βρεις τον κρυμμένο θησαυρό!",
+        render: () => `
+          <div style="font-size: 1.1rem; margin-bottom: 8px;">👇 Κύλησε μέσα στο πλαίσιο για να φτάσεις στο τέλος! 👇</div>
+          <div class="scroll-box" onscroll="act3Scroll(this)">
+            <p>1. Ξεκινάμε από πάνω! 🎈</p>
+            <p>2. Κατεβαίνουμε... 🚗</p>
+            <p>3. Κι άλλο κάτω... 🛴</p>
+            <p>4. Συνέχισε να κυλάς... 🐢</p>
+            <p>5. Έφτασες σχεδόν! 🌟</p>
+            <p style="font-size:1.6rem; color: #E91E63; font-weight:bold;">🏆 Μπράβο! Βρήκες το κύπελλο!</p>
+          </div>
+        `
+      },
+      4: {
+        title: "Δ. Πού τοποθετούμε το Ποντίκι;",
+        desc: "Πάτησε πάνω στην κατάλληλη επιφάνεια για να γλιστράει σωστά το ποντίκι!",
+        speech: "Πού πρέπει να βάλουμε το ποντίκι; Στο ειδικό χαλάκι mousepad ή πάνω σε γυαλί;",
+        render: () => `
+          <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+            <div class="item-box" onclick="act4Check(false)">
+              🪟 <br><strong>Πάνω σε γυαλί</strong>
+            </div>
+            <div class="item-box" onclick="act4Check(true)">
+              🟫 <br><strong>Στο Mousepad (χαλάκι)</strong>
+            </div>
+            <div class="item-box" onclick="act4Check(false)">
+              🛋️ <br><strong>Πάνω σε μαξιλάρι</strong>
+            </div>
+          </div>
+        `
+      },
+      5: {
+        title: "Ε. Πώς κρατάμε το ποντίκι;",
+        desc: "Ποιο δάχτυλο ακουμπάει στο αριστερό κλικ όταν γράφουμε με το δεξί χέρι;",
+        speech: "Ποιο δάχτυλο βάζουμε στο αριστερό πλήκτρο του ποντικιού;",
+        render: () => `
+          <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+            <div class="item-box" onclick="act5Check(true)">
+              👉 <br><strong>Ο Δείκτης</strong>
+            </div>
+            <div class="item-box" onclick="act5Check(false)">
+              👍 <br><strong>Ο Αντίχειρας</strong>
+            </div>
+            <div class="item-box" onclick="act5Check(false)">
+              🤙 <br><strong>Το Μικρό δάχτυλο</strong>
+            </div>
+          </div>
+        `
+      },
+      6: {
+        title: "ΣΤ. Βρες το μέρος του ποντικιού!",
+        desc: "Πάτα πάνω στη ΡΟΔΕΛΑ (μεσαίο μέρος) του ποντικιού!",
+        speech: "Μπορείς να βρεις και να πατήσεις τη ροδέλα κύλισης στο ποντίκι;",
+        render: () => `
+          <svg class="mouse-svg" viewBox="0 0 200 300">
+            <!-- Mouse Base -->
+            <path d="M 30,120 A 70,70 0 0 1 170,120 L 170,200 A 70,70 0 0 1 30,200 Z" fill="#FFF9C4" stroke="#333" stroke-width="6" onclick="act6Check('body')"/>
+            <!-- Left Button -->
+            <path class="interactive-part" d="M 32,118 A 68,68 0 0 1 95,52 L 95,120 L 32,120 Z" fill="#C8E6C9" stroke="#333" stroke-width="4" onclick="act6Check('left')"/>
+            <!-- Right Button -->
+            <path class="interactive-part" d="M 105,120 L 105,52 A 68,68 0 0 1 168,118 L 105,120 Z" fill="#FFCDD2" stroke="#333" stroke-width="4" onclick="act6Check('right')"/>
+            <!-- Scroll Wheel -->
+            <rect id="targetWheel" class="interactive-part" x="94" y="80" width="12" height="35" rx="6" fill="#2196F3" stroke="#333" stroke-width="3" onclick="act6Check('wheel')"/>
+          </svg>
+        `
+      }
+    };
+
+    let currentAct = 1;
+
+    function loadActivity(id) {
+      currentAct = id;
+      // Ενημέρωση καρτελών
+      document.querySelectorAll('.tab-btn').forEach((btn, index) => {
+        btn.classList.toggle('active', index + 1 === id);
+      });
+
+      // Ενημέρωση κειμένων
+      const act = activities[id];
+      document.getElementById('actTitle').innerText = act.title;
+      document.getElementById('actDesc').innerText = act.desc;
+      document.getElementById('feedback').innerText = "";
+
+      // Φόρτωση σκηνής
+      document.getElementById('stageArea').innerHTML = act.render();
+    }
+
+    // Ηχητική εκφώνηση οδηγίας
+    function speakCurrentInstruction() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const text = activities[currentAct].speech;
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'el-GR';
+        msg.rate = 0.9;
+        window.speechSynthesis.speak(msg);
+      } else {
+        alert("Η φωνητική ανάγνωση δεν υποστηρίζεται στον φυλλομετρητή σας.");
+      }
+    }
+
+    /* Συναρτήσεις λογικής δραστηριοτήτων */
+    function act1Click() {
+      const fb = document.getElementById('feedback');
+      fb.style.color = "var(--accent-green)";
+      fb.innerText = "🎉 Μπράβο! Έκανες αριστερό κλικ και διάλεξες το γατάκι!";
+      document.getElementById('starAnim').innerText = "😺✨";
+    }
+
+    function act2Click() {
+      const menu = document.getElementById('menuBox');
+      menu.style.display = "block";
+      const fb = document.getElementById('feedback');
+      fb.style.color = "var(--primary-color)";
+      fb.innerText = "🌟 Τέλεια! Εμφανίστηκε η λίστα επιλογών με το δεξί κλικ!";
+    }
+
+    function act3Scroll(el) {
+      if (el.scrollHeight - el.scrollTop <= el.clientHeight + 5) {
+        const fb = document.getElementById('feedback');
+        fb.style.color = "var(--accent-green)";
+        fb.innerText = "👏 Εξαιρετικά! Έμαθες να κυλάς τη σελίδα με τη ροδέλα!";
+      }
+    }
+
+    function act4Check(isCorrect) {
+      const fb = document.getElementById('feedback');
+      if (isCorrect) {
+        fb.style.color = "var(--accent-green)";
+        fb.innerText = "🎯 Σωστά! Το ειδικό ύφασμα (mousepad) βοηθά το ποντίκι να κινείται τέλεια!";
+      } else {
+        fb.style.color = "#d32f2f";
+        fb.innerText = "❌ Προσπάθησε ξανά! Εκεί το ποντίκι δυσκολεύεται να κινηθεί.";
+      }
+    }
+
+    function act5Check(isCorrect) {
+      const fb = document.getElementById('feedback');
+      if (isCorrect) {
+        fb.style.color = "var(--accent-green)";
+        fb.innerText = "🌟 Πολύ σωστά! Ο δείκτης του χεριού μας πατάει το αριστερό πλήκτρο!";
+      } else {
+        fb.style.color = "#d32f2f";
+        fb.innerText = "❌ Για δοκίμασε ξανά! Ποιο είναι το δάχτυλο που δείχνουμε;";
+      }
+    }
+
+    function act6Check(part) {
+      const fb = document.getElementById('feedback');
+      if (part === 'wheel') {
+        fb.style.color = "var(--accent-green)";
+        fb.innerText = "🎉 Μπράβο! Αυτή είναι η μπλε ροδέλα που γυρίζει!";
+      } else {
+        fb.style.color = "#d32f2f";
+        fb.innerText = "🔍 Αυτό είναι άλλο πλήκτρο. Βρες τη ροδέλα στη μέση!";
+      }
+    }
+
+    // Αρχική φόρτωση
+    window.onload = () => {
+      loadActivity(1);
+    };
+  </script>
+</body>
+</html>
