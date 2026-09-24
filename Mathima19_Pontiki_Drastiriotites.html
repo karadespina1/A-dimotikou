@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Μαθαίνω το ποντίκι με τον Ήρωνα</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF7E8;
+    --ink:#2B2250;
+    --sky:#5EC4FF;
+    --sun:#FFC93C;
+    --coral:#FF6B6B;
+    --mint:#1FC9A3;
+    --purple:#8B5CF6;
+    --pink:#FF8FB1;
+    --card-shadow: 0 10px 0 rgba(43,34,80,0.12), 0 16px 24px rgba(43,34,80,0.10);
+    --btn-shadow: 0 6px 0 rgba(43,34,80,0.25);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Baloo 2', system-ui, sans-serif;
+    background:
+      radial-gradient(circle at 12% 8%, #fff 0, transparent 40%),
+      radial-gradient(circle at 90% 85%, #ffe9c7 0, transparent 45%),
+      var(--cream);
+    color:var(--ink);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{max-width:980px; margin:0 auto; padding:18px 18px 60px;}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin-bottom:18px;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-badge{
+    width:52px;height:52px;border-radius:50%;
+    background:linear-gradient(160deg,var(--sun),#FF9F43);
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px; box-shadow: var(--card-shadow);
+    flex:none;
+  }
+  .brand h1{font-size:1.35rem; margin:0; font-weight:800; line-height:1.15;}
+  .brand small{display:block;font-weight:600;color:#6b5f9e;font-size:.85rem;}
+  .home-btn{
+    border:none; cursor:pointer; font-family:inherit; font-weight:700;
+    background:var(--purple); color:#fff; padding:10px 18px; border-radius:16px;
+    font-size:1rem; box-shadow:var(--btn-shadow); display:flex; align-items:center; gap:8px;
+  }
+  .home-btn:active{transform:translateY(4px); box-shadow:0 2px 0 rgba(43,34,80,0.25);}
+
+  /* ---------- Mascot ---------- */
+  .mascot{position:relative; width:64px;height:64px; flex:none;}
+  .mascot .face{
+    width:64px;height:64px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff, #E9E1FF 60%, #C9B8FF 100%);
+    border:3px solid var(--purple); position:relative;
+  }
+  .mascot .ear{
+    position:absolute; width:22px;height:22px;border-radius:50%;
+    background:#C9B8FF; border:3px solid var(--purple); top:-14px;
+  }
+  .mascot .ear.l{left:-4px;} .mascot .ear.r{right:-4px;}
+  .mascot .eye{position:absolute; width:8px;height:10px;border-radius:50%; background:var(--ink); top:26px;}
+  .mascot .eye.l{left:16px;} .mascot .eye.r{right:16px;}
+  .mascot .cheek{position:absolute; width:10px;height:6px;border-radius:50%; background:var(--pink); top:36px; opacity:.8;}
+  .mascot .cheek.l{left:8px;} .mascot .cheek.r{right:8px;}
+  .mascot .mouth{position:absolute; width:16px;height:8px; border-radius:0 0 16px 16px; border:3px solid var(--ink); border-top:none; left:24px; top:38px;}
+
+  .speech-row{display:flex; align-items:flex-start; gap:12px; margin:6px 0 20px;}
+  .bubble{
+    background:#fff; border-radius:18px; padding:12px 16px; box-shadow:var(--card-shadow);
+    font-weight:600; font-size:1.05rem; position:relative; flex:1;
+  }
+  .bubble:before{
+    content:""; position:absolute; left:-9px; top:18px; width:0;height:0;
+    border-top:9px solid transparent; border-bottom:9px solid transparent; border-right:9px solid #fff;
+  }
+  .speaker-btn{
+    border:none; background:var(--mint); color:#fff; border-radius:50%; width:40px;height:40px;
+    font-size:1.1rem; cursor:pointer; box-shadow:var(--btn-shadow); flex:none;
+  }
+  .speaker-btn:active{transform:translateY(4px); box-shadow:none;}
+
+  /* ---------- Screens ---------- */
+  .screen{display:none;}
+  .screen.active{display:block; animation:fadein .35s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  /* ---------- Home grid ---------- */
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr);}}
+  .card{
+    background:#fff; border-radius:24px; padding:18px 14px 16px; text-align:center;
+    box-shadow:var(--card-shadow); border:none; cursor:pointer; font-family:inherit;
+    display:flex; flex-direction:column; align-items:center; gap:8px; position:relative;
+    transition:transform .15s ease;
+  }
+  .card:active{transform:translateY(4px);}
+  .card .icon{
+    width:78px;height:78px;border-radius:50%; display:flex;align-items:center;justify-content:center;
+    font-size:2.2rem; box-shadow: inset 0 -6px 0 rgba(0,0,0,0.08);
+  }
+  .card .label{font-weight:800; font-size:1.02rem; color:var(--ink);}
+  .card .sub{font-size:.8rem; font-weight:600; color:#8a7fb8;}
+  .card .star{
+    position:absolute; top:10px; right:10px; font-size:1.3rem;
+    filter:grayscale(1); opacity:.35;
+  }
+  .card.done .star{filter:none; opacity:1;}
+  .card.done{outline:3px solid var(--mint);}
+  .c1 .icon{background:#DFF3FF;} .c2 .icon{background:#FFE9CE;} .c3 .icon{background:#E4F9F0;}
+  .c4 .icon{background:#EFE7FF;} .c5 .icon{background:#FFF3D0;}
+
+  .progress-shelf{
+    margin-top:22px; background:#fff; border-radius:22px; padding:16px 18px; box-shadow:var(--card-shadow);
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .progress-shelf .ptitle{font-weight:800; margin-right:6px;}
+  .progress-shelf .pbadge{
+    width:38px;height:38px;border-radius:50%; display:flex;align-items:center;justify-content:center;
+    background:#f1eefc; font-size:1.2rem; filter:grayscale(1); opacity:.4;
+  }
+  .progress-shelf .pbadge.done{filter:none; opacity:1; background:linear-gradient(160deg,#FFEFC2,var(--sun));}
+
+  /* ---------- Activity chrome ---------- */
+  .activity-head{display:flex; align-items:center; gap:12px; margin-bottom:6px;}
+  .activity-head .a-icon{
+    width:56px;height:56px;border-radius:18px; display:flex;align-items:center;justify-content:center;
+    font-size:1.7rem; box-shadow:var(--card-shadow); flex:none;
+  }
+  .activity-head h2{margin:0; font-size:1.25rem; font-weight:800;}
+  .goal-row{display:flex; align-items:center; gap:10px; margin:2px 0 14px; font-weight:700; color:#6b5f9e;}
+  .goal-bar{flex:1; height:14px; background:#eee5ff; border-radius:10px; overflow:hidden;}
+  .goal-fill{height:100%; background:linear-gradient(90deg,var(--mint),#33e0b0); width:0%; transition:width .3s ease;}
+
+  .stage{
+    position:relative; border-radius:26px; height:420px; overflow:hidden; box-shadow:var(--card-shadow);
+    user-select:none; -webkit-user-select:none; touch-action:none;
+  }
+  .stage-1{background:linear-gradient(180deg,#8FDBFF 0%, #C9EEFF 60%, #E9F9FF 100%);}
+  .stage-2{background:linear-gradient(180deg,#3d2b52 0%, #6b4a86 60%, #9a6bb0 100%);}
+  .stage-3{background:linear-gradient(180deg,#8FDBFF 0%, #cdeeff 70%, #eafff5 100%);}
+  .stage-4{background:linear-gradient(180deg,#B7F0D6 0%, #E9FFEF 60%, #FFF8DE 100%);}
+  .stage-5{background:linear-gradient(180deg,#7EC8FF 0%, #FFE7A6 100%);}
+
+  .cloud{position:absolute; background:#fff; border-radius:50%; opacity:.85;}
+  .ground{position:absolute; bottom:0; left:0; right:0; height:46px; background:#8CC98B; border-top:6px solid #6FAE6E;}
+
+  /* balloons */
+  .balloon{
+    position:absolute; width:56px;height:70px; border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+    cursor:pointer; box-shadow: inset -6px -6px 0 rgba(0,0,0,0.07);
+  }
+  .balloon:after{
+    content:""; position:absolute; bottom:-16px; left:50%; width:2px;height:16px; background:rgba(0,0,0,0.25);
+  }
+  .balloon.pop{animation:popAnim .25s ease forwards;}
+  @keyframes popAnim{to{transform:scale(1.6); opacity:0;}}
+
+  /* chests */
+  .chest-grid{position:absolute; inset:0; display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:30px 34px;}
+  .chest{
+    align-self:end; justify-self:center; width:88px; height:70px; position:relative; cursor:pointer;
+  }
+  .chest .lid{
+    position:absolute; top:0; left:0; width:100%; height:34px; background:#B87333; border-radius:14px 14px 4px 4px;
+    border:3px solid #7a4a1f; transform-origin:bottom; transition:transform .25s ease;
+  }
+  .chest .body{
+    position:absolute; bottom:0; left:0; width:100%; height:44px; background:#D89B5C; border-radius:4px 4px 10px 10px;
+    border:3px solid #7a4a1f;
+  }
+  .chest .lock{position:absolute; left:50%; top:26px; transform:translateX(-50%); width:14px;height:14px;background:#FFD24C;border-radius:3px; border:2px solid #7a4a1f;}
+  .chest.opened .lid{transform:rotate(-100deg) translateY(-6px);}
+  .chest.opened .lock{opacity:0;}
+  .chest .hint{
+    position:absolute; top:-30px; left:50%; transform:translateX(-50%); font-size:1.4rem; opacity:0; transition:opacity .25s;
+  }
+  .chest.show-hint .hint{opacity:1;}
+  .chest .prize{position:absolute; top:-34px; left:50%; transform:translateX(-50%) scale(0); font-size:1.6rem; transition:transform .3s cubic-bezier(.4,1.8,.4,1);}
+  .chest.opened .prize{transform:translateX(-50%) scale(1);}
+  .chest .wiggle{animation:wiggle .3s ease;}
+  @keyframes wiggle{0%,100%{transform:rotate(0);}25%{transform:rotate(-6deg);}75%{transform:rotate(6deg);}}
+
+  /* balloon-lift game (scroll) */
+  .lift-track{position:absolute; right:60px; top:20px; bottom:56px; width:10px; background:rgba(255,255,255,.5); border-radius:6px;}
+  .lift-track .flag{position:absolute; top:-8px; left:-14px; font-size:1.8rem;}
+  .hotballoon{position:absolute; left:50%; transform:translateX(-50%); bottom:56px; font-size:4.2rem; transition:bottom .18s linear; filter:drop-shadow(0 8px 6px rgba(0,0,0,.15));}
+  .altitude-badge{position:absolute; top:14px; left:14px; background:#fff; padding:8px 14px; border-radius:14px; font-weight:800; box-shadow:var(--card-shadow);}
+  .scroll-hint{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); text-align:center; color:#fff;
+    font-weight:800; text-shadow:0 3px 0 rgba(0,0,0,.2); pointer-events:none; opacity:.9;
+  }
+  .scroll-hint .wheel-icon{font-size:2.6rem; animation:bob 1.4s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+
+  /* combo garden */
+  .bubble{
+    position:absolute; border-radius:50%; cursor:pointer;
+    background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.9), rgba(158,224,255,.55) 60%, rgba(94,196,255,.4));
+    border:2px solid rgba(255,255,255,.8);
+  }
+  .bud{position:absolute; bottom:46px; cursor:pointer; font-size:2.4rem; transition:transform .2s;}
+  .bud.bloomed{transform:scale(1.15);}
+
+  /* finale */
+  .finale-stagebox{position:relative;}
+  .stagepanel{display:none;}
+  .stagepanel.on{display:block;}
+  .step-dots{display:flex; gap:8px; justify-content:center; margin:10px 0;}
+  .step-dots span{width:12px;height:12px;border-radius:50%; background:#e4dcff;}
+  .step-dots span.on{background:var(--purple);}
+  .star-target{position:absolute; font-size:2.2rem; cursor:pointer; filter:grayscale(1) opacity(.5);}
+  .star-target.lit{filter:none; animation:pop .3s ease;}
+  @keyframes pop{0%{transform:scale(.6);}70%{transform:scale(1.3);}100%{transform:scale(1);}}
+  .door{position:absolute; left:50%; bottom:46px; transform:translateX(-50%); width:100px;height:150px; cursor:pointer;}
+  .door .frame{position:absolute; inset:0; background:#7a4a1f; border-radius:10px 10px 0 0;}
+  .door .panel{position:absolute; left:6px; top:6px; right:6px; bottom:0; background:#C98A4B; border-radius:6px 6px 0 0; transform-origin:left; transition:transform .3s ease;}
+  .door.opened .panel{transform:perspective(300px) rotateY(-70deg);}
+  .door .knob{position:absolute; right:14px; top:70px; width:10px;height:10px; border-radius:50%; background:#FFD24C;}
+
+  /* buttons */
+  .btn{
+    border:none; cursor:pointer; font-family:inherit; font-weight:800; font-size:1rem;
+    padding:12px 22px; border-radius:16px; box-shadow:var(--btn-shadow); color:#fff;
+  }
+  .btn:active{transform:translateY(4px); box-shadow:none;}
+  .btn.mint{background:var(--mint);}
+  .btn.purple{background:var(--purple);}
+  .btn.coral{background:var(--coral);}
+  .center-row{display:flex; justify-content:center; margin-top:16px;}
+
+  /* modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(43,34,80,0.55); display:none;
+    align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:#fff; border-radius:26px; padding:28px 26px; max-width:420px; text-align:center;
+    box-shadow:0 20px 40px rgba(0,0,0,.25);
+  }
+  .modal .big-emoji{font-size:3.2rem; margin-bottom:6px;}
+  .modal h3{margin:6px 0; font-size:1.3rem;}
+  .modal p{color:#6b5f9e; font-weight:600; margin:6px 0 16px;}
+  .confetti-piece{position:fixed; top:0; font-size:1.4rem; pointer-events:none; z-index:60;}
+
+  footer.note{margin-top:30px; text-align:center; font-size:.8rem; color:#a79ccb; font-weight:600;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">🖱️</div>
+      <div>
+        <h1>Μαθαίνω το ποντίκι</h1>
+        <small>Μάθημα 19ο — με τον Ήρωνα</small>
+      </div>
+    </div>
+    <button class="home-btn" onclick="goHome()">🏠 Αρχική</button>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <section class="screen active" id="screen-home">
+    <div class="speech-row">
+      <div class="mascot"><div class="face"><div class="ear l"></div><div class="ear r"></div><div class="eye l"></div><div class="eye r"></div><div class="cheek l"></div><div class="cheek r"></div><div class="mouth"></div></div></div>
+      <div class="bubble" id="home-bubble">Γεια σου! Είμαι ο Ήρωνας. Διάλεξε ένα παιχνίδι για να μάθεις το ποντίκι!</div>
+      <button class="speaker-btn" onclick="speak(document.getElementById('home-bubble').textContent)">🔊</button>
+    </div>
+
+    <div class="grid">
+      <button class="card c1" onclick="openActivity(1)"><span class="star">⭐</span><div class="icon">🎈</div><div class="label">Σκάσε τα μπαλόνια</div><div class="sub">Απλό κλικ</div></button>
+      <button class="card c2" onclick="openActivity(2)"><span class="star">⭐</span><div class="icon">🎁</div><div class="label">Άνοιξε τα κουτιά</div><div class="sub">Διπλό κλικ</div></button>
+      <button class="card c3" onclick="openActivity(3)"><span class="star">⭐</span><div class="icon">🎈🔥</div><div class="label">Πέταξε ψηλά</div><div class="sub">Ροδέλα</div></button>
+      <button class="card c4" onclick="openActivity(4)"><span class="star">⭐</span><div class="icon">🌷</div><div class="label">Ο κήπος</div><div class="sub">Κλικ &amp; διπλό κλικ</div></button>
+      <button class="card c5" onclick="openActivity(5)"><span class="star">⭐</span><div class="icon">🗺️</div><div class="label">Το ταξίδι του Ήρωνα</div><div class="sub">Όλα μαζί!</div></button>
+    </div>
+
+    <div class="progress-shelf">
+      <span class="ptitle">Η πρόοδός μου:</span>
+      <span class="pbadge" id="pb-1">🎈</span>
+      <span class="pbadge" id="pb-2">🎁</span>
+      <span class="pbadge" id="pb-3">🔥</span>
+      <span class="pbadge" id="pb-4">🌷</span>
+      <span class="pbadge" id="pb-5">🗺️</span>
+    </div>
+    <footer class="note">Χρησιμοποίησε πραγματικό ποντίκι υπολογιστή για την καλύτερη εμπειρία 🙂</footer>
+  </section>
+
+  <!-- ============ 1. BALLOONS - single click ============ -->
+  <section class="screen" id="screen-1">
+    <div class="activity-head">
+      <div class="a-icon" style="background:#DFF3FF;">🎈</div>
+      <h2>Σκάσε τα μπαλόνια</h2>
+    </div>
+    <div class="speech-row">
+      <div class="bubble" id="b1-bubble">Κάνε ένα μονό κλικ με το αριστερό κουμπί πάνω σε κάθε μπαλόνι για να το σκάσεις!</div>
+      <button class="speaker-btn" onclick="speak(document.getElementById('b1-bubble').textContent)">🔊</button>
+    </div>
+    <div class="goal-row">🎯 Σκάσε <span id="g1-target">8</span> μπαλόνια <div class="goal-bar"><div class="goal-fill" id="g1-fill"></div></div> <span id="g1-count">0</span>/<span id="g1-target2">8</span></div>
+    <div class="stage stage-1" id="stage-1"></div>
+  </section>
+
+  <!-- ============ 2. CHESTS - double click ============ -->
+  <section class="screen" id="screen-2">
+    <div class="activity-head">
+      <div class="a-icon" style="background:#FFE9CE;">🎁</div>
+      <h2>Άνοιξε τα κουτιά</h2>
+    </div>
+    <div class="speech-row">
+      <div class="bubble" id="b2-bubble">Αυτά τα κουτιά είναι κλειδωμένα! Κάνε γρήγορο διπλό κλικ πάνω τους για να ανοίξουν.</div>
+      <button class="speaker-btn" onclick="speak(document.getElementById('b2-bubble').textContent)">🔊</button>
+    </div>
+    <div class="goal-row">🎯 Άνοιξε όλα τα κουτιά <div class="goal-bar"><div class="goal-fill" id="g2-fill"></div></div> <span id="g2-count">0</span>/6</div>
+    <div class="stage stage-2" id="stage-2">
+      <div class="chest-grid" id="chest-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ 3. SCROLL WHEEL BALLOON LIFT ============ -->
+  <section class="screen" id="screen-3">
+    <div class="activity-head">
+      <div class="a-icon" style="background:#E4F9F0;">🎈🔥</div>
+      <h2>Πέταξε το αερόστατο ψηλά</h2>
+    </div>
+    <div class="speech-row">
+      <div class="bubble" id="b3-bubble">Γύρνα τη ροδέλα του ποντικιού προς τα πάνω για να ανέβει το αερόστατο μέχρι το σύννεφο!</div>
+      <button class="speaker-btn" onclick="speak(document.getElementById('b3-bubble').textContent)">🔊</button>
+    </div>
+    <div class="stage stage-3" id="stage-3">
+      <div class="altitude-badge">Ύψος: <span id="alt-val">0</span>%</div>
+      <div class="lift-track"><div class="flag">🏁</div></div>
+      <div class="scroll-hint" id="scroll-hint"><div class="wheel-icon">🖱️</div>Γύρνα τη ροδέλα!</div>
+      <div class="hotballoon" id="hotballoon" style="bottom:56px;">🎈</div>
+      <div class="ground"></div>
+    </div>
+  </section>
+
+  <!-- ============ 4. GARDEN COMBO ============ -->
+  <section class="screen" id="screen-4">
+    <div class="activity-head">
+      <div class="a-icon" style="background:#EFE7FF;">🌷</div>
+      <h2>Ο κήπος με τις εκπλήξεις</h2>
+    </div>
+    <div class="speech-row">
+      <div class="bubble" id="b4-bubble">Κάνε ένα κλικ στις φούσκες για να πετάξουν οι πεταλούδες, και διπλό κλικ στα μπουμπούκια για να ανθίσουν τα λουλούδια!</div>
+      <button class="speaker-btn" onclick="speak(document.getElementById('b4-bubble').textContent)">🔊</button>
+    </div>
+    <div class="goal-row">🎯 Πρόοδος κήπου <div class="goal-bar"><div class="goal-fill" id="g4-fill"></div></div> <span id="g4-count">0</span>/10</div>
+    <div class="stage stage-4" id="stage-4"><div class="ground"></div></div>
+  </section>
+
+  <!-- ============ 5. FINALE ============ -->
+  <section class="screen" id="screen-5">
+    <div class="activity-head">
+      <div class="a-icon" style="background:#FFF3D0;">🗺️</div>
+      <h2>Το μεγάλο ταξίδι του Ήρωνα</h2>
+    </div>
+    <div class="speech-row">
+      <div class="bubble" id="b5-bubble">Θα χρειαστείς ό,τι έμαθες: κλικ, διπλό κλικ και τη ροδέλα! Πάμε!</div>
+      <button class="speaker-btn" onclick="speak(document.getElementById('b5-bubble').textContent)">🔊</button>
+    </div>
+    <div class="step-dots"><span id="dot1" class="on"></span><span id="dot2"></span><span id="dot3"></span></div>
+    <div class="stage stage-5 finale-stagebox" id="stage-5">
+      <div class="stagepanel on" id="panel-1">
+        <div class="ground"></div>
+      </div>
+      <div class="stagepanel" id="panel-2">
+        <div class="door" id="finale-door" onclick="finaleOpenDoor()">
+          <div class="frame"></div><div class="panel"></div><div class="knob"></div>
+        </div>
+        <div class="ground"></div>
+      </div>
+      <div class="stagepanel" id="panel-3">
+        <div class="altitude-badge">Ύψος: <span id="alt-val2">0</span>%</div>
+        <div class="lift-track"><div class="flag">🏁</div></div>
+        <div class="scroll-hint" id="scroll-hint2"><div class="wheel-icon">🖱️</div>Γύρνα τη ροδέλα!</div>
+        <div class="hotballoon" id="hotballoon2" style="bottom:56px;">🎈</div>
+        <div class="ground"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="big-emoji" id="modal-emoji">🌟</div>
+    <h3 id="modal-title">Μπράβο!</h3>
+    <p id="modal-text">Τα κατάφερες!</p>
+    <button class="btn purple" onclick="closeModal()">Συνέχεια</button>
+  </div>
+</div>
+
+<script>
+/* ---------------- State ---------------- */
+var PROGRESS = {1:false,2:false,3:false,4:false,5:false};
+(function loadProgress(){
+  try{
+    var saved = JSON.parse(localStorage.getItem('pontiki-progress-19')||'null');
+    if(saved) PROGRESS = saved;
+  }catch(e){}
+})();
+function saveProgress(){
+  try{ localStorage.setItem('pontiki-progress-19', JSON.stringify(PROGRESS)); }catch(e){}
+}
+function refreshHome(){
+  for(var i=1;i<=5;i++){
+    var card = document.querySelector('.c'+i);
+    var pb = document.getElementById('pb-'+i);
+    if(PROGRESS[i]){ card.classList.add('done'); pb.classList.add('done'); }
+    else { card.classList.remove('done'); pb.classList.remove('done'); }
+  }
+}
+
+/* ---------------- Audio ---------------- */
+function playTone(freq, duration, type, gain){
+  try{
+    var ctx = window._actx || (window._actx = new (window.AudioContext||window.webkitAudioContext)());
+    var osc = ctx.createOscillator();
+    var g = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    g.gain.value = gain || 0.2;
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+    osc.stop(ctx.currentTime + duration + 0.03);
+  }catch(e){}
+}
+function playPop(){ playTone(650,0.10,'triangle',0.22); setTimeout(function(){playTone(950,0.08,'triangle',0.14);},40); }
+function playOpen(){ playTone(400,0.1,'square',0.15); setTimeout(function(){playTone(700,0.15,'sine',0.18);},90); }
+function playChime(){ [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){playTone(f,0.22,'sine',0.18);}, i*90); }); }
+function playWrong(){ playTone(180,0.22,'sawtooth',0.15); }
+function playWhoosh(){ for(var i=0;i<6;i++){ (function(i){ setTimeout(function(){ playTone(300+i*60,0.08,'sine',0.1); }, i*30); })(i); } }
+
+/* ---------------- Speech ---------------- */
+function speak(text){
+  try{
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'el-GR'; u.rate = 0.95; u.pitch = 1.08;
+    var voices = window.speechSynthesis.getVoices();
+    var gr = voices.find(function(v){ return v.lang && v.lang.toLowerCase().indexOf('el')===0; });
+    if(gr) u.voice = gr;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+if('speechSynthesis' in window){ window.speechSynthesis.onvoiceschanged = function(){}; }
+
+/* ---------------- Confetti ---------------- */
+var CONF_EMOJI = ['🎉','⭐','✨','🎈','🌟','💫'];
+function burstConfetti(x,y,count){
+  count = count || 14;
+  for(var i=0;i<count;i++){
+    var s = document.createElement('div');
+    s.className='confetti-piece';
+    s.textContent = CONF_EMOJI[Math.floor(Math.random()*CONF_EMOJI.length)];
+    s.style.left = x + 'px'; s.style.top = y + 'px';
+    document.body.appendChild(s);
+    var dx = (Math.random()-0.5)*260;
+    var dy = -(120+Math.random()*220);
+    var rot = (Math.random()-0.5)*360;
+    s.animate([
+      {transform:'translate(0,0) rotate(0deg)', opacity:1},
+      {transform:'translate('+dx+'px,'+dy+'px) rotate('+rot+'deg)', opacity:0}
+    ], {duration:900+Math.random()*400, easing:'cubic-bezier(.2,.8,.4,1)'});
+    setTimeout(function(el){ el.remove(); }, 1400, s);
+  }
+}
+function fullScreenConfetti(){
+  var w = window.innerWidth;
+  for(var i=0;i<40;i++){
+    (function(){ setTimeout(function(){ burstConfetti(Math.random()*w, -20, 4); }, Math.random()*600); })();
+  }
+}
+
+/* ---------------- Navigation ---------------- */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+function goHome(){
+  cleanupAll();
+  refreshHome();
+  showScreen('screen-home');
+}
+function openActivity(n){
+  cleanupAll();
+  showScreen('screen-'+n);
+  if(n===1) initBalloons();
+  if(n===2) initChests();
+  if(n===3) initLift();
+  if(n===4) initGarden();
+  if(n===5) initFinale();
+}
+var activeTimers = [];
+function cleanupAll(){
+  activeTimers.forEach(function(t){ clearInterval(t); clearTimeout(t); });
+  activeTimers = [];
+  var s3 = document.getElementById('stage-3'); if(s3 && s3._wheelHandler) s3.removeEventListener('wheel', s3._wheelHandler);
+  var s6 = document.getElementById('panel-3'); if(s6 && s6._wheelHandler) s6.removeEventListener('wheel', s6._wheelHandler);
+}
+
+function openModal(emoji, title, text){
+  document.getElementById('modal-emoji').textContent = emoji;
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-text').textContent = text;
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('overlay').classList.remove('show');
+  goHome();
+}
+function completeActivity(n, title){
+  if(PROGRESS[n]) return;
+  PROGRESS[n] = true;
+  saveProgress();
+  playChime();
+  var stageIds = {1:'stage-1',2:'stage-2',3:'stage-3',4:'stage-4',5:'stage-5'};
+  var stageEl = document.getElementById(stageIds[n]);
+  var rect = stageEl ? stageEl.getBoundingClientRect() : {left:window.innerWidth/2, top:200, width:0};
+  burstConfetti(rect.left + rect.width/2, rect.top+100, 22);
+  var msg = 'Μπράβο! Ολοκλήρωσες: ' + title;
+  speak(msg);
+  openModal('🌟','Μπράβο!', msg);
+}
+
+/* =========================================================
+   1. BALLOONS — single left click
+   ========================================================= */
+var BALLOON_COLORS = ['#FF6B6B','#FFC93C','#1FC9A3','#8B5CF6','#FF8FB1','#5EC4FF'];
+var balloon1_count = 0, balloon1_target = 8, balloon1_interval=null;
+function initBalloons(){
+  balloon1_count = 0; balloon1_target = 8;
+  document.getElementById('g1-count').textContent = '0';
+  document.getElementById('g1-fill').style.width = '0%';
+  var stage = document.getElementById('stage-1');
+  stage.innerHTML = '';
+  speak(document.getElementById('b1-bubble').textContent);
+  balloon1_interval = setInterval(function(){
+    var onScreen = stage.querySelectorAll('.balloon').length;
+    if(onScreen < 5) spawnBalloon(stage);
+  }, 900);
+  activeTimers.push(balloon1_interval);
+  spawnBalloon(stage); spawnBalloon(stage);
+}
+function spawnBalloon(stage){
+  var el = document.createElement('div');
+  el.className = 'balloon';
+  var color = BALLOON_COLORS[Math.floor(Math.random()*BALLOON_COLORS.length)];
+  el.style.background = 'radial-gradient(circle at 35% 30%, #fff8, '+color+')';
+  var left = 6 + Math.random()*80;
+  el.style.left = left + '%';
+  el.style.bottom = '-80px';
+  var dur = 6 + Math.random()*3;
+  el.style.transition = 'bottom '+dur+'s linear';
+  stage.appendChild(el);
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){ el.style.bottom = '440px'; });
+  });
+  var removeTimeout = setTimeout(function(){ if(el.parentNode) el.remove(); }, dur*1000+200);
+  activeTimers.push(removeTimeout);
+  el.addEventListener('click', function(ev){
+    if(el.classList.contains('pop')) return;
+    el.classList.add('pop');
+    playPop();
+    var r = el.getBoundingClientRect();
+    burstConfetti(r.left+r.width/2, r.top+r.height/2, 8);
+    balloon1_count++;
+    document.getElementById('g1-count').textContent = balloon1_count;
+    document.getElementById('g1-fill').style.width = Math.min(100,(balloon1_count/balloon1_target)*100)+'%';
+    setTimeout(function(){ if(el.parentNode) el.remove(); }, 250);
+    if(balloon1_count >= balloon1_target){
+      clearInterval(balloon1_interval);
+      setTimeout(function(){ completeActivity(1,'Σκάσε τα μπαλόνια 🎈'); }, 400);
+    }
+  });
+}
+
+/* =========================================================
+   2. CHESTS — double click
+   ========================================================= */
+function initChests(){
+  document.getElementById('g2-count').textContent='0';
+  document.getElementById('g2-fill').style.width='0%';
+  speak(document.getElementById('b2-bubble').textContent);
+  var grid = document.getElementById('chest-grid');
+  grid.innerHTML='';
+  var opened = 0;
+  for(var i=0;i<6;i++){
+    var c = document.createElement('div');
+    c.className='chest';
+    c.innerHTML = '<div class="hint">🖱️🖱️</div><div class="prize">⭐</div><div class="lid"></div><div class="lock"></div><div class="body"></div>';
+    grid.appendChild(c);
+    (function(c){
+      c.addEventListener('click', function(){
+        if(c.classList.contains('opened')) return;
+        c.classList.add('show-hint');
+        var lid = c.querySelector('.lid');
+        lid.classList.remove('wiggle'); void lid.offsetWidth; lid.classList.add('wiggle');
+      });
+      c.addEventListener('dblclick', function(){
+        if(c.classList.contains('opened')) return;
+        c.classList.add('opened');
+        playOpen();
+        var r = c.getBoundingClientRect();
+        burstConfetti(r.left+r.width/2, r.top, 10);
+        opened++;
+        document.getElementById('g2-count').textContent = opened;
+        document.getElementById('g2-fill').style.width = Math.min(100,(opened/6)*100)+'%';
+        if(opened>=6){
+          setTimeout(function(){ completeActivity(2,'Άνοιξε τα κουτιά 🎁'); }, 400);
+        }
+      });
+    })(c);
+  }
+}
+
+/* =========================================================
+   3. HOT-AIR BALLOON — scroll wheel
+   ========================================================= */
+var altitude1 = 0;
+function initLift(){
+  altitude1 = 0;
+  document.getElementById('alt-val').textContent='0';
+  document.getElementById('hotballoon').style.bottom='56px';
+  document.getElementById('scroll-hint').style.opacity='0.9';
+  speak(document.getElementById('b3-bubble').textContent);
+  var stage = document.getElementById('stage-3');
+  var handler = function(e){
+    e.preventDefault();
+    var delta = e.deltaY < 0 ? 4 : -3;
+    altitude1 = Math.max(0, Math.min(100, altitude1 + delta));
+    updateLift(1, altitude1);
+    if(altitude1 > 5) document.getElementById('scroll-hint').style.opacity='0';
+    if(altitude1 >= 100){
+      stage.removeEventListener('wheel', handler);
+      playWhoosh();
+      setTimeout(function(){ completeActivity(3,'Πέταξε το αερόστατο ψηλά 🎈🔥'); }, 350);
+    }
+  };
+  stage.addEventListener('wheel', handler, {passive:false});
+  stage._wheelHandler = handler;
+}
+function updateLift(which, val){
+  var suffix = which===1 ? '' : '2';
+  var balloonEl = document.getElementById(which===1?'hotballoon':'hotballoon2');
+  var altEl = document.getElementById(which===1?'alt-val':'alt-val2');
+  balloonEl.style.bottom = (56 + val*3.1) + 'px';
+  altEl.textContent = Math.round(val);
+}
+
+/* =========================================================
+   4. GARDEN COMBO — bubbles (click) + buds (double click)
+   ========================================================= */
+var garden_progress = 0, garden_target = 10, garden_interval=null;
+function initGarden(){
+  garden_progress = 0;
+  document.getElementById('g4-count').textContent='0';
+  document.getElementById('g4-fill').style.width='0%';
+  speak(document.getElementById('b4-bubble').textContent);
+  var stage = document.getElementById('stage-4');
+  Array.from(stage.querySelectorAll('.bubble,.bud')).forEach(function(el){el.remove();});
+  garden_interval = setInterval(function(){
+    var count = stage.querySelectorAll('.bubble,.bud').length;
+    if(count < 6){
+      if(Math.random() < 0.55) spawnBubble(stage); else spawnBud(stage);
+    }
+  }, 1000);
+  activeTimers.push(garden_interval);
+  spawnBubble(stage); spawnBud(stage);
+}
+function gardenTick(){
+  garden_progress++;
+  document.getElementById('g4-count').textContent = garden_progress;
+  document.getElementById('g4-fill').style.width = Math.min(100,(garden_progress/garden_target)*100)+'%';
+  if(garden_progress >= garden_target){
+    clearInterval(garden_interval);
+    setTimeout(function(){ completeActivity(4,'Ο κήπος με τις εκπλήξεις 🌷'); }, 400);
+  }
+}
+function spawnBubble(stage){
+  var el = document.createElement('div');
+  el.className='bubble';
+  var size = 40+Math.random()*30;
+  el.style.width = size+'px'; el.style.height = size+'px';
+  el.style.left = (8+Math.random()*80)+'%';
+  el.style.top = (10+Math.random()*55)+'%';
+  stage.appendChild(el);
+  el.addEventListener('click', function(){
+    if(el._done) return; el._done = true;
+    playPop();
+    var r = el.getBoundingClientRect();
+    burstConfetti(r.left+r.width/2, r.top+r.height/2, 6);
+    el.animate([{transform:'scale(1)',opacity:1},{transform:'scale(1.6)',opacity:0}], {duration:220});
+    setTimeout(function(){ el.remove(); }, 200);
+    gardenTick();
+  });
+  var t = setTimeout(function(){ if(el.parentNode && !el._done) el.remove(); }, 6000);
+  activeTimers.push(t);
+}
+var BUD_EMOJI = '🌱';
+function spawnBud(stage){
+  var el = document.createElement('div');
+  el.className='bud';
+  el.textContent = BUD_EMOJI;
+  el.style.left = (8+Math.random()*82)+'%';
+  stage.appendChild(el);
+  el.addEventListener('click', function(){
+    el.animate([{transform:'scale(1)'},{transform:'scale(0.85)'},{transform:'scale(1)'}], {duration:200});
+  });
+  el.addEventListener('dblclick', function(){
+    if(el._done) return; el._done = true;
+    el.textContent = '🌸';
+    el.classList.add('bloomed');
+    playOpen();
+    var r = el.getBoundingClientRect();
+    burstConfetti(r.left+r.width/2, r.top, 8);
+    gardenTick();
+    setTimeout(function(){ if(el.parentNode) el.remove(); }, 1400);
+  });
+  var t = setTimeout(function(){ if(el.parentNode && !el._done) el.remove(); }, 7000);
+  activeTimers.push(t);
+}
+
+/* =========================================================
+   6. FINALE — 3 stages combining all skills
+   ========================================================= */
+var finale_stars_lit = 0;
+var finale_altitude = 0;
+function initFinale(){
+  finale_stars_lit = 0; finale_altitude = 0;
+  document.getElementById('panel-1').classList.add('on');
+  document.getElementById('panel-2').classList.remove('on');
+  document.getElementById('panel-3').classList.remove('on');
+  document.getElementById('dot1').classList.add('on');
+  document.getElementById('dot2').classList.remove('on');
+  document.getElementById('dot3').classList.remove('on');
+  document.getElementById('finale-door').classList.remove('opened');
+  speak(document.getElementById('b5-bubble').textContent);
+  var panel1 = document.getElementById('panel-1');
+  Array.from(panel1.querySelectorAll('.star-target')).forEach(function(s){s.remove();});
+  var spots = [ {left:'15%',top:'30%'}, {left:'48%',top:'15%'}, {left:'78%',top:'38%'} ];
+  spots.forEach(function(pos,i){
+    var s = document.createElement('div');
+    s.className='star-target';
+    s.textContent='⭐';
+    s.style.left = pos.left; s.style.top = pos.top;
+    s.addEventListener('click', function(){
+      if(s.classList.contains('lit')) return;
+      s.classList.add('lit');
+      playPop();
+      var r = s.getBoundingClientRect();
+      burstConfetti(r.left+r.width/2, r.top+r.height/2, 6);
+      finale_stars_lit++;
+      if(finale_stars_lit>=3){
+        setTimeout(function(){ finaleGoStage(2); }, 500);
+      }
+    });
+    panel1.appendChild(s);
+  });
+}
+function finaleGoStage(n){
+  document.querySelectorAll('.stagepanel').forEach(function(p){p.classList.remove('on');});
+  document.getElementById('panel-'+n).classList.add('on');
+  document.getElementById('dot1').classList.toggle('on', n>=1);
+  document.getElementById('dot2').classList.toggle('on', n>=2);
+  document.getElementById('dot3').classList.toggle('on', n>=3);
+  if(n===2) speak('Τώρα κάνε διπλό κλικ στην πόρτα για να ανοίξει!');
+  if(n===3){
+    speak('Τέλος! Γύρνα τη ροδέλα για να πετάξει ψηλά το αερόστατο!');
+    finale_altitude = 0;
+    document.getElementById('alt-val2').textContent='0';
+    document.getElementById('hotballoon2').style.bottom='56px';
+    var panel3 = document.getElementById('panel-3');
+    var handler = function(e){
+      e.preventDefault();
+      var delta = e.deltaY < 0 ? 4 : -3;
+      finale_altitude = Math.max(0, Math.min(100, finale_altitude + delta));
+      updateLift(2, finale_altitude);
+      if(finale_altitude > 5) document.getElementById('scroll-hint2').style.opacity='0';
+      if(finale_altitude >= 100){
+        panel3.removeEventListener('wheel', handler);
+        playWhoosh();
+        setTimeout(finaleFinish, 400);
+      }
+    };
+    panel3.addEventListener('wheel', handler, {passive:false});
+    panel3._wheelHandler = handler;
+  }
+}
+function finaleOpenDoor(){
+  var door = document.getElementById('finale-door');
+  if(door.classList.contains('opened')) return;
+  door.classList.add('opened');
+  playOpen();
+  var r = door.getBoundingClientRect();
+  burstConfetti(r.left+r.width/2, r.top+40, 10);
+  setTimeout(function(){ finaleGoStage(3); }, 500);
+}
+function finaleFinish(){
+  PROGRESS[5] = true;
+  saveProgress();
+  playChime();
+  fullScreenConfetti();
+  var msg = 'Μπράβο σου! Έμαθες να κρατάς και να χρησιμοποιείς σωστά το ποντίκι!';
+  speak(msg);
+  openModal('🏆','Τα κατάφερες!', msg);
+}
+
+/* doubleclick note: chest single click listener also fires before dblclick;
+   browsers fire click, click, dblclick in sequence — handled independently above */
+
+/* init */
+refreshHome();
+</script>
+</body>
+</html>
