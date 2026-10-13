@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 20: Παιχνίδια με τον Δείκτη!</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comfortaa:wght@700&display=swap');
+
+    :root {
+      --primary: #9C27B0;
+      --accent-pink: #FF4081;
+      --accent-yellow: #FFD54F;
+      --accent-green: #00E676;
+      --accent-blue: #00B0FF;
+      --bg-color: #FFF9C4;
+      --card-bg: #FFFFFF;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Comfortaa', 'Fredoka One', cursive, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #FFF9C4 0%, #FFCCBC 50%, #E1BEE7 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+
+    /* Score Bar */
+    .top-bar {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 10px 24px;
+      border-radius: 50px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      margin-bottom: 14px;
+      border: 3px solid #FFCA28;
+    }
+
+    .stars-counter {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #E65100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1 {
+      color: #D81B60;
+      font-size: 2.1rem;
+      margin: 0;
+      text-shadow: 2px 2px #FFE082;
+    }
+
+    /* Tabs Navigation */
+    .tabs-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-width: 900px;
+      margin-bottom: 14px;
+      justify-content: center;
+    }
+
+    .tab-btn {
+      background: white;
+      border: 3px solid #AB47BC;
+      color: #6A1B9A;
+      padding: 10px 14px;
+      border-radius: 25px;
+      font-size: 0.95rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .tab-btn:hover {
+      transform: scale(1.08) rotate(-2deg);
+      background: #F3E5F5;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(45deg, #EC407A, #AB47BC);
+      color: white;
+      border-color: white;
+      transform: scale(1.08);
+      box-shadow: 0 6px 12px rgba(236,64,122,0.3);
+    }
+
+    /* Main Activity Card */
+    .game-card {
+      background: white;
+      border: 5px solid #FF80AB;
+      border-radius: 35px;
+      padding: 24px;
+      width: 100%;
+      max-width: 900px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    .header-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px dashed #F8BBD0;
+      padding-bottom: 14px;
+    }
+
+    .act-title {
+      color: #C2185B;
+      font-size: 1.7rem;
+      font-weight: 900;
+      margin: 0 0 4px 0;
+    }
+
+    .act-desc {
+      font-size: 1.2rem;
+      color: #4A148C;
+      margin: 0;
+      font-weight: bold;
+    }
+
+    .speaker-btn {
+      background: #FFE082;
+      border: 3px solid #FFA000;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      font-size: 1.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      transition: transform 0.2s;
+    }
+
+    .speaker-btn:hover {
+      transform: scale(1.15) rotate(10deg);
+    }
+
+    /* Play Area */
+    .play-zone {
+      margin-top: 18px;
+      background: radial-gradient(circle, #FAFAFA 0%, #F3E5F5 100%);
+      border: 4px dashed #CE93D8;
+      border-radius: 28px;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Items / Targets */
+    .play-item {
+      font-size: 3.6rem;
+      cursor: pointer;
+      margin: 12px;
+      display: inline-block;
+      transition: transform 0.2s, filter 0.2s;
+    }
+
+    .play-item:hover {
+      transform: scale(1.3) rotate(8deg);
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.2));
+    }
+
+    .magic-target {
+      width: 95px;
+      height: 95px;
+      border-radius: 50%;
+      background: #FFE082;
+      border: 4px solid #FFA000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      cursor: pointer;
+      animation: bounce 1.8s infinite;
+      box-shadow: 0 8px 18px rgba(255, 160, 0, 0.4);
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .feedback-banner {
+      min-height: 44px;
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #2E7D32;
+      text-align: center;
+      margin-top: 14px;
+      text-shadow: 1px 1px white;
+    }
+
+    .choice-card {
+      border: 4px solid #81D4FA;
+      background: white;
+      border-radius: 22px;
+      padding: 16px 26px;
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #0277BD;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+      margin: 10px;
+    }
+
+    .choice-card:hover {
+      transform: scale(1.1) translateY(-4px);
+      background: #E1F5FE;
+      border-color: #0288D1;
+    }
+
+    /* Canvas Confetti */
+    #confettiCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Μπάρα Πόντων και Τίτλος -->
+  <div class="top-bar">
+    <h1>🎮 Παιχνιδο-Δείκτης!</h1>
+    <div class="stars-counter">
+      <span>Αστέρια:</span>
+      <span id="starScore">⭐ 0</span>
+    </div>
+  </div>
+
+  <!-- Κουμπιά Επιπέδων (Tabs) -->
+  <div class="tabs-nav">
+    <button class="tab-btn active" onclick="loadActivity(1)">1. Αριστερά ⬅️</button>
+    <button class="tab-btn" onclick="loadActivity(2)">2. Δεξιά ➡️</button>
+    <button class="tab-btn" onclick="loadActivity(3)">3. Πάνω ⬆️</button>
+    <button class="tab-btn" onclick="loadActivity(4)">4. Κάτω ⬇️</button>
+    <button class="tab-btn" onclick="loadActivity(5)">5. Μαγικές Φράουλες 🍓</button>
+    <button class="tab-btn" onclick="loadActivity(6)">6. Πυροσβέστης! 🔥</button>
+    <button class="tab-btn" onclick="loadActivity(7)">7. Μάζεψε Μήλα 🍏</button>
+    <button class="tab-btn" onclick="loadActivity(8)">8. Χωρίς Ποντίκι 📱</button>
+  </div>
+
+  <!-- Κεντρική Κάρτα Παιχνιδιού -->
+  <div class="game-card">
+    <canvas id="confettiCanvas"></canvas>
+    <div class="header-box">
+      <div>
+        <div id="actTitle" class="act-title">Τίτλος</div>
+        <p id="actDesc" class="act-desc">Οδηγία</p>
+      </div>
+      <button class="speaker-btn" onclick="speakText()" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+
+    <div id="playZone" class="play-zone"></div>
+    <div id="feedbackText" class="feedback-banner"></div>
+  </div>
+
+  <script>
+    // Ήχοι με Web Audio API (χωρίς ανάγκη εξωτερικών αρχείων)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playBeep(freq = 600, duration = 0.1) {
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function playWinSound() {
+      playBeep(523, 0.1);
+      setTimeout(() => playBeep(659, 0.1), 100);
+      setTimeout(() => playBeep(784, 0.1), 200);
+      setTimeout(() => playBeep(1046, 0.3), 300);
+    }
+
+    let starsCount = 0;
+    function addStar() {
+      starsCount++;
+      document.getElementById('starScore').innerText = `⭐ ${starsCount}`;
+      triggerConfetti();
+      playWinSound();
+    }
+
+    // Εφέ Κομφετί
+    function triggerConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      
+      const confetti = Array.from({length: 45}, () => ({
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        vx: (Math.random() - 0.5) * 12,
+        vy: (Math.random() - 0.5) * 12 - 4,
+        size: Math.random() * 8 + 6,
+        color: ['#FF1744', '#FFEA00', '#00E676', '#00B0FF', '#D500F9'][Math.floor(Math.random() * 5)]
+      }));
+
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confetti.forEach(c => {
+          c.x += c.vx;
+          c.y += c.vy;
+          c.vy += 0.25; // gravity
+          ctx.fillStyle = c.color;
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, c.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        frame++;
+        if (frame < 55) requestAnimationFrame(animate);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      animate();
+    }
+
+    // 8 Δραστηριότητες
+    const activities = {
+      1: {
+        title: "1. Ταξίδι Αριστερά! ⬅️",
+        desc: "Κούνα το ποντίκι ΑΡΙΣΤΕΡΑ για να πιάσεις το μαγικό αστέρι!",
+        speech: "Κούνα το ποντίκι σου προς τα αριστερά και άγγιξε το αστέρι!",
+        render: () => `
+          <div style="display: flex; align-items: center; justify-content: space-around; width: 80%;">
+            <div class="magic-target" onmouseenter="finishAct('🌟 ΓΙΟΥΠΙΙΙ! Ο δείκτης πήγε αριστερά!')">⭐</div>
+            <div style="font-size: 2.5rem; animation: pulse 1s infinite;">⬅️ ⬅️</div>
+            <div style="font-size: 3.5rem;">🐭</div>
+          </div>
+        `
+      },
+      2: {
+        title: "2. Ταξίδι Δεξιά! ➡️",
+        desc: "Κούνα το ποντίκι ΔΕΞΙΑ για να ανοίξεις το δώρο!",
+        speech: "Κούνα το ποντίκι σου προς τα δεξιά και φτάσε στο δώρο!",
+        render: () => `
+          <div style="display: flex; align-items: center; justify-content: space-around; width: 80%;">
+            <div style="font-size: 3.5rem;">🐭</div>
+            <div style="font-size: 2.5rem;">➡️ ➡️</div>
+            <div class="magic-target" onmouseenter="finishAct('🎁 ΤΕΛΕΙΑ! Έφτασες στο δώρο!')">🎁</div>
+          </div>
+        `
+      },
+      3: {
+        title: "3. Πέτα ψηλά! ⬆️",
+        desc: "Κούνα το ποντίκι ΠΑΝΩ για να πιάσεις το μπαλόνι στον αέρα!",
+        speech: "Κούνα το ποντίκι σου προς τα πάνω και πέτα ψηλά με το μπαλόνι!",
+        render: () => `
+          <div style="display:flex; flex-direction:column; align-items:center; gap: 14px;">
+            <div class="magic-target" onmouseenter="finishAct('🎈 ΜΠΡΑΒΟ! Πέταξες ψηλά!')">🎈</div>
+            <div style="font-size: 2.2rem;">⬆️</div>
+            <div style="font-size: 3.5rem;">🐭</div>
+          </div>
+        `
+      },
+      4: {
+        title: "4. Βουτιά κάτω! ⬇️",
+        desc: "Κούνα το ποντίκι ΚΑΤΩ για να ταΐσεις το λαγουδάκι ένα καρότο!",
+        speech: "Κούνα το ποντίκι προς τα κάτω για να βρεις το λαχταριστό καρότο!",
+        render: () => `
+          <div style="display:flex; flex-direction:column; align-items:center; gap: 14px;">
+            <div style="font-size: 3.5rem;">🐰</div>
+            <div style="font-size: 2.2rem;">⬇️</div>
+            <div class="magic-target" onmouseenter="finishAct('🥕 ΝΑΜ-ΝΑΜ! Βρήκες το καρότο!')">🥕</div>
+          </div>
+        `
+      },
+      5: {
+        title: "5. Μαγικές Φράουλες (Μόνο πέρασμα!) 🍓",
+        desc: "Πέρνα τον δείκτη πάνω από τις φράουλες ΧΩΡΙΣ ΚΛΙΚ για να γίνουν διαμάντια!",
+        speech: "Πέρνα απαλά πάνω από όλες τις φράουλες χωρίς να κάνεις κλικ!",
+        render: () => {
+          window.needed5 = 4;
+          return `
+            <div style="font-size: 1.2rem; margin-bottom: 12px; font-weight:bold; color: #880E4F;">Άγγιξε και τις 4 φράουλες με το βελάκι:</div>
+            <div>
+              <span class="play-item" onmouseenter="turnBerry(this)">🍓</span>
+              <span class="play-item" onmouseenter="turnBerry(this)">🍓</span>
+              <span class="play-item" onmouseenter="turnBerry(this)">🍓</span>
+              <span class="play-item" onmouseenter="turnBerry(this)">🍓</span>
+            </div>
+          `;
+        }
+      },
+      6: {
+        title: "6. Γίνε Πυροσβέστης! 🔥🚒",
+        desc: "Σβήσε τις φωτιές περνώντας γρήγορα τον δείκτη από πάνω τους!",
+        speech: "Γίνε πυροσβέστης! Πέρνα τον δείκτη πάνω από τις φωτιές για να τις σβήσεις!",
+        render: () => {
+          window.needed6 = 4;
+          return `
+            <div style="font-size: 1.2rem; margin-bottom: 12px; font-weight:bold; color:#E65100;">Ρίξε νερό με τον δείκτη σου:</div>
+            <div>
+              <span class="play-item" onmouseenter="putOutFire(this)">🔥</span>
+              <span class="play-item" onmouseenter="putOutFire(this)">🔥</span>
+              <span class="play-item" onmouseenter="putOutFire(this)">🔥</span>
+              <span class="play-item" onmouseenter="putOutFire(this)">🔥</span>
+            </div>
+          `;
+        }
+      },
+      7: {
+        title: "7. Μάζεψε τα Φρούτα στο Καλάθι! 🍏",
+        desc: "Πέρνα το βελάκι πάνω από τα μήλα για να τα μαζέψεις όλα!",
+        speech: "Μάζεψε όλα τα πράσινα μήλα για τη μηλόπιτα!",
+        render: () => {
+          window.needed7 = 4;
+          return `
+            <div style="font-size: 1.2rem; margin-bottom: 12px; font-weight:bold; color: #1B5E20;">Πέρνα πάνω από όλα τα μήλα:</div>
+            <div>
+              <span class="play-item" onmouseenter="pickApple(this)">🍏</span>
+              <span class="play-item" onmouseenter="pickApple(this)">🍏</span>
+              <span class="play-item" onmouseenter="pickApple(this)">🍏</span>
+              <span class="play-item" onmouseenter="pickApple(this)">🍏</span>
+            </div>
+          `;
+        }
+      },
+      8: {
+        title: "8. Μυστήριο: Ποιος δεν έχει ποντίκι; 🕵️",
+        desc: "Ποια συσκευή ΔΕΝ έχει ποντίκι γιατί την αγγίζουμε με το δαχτυλάκι μας;",
+        speech: "Ποια συσκευή λειτουργεί με το δάχτυλό μας στην οθόνη και δεν χρειάζεται ποντίκι;",
+        render: () => `
+          <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+            <div class="choice-card" onclick="checkFinal(true)">
+              📱 <br>Έξυπνο Κινητό
+            </div>
+            <div class="choice-card" onclick="checkFinal(false)">
+              🖥️ <br>Μεγάλος Υπολογιστής
+            </div>
+            <div class="choice-card" onclick="checkFinal(true)">
+              📲 <br>Ταμπλέτα (Tablet)
+            </div>
+          </div>
+        `
+      }
+    };
+
+    let curAct = 1;
+
+    function loadActivity(id) {
+      curAct = id;
+      document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx + 1 === id);
+      });
+
+      const act = activities[id];
+      document.getElementById('actTitle').innerText = act.title;
+      document.getElementById('actDesc').innerText = act.desc;
+      document.getElementById('feedbackText').innerText = "";
+      document.getElementById('playZone').innerHTML = act.render();
+    }
+
+    function speakText() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(activities[curAct].speech);
+        msg.lang = 'el-GR';
+        msg.rate = 0.9;
+        window.speechSynthesis.speak(msg);
+      }
+    }
+
+    function finishAct(msg) {
+      playWinSound();
+      addStar();
+      document.getElementById('feedbackText').innerText = msg;
+    }
+
+    function turnBerry(el) {
+      if (!el.dataset.done) {
+        el.dataset.done = "1";
+        el.innerText = "💎";
+        playBeep(800, 0.08);
+        window.needed5--;
+        if (window.needed5 === 0) finishAct("💎✨ ΟΥΑΟΥ! Όλες οι φράουλες έγιναν διαμάντια!");
+      }
+    }
+
+    function putOutFire(el) {
+      if (!el.dataset.done) {
+        el.dataset.done = "1";
+        el.innerText = "💦";
+        playBeep(450, 0.08);
+        window.needed6--;
+        if (window.needed6 === 0) finishAct("🚒💦 ΜΠΡΑΒΟ ΠΥΡΟΣΒΕΣΤΗ! Τις έσβησες όλες!");
+      }
+    }
+
+    function pickApple(el) {
+      if (!el.dataset.done) {
+        el.dataset.done = "1";
+        el.innerText = "🧺";
+        playBeep(700, 0.08);
+        window.needed7--;
+        if (window.needed7 === 0) finishAct("🍎🧺 ΤΕΛΕΙΑ! Το καλάθι γέμισε με μήλα!");
+      }
+    }
+
+    function checkFinal(ok) {
+      if (ok) {
+        finishAct("🎉 ΣΩΣΤΑ! Στην οθόνη αφής πατάμε με το δάχτυλο!");
+      } else {
+        playBeep(250, 0.15);
+        document.getElementById('feedbackText').innerText = "❌ Ο μεγάλος υπολογιστής θέλει ποντίκι! Δοκίμασε άλλη συσκευή!";
+      }
+    }
+
+    window.onload = () => loadActivity(1);
+  </script>
+</body>
+</html>
