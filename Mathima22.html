@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Δεξί κλικ, ροδέλα και σύρε με τον Ήρωνα</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF7E8; --ink:#2B2250; --sky:#5EC4FF; --sun:#FFC93C; --coral:#FF6B6B;
+    --mint:#1FC9A3; --purple:#8B5CF6; --pink:#FF8FB1;
+    --card-shadow: 0 10px 0 rgba(43,34,80,0.12), 0 16px 24px rgba(43,34,80,0.10);
+    --btn-shadow: 0 6px 0 rgba(43,34,80,0.25);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Baloo 2', system-ui, sans-serif;
+    background:
+      radial-gradient(circle at 12% 8%, #fff 0, transparent 40%),
+      radial-gradient(circle at 90% 85%, #ffe9c7 0, transparent 45%),
+      var(--cream);
+    color:var(--ink); min-height:100vh; -webkit-font-smoothing:antialiased;
+  }
+  #app{max-width:1040px; margin:0 auto; padding:18px 18px 60px;}
+
+  .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px;}
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-badge{
+    width:52px;height:52px;border-radius:50%; background:linear-gradient(160deg,var(--sun),#FF9F43);
+    display:flex;align-items:center;justify-content:center; font-size:26px; box-shadow: var(--card-shadow); flex:none;
+  }
+  .brand h1{font-size:1.25rem; margin:0; font-weight:800; line-height:1.15;}
+  .brand small{display:block;font-weight:600;color:#6b5f9e;font-size:.85rem;}
+  .home-btn{
+    border:none; cursor:pointer; font-family:inherit; font-weight:700; background:var(--purple); color:#fff;
+    padding:10px 18px; border-radius:16px; font-size:1rem; box-shadow:var(--btn-shadow); display:flex; align-items:center; gap:8px;
+  }
+  .home-btn:active{transform:translateY(4px); box-shadow:0 2px 0 rgba(43,34,80,0.25);}
+
+  .mascot{position:relative; width:60px;height:60px; flex:none;}
+  .mascot .face{width:60px;height:60px;border-radius:50%; background:radial-gradient(circle at 35% 30%, #fff, #E9E1FF 60%, #C9B8FF 100%); border:3px solid var(--purple); position:relative;}
+  .mascot .ear{position:absolute; width:20px;height:20px;border-radius:50%; background:#C9B8FF; border:3px solid var(--purple); top:-13px;}
+  .mascot .ear.l{left:-4px;} .mascot .ear.r{right:-4px;}
+  .mascot .eye{position:absolute; width:7px;height:9px;border-radius:50%; background:var(--ink); top:24px;}
+  .mascot .eye.l{left:15px;} .mascot .eye.r{right:15px;}
+  .mascot .mouth{position:absolute; width:14px;height:7px; border-radius:0 0 14px 14px; border:3px solid var(--ink); border-top:none; left:22px; top:35px;}
+
+  .speech-row{display:flex; align-items:flex-start; gap:12px; margin:6px 0 16px;}
+  .bubble{background:#fff; border-radius:18px; padding:12px 16px; box-shadow:var(--card-shadow); font-weight:600; font-size:1.02rem; position:relative; flex:1;}
+  .bubble:before{content:""; position:absolute; left:-9px; top:18px; width:0;height:0; border-top:9px solid transparent; border-bottom:9px solid transparent; border-right:9px solid #fff;}
+  .speaker-btn{border:none; background:var(--mint); color:#fff; border-radius:50%; width:38px;height:38px; font-size:1.05rem; cursor:pointer; box-shadow:var(--btn-shadow); flex:none;}
+  .speaker-btn:active{transform:translateY(4px); box-shadow:none;}
+
+  .screen{display:none;}
+  .screen.active{display:block; animation:fadein .3s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+  @media(max-width:860px){.grid{grid-template-columns:repeat(2,1fr);}}
+  .card{
+    background:#fff; border-radius:22px; padding:16px 10px 14px; text-align:center; box-shadow:var(--card-shadow);
+    border:none; cursor:pointer; font-family:inherit; display:flex; flex-direction:column; align-items:center; gap:6px;
+    position:relative; transition:transform .15s ease;
+  }
+  .card:active{transform:translateY(4px);}
+  .card .icon{width:66px;height:66px;border-radius:50%; display:flex;align-items:center;justify-content:center; font-size:1.9rem; box-shadow: inset 0 -6px 0 rgba(0,0,0,0.08);}
+  .card .label{font-weight:800; font-size:.9rem; color:var(--ink); line-height:1.15;}
+  .card .sub{font-size:.7rem; font-weight:700; color:#8a7fb8;}
+  .mini-dots{display:flex; gap:5px; margin-top:2px;}
+  .mini-dots span{width:9px;height:9px;border-radius:50%; background:#e4dcff;}
+  .mini-dots span.done{background:var(--mint);}
+  .g1 .icon{background:#FFE9CE;} .g2 .icon{background:#FFE3E3;} .g3 .icon{background:#E3F6FF;} .g4 .icon{background:#E4F9F0;}
+  .g5 .icon{background:#F3E8FF;} .g6 .icon{background:#FFF0F5;} .g7 .icon{background:#FFF3D0;} .g8 .icon{background:#E8F0FF;}
+
+  .progress-shelf{margin-top:20px; background:#fff; border-radius:22px; padding:14px 18px; box-shadow:var(--card-shadow); display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .progress-shelf .ptitle{font-weight:800; margin-right:4px;}
+  .progress-shelf .pbadge{width:36px;height:36px;border-radius:50%; display:flex;align-items:center;justify-content:center; background:#f1eefc; font-size:1.1rem; filter:grayscale(1); opacity:.4;}
+  .progress-shelf .pbadge.done{filter:none; opacity:1; background:linear-gradient(160deg,#FFEFC2,var(--sun));}
+
+  .activity-head{display:flex; align-items:center; gap:12px; margin-bottom:4px;}
+  .activity-head .a-icon{width:54px;height:54px;border-radius:18px; display:flex;align-items:center;justify-content:center; font-size:1.6rem; box-shadow:var(--card-shadow); flex:none;}
+  .activity-head h2{margin:0; font-size:1.15rem; font-weight:800;}
+
+  .level-row{display:flex; align-items:center; gap:10px; margin:8px 0 12px;}
+  .level-dot{width:38px;height:38px;border-radius:50%; background:#eee5ff; border:none; cursor:pointer; font-weight:800; color:#8a7fb8; box-shadow:var(--btn-shadow); font-family:inherit; font-size:.95rem;}
+  .level-dot:active{transform:translateY(3px); box-shadow:none;}
+  .level-dot.current{background:var(--sun); color:#fff;}
+  .level-dot.done{background:var(--mint); color:#fff;}
+  .level-dot.locked{background:#e4dcff; color:#b4a8e0; cursor:not-allowed;}
+  .goal-row{display:flex; align-items:center; gap:10px; margin:2px 0 12px; font-weight:700; color:#6b5f9e;}
+  .goal-bar{flex:1; height:14px; background:#eee5ff; border-radius:10px; overflow:hidden;}
+  .goal-fill{height:100%; background:linear-gradient(90deg,var(--mint),#33e0b0); width:0%; transition:width .3s ease;}
+
+  .stage{position:relative; border-radius:26px; height:400px; overflow:hidden; box-shadow:var(--card-shadow); user-select:none; -webkit-user-select:none;}
+  .stage-menu{background:linear-gradient(180deg,#FFE3CE 0%, #FFF3E6 100%);}
+  .stage-reveal{background:linear-gradient(180deg,#FFD9D9 0%, #FFF0F0 100%);}
+  .stage-scrollpage{background:linear-gradient(180deg,#8FDBFF 0%, #cdeeff 100%);}
+  .stage-climb{background:linear-gradient(180deg,#B7F0D6 0%, #E9FFEF 60%, #FFF8DE 100%);}
+  .stage-puzzle{background:linear-gradient(180deg,#E8DBFF 0%, #F6EEFF 100%);}
+  .stage-mosaic{background:linear-gradient(180deg,#FFE6EF 0%, #FFF1F6 100%);}
+  .stage-sort{background:linear-gradient(180deg,#FFF3D0 0%, #FFFAEA 100%);}
+  .stage-final{background:linear-gradient(180deg,#7EC8FF 0%, #FFE7A6 100%);}
+  .ground{position:absolute; bottom:0; left:0; right:0; height:40px; background:#8CC98B; border-top:6px solid #6FAE6E;}
+
+  /* right-click reveal */
+  .reveal-item{position:absolute; cursor:context-menu; text-align:center;}
+  .reveal-item .cover{font-size:2.6rem; transition:transform .25s, opacity .25s;}
+  .reveal-item .prize{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:2.2rem; opacity:0; transform:scale(.4); transition:opacity .25s, transform .25s;}
+  .reveal-item.opened .cover{transform:scale(0); opacity:0;}
+  .reveal-item.opened .prize{opacity:1; transform:scale(1);}
+  .reveal-item.decoy{cursor:default;}
+  .reveal-item .rc-hint{position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-size:1rem; opacity:0; transition:opacity .2s;}
+  .reveal-item.show-rc .rc-hint{opacity:1;}
+  .shake-anim{animation:shake .3s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+
+  /* right-click context menu */
+  .rc-menu{position:absolute; background:#fff; border-radius:14px; box-shadow:0 10px 24px rgba(0,0,0,.25); padding:6px; display:flex; flex-direction:column; gap:4px; z-index:30;}
+  .rc-menu button{
+    border:none; background:#f4f1ff; border-radius:10px; padding:8px 14px; font-family:inherit; font-size:1.3rem;
+    cursor:pointer; display:flex; align-items:center; gap:8px; font-weight:700;
+  }
+  .rc-menu button.target-glow{animation:glowPulse 1s ease-in-out infinite;}
+  @keyframes glowPulse{0%,100%{background:#f4f1ff;}50%{background:#FFE9A8;}}
+  .rc-target-hint{position:absolute; top:10px; left:50%; transform:translateX(-50%); background:#fff; padding:8px 16px; border-radius:14px; font-weight:800; box-shadow:var(--card-shadow);}
+
+  /* scroll page */
+  .scroll-viewport{position:absolute; inset:0; overflow:hidden;}
+  .scroll-content{position:absolute; left:0; right:0; top:0; will-change:transform;}
+  .scroll-sticker{position:absolute; font-size:2.4rem; cursor:pointer; filter:drop-shadow(0 4px 4px rgba(0,0,0,.15));}
+  .scroll-sticker.got{animation:popAnim .3s ease forwards;}
+  @keyframes popAnim{to{transform:scale(1.6); opacity:0;}}
+  .scroll-track{position:absolute; right:10px; top:14px; bottom:14px; width:8px; background:rgba(0,0,0,.12); border-radius:6px;}
+  .scroll-thumb{position:absolute; left:0; width:100%; background:var(--purple); border-radius:6px; transition:top .1s linear;}
+  .scroll-hint{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); text-align:center; color:#2b4; font-weight:800; pointer-events:none; opacity:.85;}
+  .scroll-hint .wheel-icon{font-size:2.4rem; animation:bob 1.4s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+
+  /* climb */
+  .lift-track{position:absolute; right:60px; top:20px; bottom:56px; width:10px; background:rgba(255,255,255,.5); border-radius:6px;}
+  .lift-track .flag{position:absolute; top:-8px; left:-14px; font-size:1.8rem;}
+  .climber{position:absolute; left:50%; transform:translateX(-50%); bottom:56px; font-size:3.6rem; transition:bottom .15s linear; filter:drop-shadow(0 8px 6px rgba(0,0,0,.15));}
+  .altitude-badge{position:absolute; top:14px; left:14px; background:#fff; padding:8px 14px; border-radius:14px; font-weight:800; box-shadow:var(--card-shadow);}
+  .waypoint-caption{position:absolute; top:14px; left:50%; transform:translateX(-50%); background:#fff; padding:8px 16px; border-radius:14px; font-weight:800; box-shadow:var(--card-shadow); white-space:nowrap;}
+  .banana{position:absolute; font-size:1.6rem; opacity:.5; transition:opacity .3s, transform .3s;}
+  .banana.collected{opacity:0; transform:scale(1.6);}
+
+  /* drag chips & zones */
+  .match-wrap{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:40px; padding:16px; flex-wrap:wrap;}
+  .chip-rail{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; max-width:220px;}
+  .chip-rail.row{flex-direction:row;}
+  .chip-slot{width:62px; height:62px; display:flex; align-items:center; justify-content:center;}
+  .drag-chip{
+    width:56px;height:56px;border-radius:16px; display:flex; align-items:center; justify-content:center;
+    font-size:1.7rem; background:#fff; box-shadow:var(--btn-shadow); cursor:grab; touch-action:none; user-select:none;
+  }
+  .drag-chip.dragging{z-index:200; cursor:grabbing; box-shadow:0 14px 20px rgba(0,0,0,.25);}
+  .drag-chip.placed{opacity:0; pointer-events:none;}
+  .zones-wrap{display:grid; gap:10px;}
+  .dropzone{
+    width:62px;height:62px;border-radius:16px; background:rgba(255,255,255,.55); border:3px dashed #b4a8e0;
+    display:flex; align-items:center; justify-content:center; font-size:1.6rem; opacity:.65; position:relative;
+  }
+  .dropzone.drag-over{filter:brightness(1.15); border-style:solid; border-color:var(--mint);}
+  .dropzone.matched{opacity:1; border-style:solid; border-color:var(--mint); background:#fff;}
+  .basket{
+    width:90px;height:74px;border-radius:14px 14px 20px 20px; background:#D89B5C; border:3px solid #7a4a1f;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:6px; font-size:1.5rem; position:relative;
+  }
+  .basket .label-emoji{position:absolute; top:-30px; font-size:1.6rem;}
+  .basket .held{font-size:1.1rem; display:flex; gap:2px; flex-wrap:wrap; justify-content:center;}
+
+  /* final */
+  .final-caption{position:absolute; top:12px; left:50%; transform:translateX(-50%); background:#fff; padding:8px 16px; border-radius:14px; font-weight:800; box-shadow:var(--card-shadow); white-space:nowrap; z-index:5;}
+
+  .btn{border:none; cursor:pointer; font-family:inherit; font-weight:800; font-size:1rem; padding:12px 22px; border-radius:16px; box-shadow:var(--btn-shadow); color:#fff;}
+  .btn:active{transform:translateY(4px); box-shadow:none;}
+  .btn.mint{background:var(--mint);} .btn.purple{background:var(--purple);} .btn.coral{background:var(--coral);}
+
+  .overlay{position:fixed; inset:0; background:rgba(43,34,80,0.55); display:none; align-items:center; justify-content:center; z-index:50; padding:20px;}
+  .overlay.show{display:flex;}
+  .modal{background:#fff; border-radius:26px; padding:28px 26px; max-width:420px; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,.25);}
+  .modal .big-emoji{font-size:3.2rem; margin-bottom:6px;}
+  .modal h3{margin:6px 0; font-size:1.3rem;}
+  .modal p{color:#6b5f9e; font-weight:600; margin:6px 0 16px;}
+  .modal-btns{display:flex; gap:10px; justify-content:center;}
+  .confetti-piece{position:fixed; top:0; font-size:1.4rem; pointer-events:none; z-index:60;}
+
+  footer.note{margin-top:28px; text-align:center; font-size:.8rem; color:#a79ccb; font-weight:600;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">🖱️</div>
+      <div><h1>Δεξί κλικ, ροδέλα &amp; σύρε</h1><small>Μάθημα 22ο — με τον Ήρωνα</small></div>
+    </div>
+    <button class="home-btn" onclick="goHome()">🏠 Αρχική</button>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <section class="screen active" id="screen-home">
+    <div class="speech-row">
+      <div class="mascot"><div class="face"><div class="ear l"></div><div class="ear r"></div><div class="eye l"></div><div class="eye r"></div><div class="mouth"></div></div></div>
+      <div class="bubble" id="home-bubble">Γεια σου! Θα μάθουμε το δεξί κλικ, τη ροδέλα κύλισης και το «σύρε». 8 παιχνίδια, 3 επίπεδα το καθένα!</div>
+      <button class="speaker-btn" onclick="speak(document.getElementById('home-bubble').textContent)">🔊</button>
+    </div>
+
+    <div class="grid" id="home-grid"></div>
+
+    <div class="progress-shelf" id="progress-shelf">
+      <span class="ptitle">Η πρόοδός μου:</span>
+    </div>
+    <footer class="note">Χρησιμοποίησε πραγματικό ποντίκι υπολογιστή για την καλύτερη εμπειρία 🙂</footer>
+  </section>
+
+  <div id="activity-screens"></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="big-emoji" id="modal-emoji">🌟</div>
+    <h3 id="modal-title">Μπράβο!</h3>
+    <p id="modal-text">Τα κατάφερες!</p>
+    <div class="modal-btns" id="modal-btns"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   GAME DEFINITIONS
+   ============================================================ */
+var GAMES = [
+  {id:1, title:'Δεξί κλικ — Τι θα διαλέξω;', icon:'🖱️', sub:'Δεξί κλικ', bg:'stage-menu', engine:'menu',
+   bubble:'Κάνε δεξί κλικ σε κάθε φάκελο και διάλεξε μια επιλογή από τη λίστα!',
+   options:['✂️','📋','🗑️','⭐','🔧'],
+   levels:[ {count:3, opts:3, targeted:false}, {count:4, opts:4, targeted:false}, {count:5, opts:4, targeted:true} ]},
+  {id:2, title:'Τι κρύβεται πίσω;', icon:'🪨', sub:'Δεξί κλικ', bg:'stage-reveal', engine:'reveal',
+   bubble:'Κάνε δεξί κλικ σε κάθε βράχο για να δεις τι κρύβεται από πίσω!',
+   levels:[ {count:4, decoys:0}, {count:6, decoys:0}, {count:6, decoys:2} ]},
+  {id:3, title:'Το μεγάλο βιβλίο', icon:'📜', sub:'Ροδέλα κύλισης', bg:'stage-scrollpage', engine:'scrollpage',
+   bubble:'Γύρνα τη ροδέλα για να κυλήσεις τη σελίδα προς τα κάτω και βρες τα αστέρια!',
+   levels:[ {pageMult:2.2, stickers:4}, {pageMult:3, stickers:6}, {pageMult:3.6, stickers:8, bidirectional:true} ]},
+  {id:4, title:'Το μαϊμουδάκι ανεβαίνει', icon:'🐒', sub:'Ροδέλα κύλισης', bg:'stage-climb', engine:'climb',
+   bubble:'Γύρνα τη ροδέλα προς τα πάνω για να ανέβει το μαϊμουδάκι στο δέντρο!',
+   levels:[ {waypoints:[100]}, {waypoints:[100,0]}, {waypoints:[100,0,100]} ]},
+  {id:5, title:'Λύνω το παζλ', icon:'🧩', sub:'Σύρε (drag)', bg:'stage-puzzle', engine:'match', layout:'row',
+   bubble:'Σύρε κάθε κομμάτι στη θέση του με το ίδιο σχήμα!',
+   pool:[['🔺','🔺'],['⭐','⭐'],['⬛','⬛'],['⚪','⚪'],['🔷','🔷'],['🔶','🔶']],
+   levels:[ {count:3}, {count:4}, {count:6} ]},
+  {id:6, title:'Φτιάχνω το μωσαϊκό', icon:'🎨', sub:'Σύρε (drag)', bg:'stage-mosaic', engine:'match', layout:'grid',
+   bubble:'Σύρε κάθε πλακάκι στο κουτάκι με το ίδιο σχέδιο για να φτιάξεις την εικόνα!',
+   pool:[['🌸','🌸'],['🌞','🌞'],['🌳','🌳'],['🦋','🦋'],['🐝','🐝'],['☁️','☁️'],['🍄','🍄'],['🐞','🐞'],['🌈','🌈']],
+   levels:[ {count:4, cols:2}, {count:6, cols:3}, {count:9, cols:3} ]},
+  {id:7, title:'Βάλε τα στη θέση τους', icon:'🧺', sub:'Σύρε (drag) & ταξινόμηση', bg:'stage-sort', engine:'sort',
+   bubble:'Σύρε κάθε πράγμα στο σωστό καλάθι!',
+   categories:[
+     {cat:'fruit', label:'🧺', items:['🍎','🍌','🍇','🍓','🍊']},
+     {cat:'toys', label:'📦', items:['🧸','🎲','⚽','🪀','🎯']},
+     {cat:'books', label:'🎒', items:['📕','📘','📗','📙','📓']}
+   ],
+   levels:[ {catCount:2, perCat:2}, {catCount:2, perCat:3}, {catCount:3, perCat:3} ]},
+  {id:8, title:'Η εξερεύνηση του Ήρωνα', icon:'🗺️', sub:'Όλα μαζί', bg:'stage-final', engine:'final',
+   bubble:'Δεξί κλικ, ροδέλα και σύρε — όλα μαζί σε μία μεγάλη περιπέτεια!',
+   levels:[
+     {steps:[{type:'reveal',count:2},{type:'climb',count:1},{type:'drag',count:1}]},
+     {steps:[{type:'reveal',count:2},{type:'climb',count:1},{type:'drag',count:2},{type:'reveal',count:1}]},
+     {steps:[{type:'drag',count:1},{type:'reveal',count:2},{type:'climb',count:2},{type:'drag',count:2},{type:'reveal',count:1}]}
+   ]}
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+var PROGRESS = {};
+GAMES.forEach(function(g){ PROGRESS[g.id] = [false,false,false]; });
+(function loadProgress(){
+  try{
+    var saved = JSON.parse(localStorage.getItem('pontiki-progress-22')||'null');
+    if(saved) Object.keys(saved).forEach(function(k){ PROGRESS[k] = saved[k]; });
+  }catch(e){}
+})();
+function saveProgress(){ try{ localStorage.setItem('pontiki-progress-22', JSON.stringify(PROGRESS)); }catch(e){} }
+
+var currentGameId = null;
+var currentLevel = 1;
+var activeTimers = [];
+
+/* ============================================================
+   AUDIO
+   ============================================================ */
+function playTone(freq,duration,type,gain){
+  try{
+    var ctx = window._actx || (window._actx = new (window.AudioContext||window.webkitAudioContext)());
+    var osc=ctx.createOscillator(), g=ctx.createGain();
+    osc.type=type||'sine'; osc.frequency.value=freq; g.gain.value=gain||0.2;
+    osc.connect(g); g.connect(ctx.destination); osc.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+duration);
+    osc.stop(ctx.currentTime+duration+0.03);
+  }catch(e){}
+}
+function playPop(){ playTone(650,0.10,'triangle',0.22); setTimeout(function(){playTone(950,0.08,'triangle',0.14);},40); }
+function playOpen(){ playTone(400,0.1,'square',0.15); setTimeout(function(){playTone(700,0.15,'sine',0.18);},90); }
+function playChime(){ [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){playTone(f,0.22,'sine',0.18);}, i*90); }); }
+function playWrong(){ playTone(180,0.22,'sawtooth',0.15); }
+function playLevelUp(){ [659,784,988,1318].forEach(function(f,i){ setTimeout(function(){playTone(f,0.18,'triangle',0.2);}, i*80); }); }
+
+/* ============================================================
+   SPEECH
+   ============================================================ */
+function speak(text){
+  try{
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang='el-GR'; u.rate=0.95; u.pitch=1.08;
+    var voices = window.speechSynthesis.getVoices();
+    var gr = voices.find(function(v){ return v.lang && v.lang.toLowerCase().indexOf('el')===0; });
+    if(gr) u.voice = gr;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+if('speechSynthesis' in window){ window.speechSynthesis.onvoiceschanged = function(){}; }
+
+/* ============================================================
+   CONFETTI
+   ============================================================ */
+var CONF_EMOJI = ['🎉','⭐','✨','🎈','🌟','💫'];
+function burstConfetti(x,y,count){
+  count = count || 14;
+  for(var i=0;i<count;i++){
+    var s = document.createElement('div');
+    s.className='confetti-piece';
+    s.textContent = CONF_EMOJI[Math.floor(Math.random()*CONF_EMOJI.length)];
+    s.style.left = x+'px'; s.style.top = y+'px';
+    document.body.appendChild(s);
+    var dx=(Math.random()-0.5)*260, dy=-(120+Math.random()*220), rot=(Math.random()-0.5)*360;
+    s.animate([{transform:'translate(0,0) rotate(0deg)', opacity:1},{transform:'translate('+dx+'px,'+dy+'px) rotate('+rot+'deg)', opacity:0}],
+      {duration:900+Math.random()*400, easing:'cubic-bezier(.2,.8,.4,1)'});
+    setTimeout(function(el){ el.remove(); }, 1400, s);
+  }
+}
+function fullScreenConfetti(){
+  var w = window.innerWidth;
+  for(var i=0;i<40;i++){ (function(){ setTimeout(function(){ burstConfetti(Math.random()*w, -20, 4); }, Math.random()*600); })(); }
+}
+
+/* ============================================================
+   HOME GRID
+   ============================================================ */
+function buildHome(){
+  var grid = document.getElementById('home-grid');
+  grid.innerHTML = '';
+  GAMES.forEach(function(g){
+    var dots = PROGRESS[g.id].map(function(d){ return '<span class="'+(d?'done':'')+'"></span>'; }).join('');
+    var btn = document.createElement('button');
+    btn.className = 'card g'+g.id;
+    btn.onclick = function(){ openActivity(g.id); };
+    btn.innerHTML = '<div class="icon">'+g.icon+'</div><div class="label">'+g.title+'</div><div class="sub">'+g.sub+'</div><div class="mini-dots">'+dots+'</div>';
+    grid.appendChild(btn);
+  });
+  var shelf = document.getElementById('progress-shelf');
+  shelf.innerHTML = '<span class="ptitle">Η πρόοδός μου:</span>' + GAMES.map(function(g){
+    var allDone = PROGRESS[g.id].every(function(d){return d;});
+    return '<span class="pbadge'+(allDone?' done':'')+'">'+g.icon+'</span>';
+  }).join('');
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+function goHome(){
+  cleanupAll();
+  buildHome();
+  showScreen('screen-home');
+}
+function cleanupAll(){
+  activeTimers.forEach(function(t){ clearInterval(t); clearTimeout(t); });
+  activeTimers = [];
+  document.querySelectorAll('.stage').forEach(function(s){
+    if(s._wheelHandler){ s.removeEventListener('wheel', s._wheelHandler); s._wheelHandler=null; }
+    if(s._ctxHandler){ s.removeEventListener('contextmenu', s._ctxHandler); s._ctxHandler=null; }
+  });
+  document.querySelectorAll('.rc-menu').forEach(function(m){ m.remove(); });
+}
+function gameMeta(id){ return GAMES.find(function(g){ return g.id===id; }); }
+
+function ensureActivityScreen(game){
+  var existing = document.getElementById('screen-g'+game.id);
+  if(existing) return existing;
+  var container = document.getElementById('activity-screens');
+  var sec = document.createElement('section');
+  sec.className = 'screen';
+  sec.id = 'screen-g'+game.id;
+  sec.innerHTML =
+    '<div class="activity-head"><div class="a-icon" style="background:#fff;">'+game.icon+'</div><h2>'+game.title+'</h2></div>'+
+    '<div class="speech-row"><div class="bubble" id="bubble-g'+game.id+'">'+game.bubble+'</div>'+
+    '<button class="speaker-btn" onclick="speak(document.getElementById(\'bubble-g'+game.id+'\').textContent)">🔊</button></div>'+
+    '<div class="level-row" id="levelrow-g'+game.id+'"></div>'+
+    '<div class="goal-row">🎯 <div class="goal-bar"><div class="goal-fill" id="goalfill-g'+game.id+'"></div></div> <span id="goalcount-g'+game.id+'">0</span>/<span id="goaltotal-g'+game.id+'">0</span></div>'+
+    '<div class="stage '+game.bg+'" id="stage-g'+game.id+'"></div>';
+  container.appendChild(sec);
+  return sec;
+}
+function buildLevelRow(game){
+  var row = document.getElementById('levelrow-g'+game.id);
+  var done = PROGRESS[game.id];
+  var html = '';
+  for(var i=0;i<3;i++){
+    var locked = (i>0 && !done[i-1] && !done[i]);
+    var cls = 'level-dot' + (i+1===currentLevel?' current':'') + (done[i]?' done':'') + (locked?' locked':'');
+    html += '<button class="'+cls+'" '+(locked?'disabled':'onclick="selectLevel('+game.id+','+(i+1)+')"')+'>'+(i+1)+'</button>';
+  }
+  row.innerHTML = html;
+}
+function openActivity(id){
+  cleanupAll();
+  var game = gameMeta(id);
+  currentGameId = id;
+  ensureActivityScreen(game);
+  showScreen('screen-g'+id);
+  var done = PROGRESS[id];
+  var startLevel = 1;
+  for(var i=0;i<3;i++){ if(!done[i]){ startLevel = i+1; break; } if(i===2) startLevel = 3; }
+  selectLevel(id, startLevel);
+}
+function selectLevel(gameId, level){
+  cleanupAll();
+  currentGameId = gameId; currentLevel = level;
+  var game = gameMeta(gameId);
+  buildLevelRow(game);
+  speak(game.bubble + ' Επίπεδο ' + level + '.');
+  document.getElementById('goalcount-g'+gameId).textContent = '0';
+  document.getElementById('goalfill-g'+gameId).style.width = '0%';
+  var stage = document.getElementById('stage-g'+gameId);
+  stage.innerHTML = '';
+  var cfg = game.levels[level-1];
+  if(game.engine==='menu') initMenu(game, cfg, stage);
+  else if(game.engine==='reveal') initReveal(game, cfg, stage);
+  else if(game.engine==='scrollpage') initScrollPage(game, cfg, stage);
+  else if(game.engine==='climb') initClimb(game, cfg, stage);
+  else if(game.engine==='match') initMatch(game, cfg, stage);
+  else if(game.engine==='sort') initSort(game, cfg, stage);
+  else if(game.engine==='final') initFinal(game, cfg, stage);
+}
+function levelComplete(game, level){
+  var arr = PROGRESS[game.id];
+  arr[level-1] = true;
+  saveProgress();
+  buildLevelRow(game);
+  if(level < 3){
+    playLevelUp();
+    var stageEl = document.getElementById('stage-g'+game.id);
+    var r = stageEl.getBoundingClientRect();
+    burstConfetti(r.left+r.width/2, r.top+80, 14);
+    var msg = 'Μπράβο! Ολοκλήρωσες το επίπεδο ' + level + '. Πάμε στο επίπεδο ' + (level+1) + '!';
+    speak(msg);
+    openLevelModal('🌟','Επίπεδο '+level+' ολοκληρώθηκε!', msg, [
+      {label:'Επόμενο επίπεδο ▶', cls:'mint', action:function(){ closeModal(); selectLevel(game.id, level+1); }},
+      {label:'🏠 Αρχική', cls:'purple', action:function(){ closeModal(); goHome(); }}
+    ]);
+  } else {
+    playChime();
+    var stageEl2 = document.getElementById('stage-g'+game.id);
+    var r2 = stageEl2.getBoundingClientRect();
+    fullScreenConfetti();
+    burstConfetti(r2.left+r2.width/2, r2.top+80, 20);
+    var msg2 = 'Υπέροχα! Ολοκλήρωσες και τα 3 επίπεδα: ' + game.title + '!';
+    speak(msg2);
+    openLevelModal('🏆','Τέλειο παιχνίδι!', msg2, [
+      {label:'🏠 Αρχική', cls:'purple', action:function(){ closeModal(); goHome(); }},
+      {label:'Ξαναπαίξε 🔁', cls:'mint', action:function(){ closeModal(); selectLevel(game.id, 1); }}
+    ]);
+  }
+}
+function openLevelModal(emoji, title, text, buttons){
+  document.getElementById('modal-emoji').textContent = emoji;
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-text').textContent = text;
+  var btnWrap = document.getElementById('modal-btns');
+  btnWrap.innerHTML = '';
+  buttons.forEach(function(b){
+    var el = document.createElement('button');
+    el.className = 'btn '+b.cls;
+    el.textContent = b.label;
+    el.onclick = b.action;
+    btnWrap.appendChild(el);
+  });
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
+function updateGoal(gameId, count, total){
+  document.getElementById('goalcount-g'+gameId).textContent = count;
+  document.getElementById('goaltotal-g'+gameId).textContent = total;
+  document.getElementById('goalfill-g'+gameId).style.width = Math.min(100,(count/total)*100)+'%';
+}
+
+/* ============================================================
+   ENGINE: RIGHT-CLICK MENU (pick an option from context menu)
+   ============================================================ */
+function initMenu(game, cfg, stage){
+  var done = 0;
+  updateGoal(game.id, 0, cfg.count);
+  var folders = [];
+  var positions = [[18,55],[42,30],[66,58],[25,20],[55,18]];
+  for(var i=0;i<cfg.count;i++){
+    var el = document.createElement('div');
+    el.className = 'reveal-item';
+    el.style.left = positions[i%positions.length][0] + '%';
+    el.style.top = positions[i%positions.length][1] + '%';
+    el.innerHTML = '<div class="cover">📁</div>';
+    stage.appendChild(el);
+    folders.push(el);
+    el.addEventListener('contextmenu', function(e){
+      e.preventDefault();
+      if(this.dataset.done) return;
+      openRcMenu(stage, e.clientX, e.clientY, game, cfg, this);
+    });
+  }
+  window._menuDoneCheck = function(){
+    done++;
+    updateGoal(game.id, done, cfg.count);
+    if(done >= cfg.count){ setTimeout(function(){ levelComplete(game, currentLevel); }, 400); }
+  };
+}
+function openRcMenu(stage, clientX, clientY, game, cfg, folderEl){
+  document.querySelectorAll('.rc-menu').forEach(function(m){ m.remove(); });
+  var rect = stage.getBoundingClientRect();
+  var menu = document.createElement('div');
+  menu.className = 'rc-menu';
+  var x = Math.min(clientX - rect.left, rect.width-110);
+  var y = Math.min(clientY - rect.top, rect.height-120);
+  menu.style.left = Math.max(4,x) + 'px';
+  menu.style.top = Math.max(4,y) + 'px';
+  var opts = game.options.slice(0, cfg.opts);
+  var targetIndex = cfg.targeted ? Math.floor(Math.random()*opts.length) : -1;
+  var hint = null;
+  if(cfg.targeted){
+    hint = document.createElement('div');
+    hint.className = 'rc-target-hint';
+    hint.textContent = 'Διάλεξε: ' + opts[targetIndex];
+    stage.appendChild(hint);
+  }
+  opts.forEach(function(opt, idx){
+    var b = document.createElement('button');
+    b.textContent = opt;
+    if(cfg.targeted && idx===targetIndex) b.classList.add('target-glow');
+    b.addEventListener('click', function(){
+      if(cfg.targeted && idx !== targetIndex){
+        playWrong();
+        b.parentNode.classList.add('shake-anim');
+        setTimeout(function(){ if(b.parentNode) b.parentNode.classList.remove('shake-anim'); }, 300);
+        return;
+      }
+      menu.remove();
+      if(hint) hint.remove();
+      folderEl.dataset.done = '1';
+      folderEl.classList.add('opened');
+      folderEl.innerHTML = '<div class="prize" style="opacity:1;transform:scale(1);">✅</div>';
+      playOpen();
+      var r = folderEl.getBoundingClientRect();
+      burstConfetti(r.left+r.width/2, r.top+r.height/2, 8);
+      window._menuDoneCheck();
+    });
+    menu.appendChild(b);
+  });
+  stage.appendChild(menu);
+  var closeHandler = function(ev){
+    if(!menu.contains(ev.target)){
+      menu.remove(); if(hint) hint.remove();
+      document.removeEventListener('click', closeHandler);
+    }
+  };
+  setTimeout(function(){ document.addEventListener('click', closeHandler); }, 10);
+}
+
+/* ============================================================
+   ENGINE: RIGHT-CLICK REVEAL
+   ============================================================ */
+function initReveal(game, cfg, stage){
+  var opened = 0;
+  updateGoal(game.id, 0, cfg.count);
+  var prizes = ['⭐','🌸','🍄','🐚','🔑','🧸','💎','🍀'];
+  var items = [];
+  for(var i=0;i<cfg.count;i++) items.push({decoy:false, prize:prizes[i%prizes.length]});
+  for(var j=0;j<cfg.decoys;j++) items.push({decoy:true});
+  items.sort(function(){ return Math.random()-0.5; });
+  var cols = Math.ceil(Math.sqrt(items.length));
+  items.forEach(function(item, idx){
+    var el = document.createElement('div');
+    el.className = 'reveal-item' + (item.decoy?' decoy':'');
+    var col = idx % cols, row = Math.floor(idx/cols);
+    el.style.left = (10 + col*(78/Math.max(1,cols-1||1))) + '%';
+    el.style.top = (18 + row*32) + '%';
+    el.innerHTML = '<div class="rc-hint">🖱️➡️</div><div class="cover">'+(item.decoy?'🌵':'🪨')+'</div>'+(item.decoy?'':'<div class="prize">'+item.prize+'</div>');
+    stage.appendChild(el);
+    el.addEventListener('contextmenu', function(e){
+      e.preventDefault();
+      if(item.decoy){
+        this.classList.add('shake-anim');
+        playWrong();
+        speak('Αυτό δεν κρύβει τίποτα!');
+        var self = this;
+        setTimeout(function(){ self.classList.remove('shake-anim'); }, 300);
+        return;
+      }
+      if(this.classList.contains('opened')) return;
+      this.classList.add('opened');
+      playOpen();
+      var r = this.getBoundingClientRect();
+      burstConfetti(r.left+r.width/2, r.top+r.height/2, 8);
+      opened++;
+      updateGoal(game.id, opened, cfg.count);
+      if(opened >= cfg.count){ setTimeout(function(){ levelComplete(game, currentLevel); }, 400); }
+    });
+    el.addEventListener('click', function(){
+      this.classList.add('show-rc');
+      var self = this;
+      setTimeout(function(){ self.classList.remove('show-rc'); }, 900);
+    });
+  });
+}
+
+/* ============================================================
+   ENGINE: SCROLL PAGE (scroll through a tall page to find stickers)
+   ============================================================ */
+function initScrollPage(game, cfg, stage){
+  var found = 0;
+  updateGoal(game.id, 0, cfg.stickers);
+  var stageH = stage.clientHeight || 400;
+  var pageH = Math.round(stageH * cfg.pageMult);
+  var vp = document.createElement('div'); vp.className = 'scroll-viewport';
+  var content = document.createElement('div'); content.className = 'scroll-content';
+  content.style.height = pageH + 'px';
+  content.style.background = 'repeating-linear-gradient(180deg, #E9F7FF 0px, #E9F7FF 70px, #FFFFFF 70px, #FFFFFF 140px)';
+  var stickerPositions = [];
+  for(var i=0;i<cfg.stickers;i++){
+    var y = 40 + Math.round((pageH-120) * (i+0.5)/cfg.stickers);
+    stickerPositions.push(y);
+  }
+  stickerPositions.forEach(function(y, idx){
+    var s = document.createElement('div');
+    s.className = 'scroll-sticker';
+    s.textContent = '⭐';
+    s.style.top = y + 'px';
+    s.style.left = (15 + (idx%3)*30) + '%';
+    content.appendChild(s);
+    s.addEventListener('click', function(){
+      if(this.classList.contains('got')) return;
+      this.classList.add('got');
+      playPop();
+      var r = this.getBoundingClientRect();
+      burstConfetti(r.left+r.width/2, r.top+r.height/2, 6);
+      found++;
+      updateGoal(game.id, found, cfg.stickers);
+      if(found >= cfg.stickers){ setTimeout(function(){ levelComplete(game, currentLevel); }, 400); }
+    });
+  });
+  vp.appendChild(content);
+  stage.appendChild(vp);
+  var track = document.createElement('div'); track.className='scroll-track';
+  var thumb = document.createElement('div'); thumb.className='scroll-thumb';
+  track.appendChild(thumb);
+  stage.appendChild(track);
+  var hint = document.createElement('div'); hint.className='scroll-hint';
+  hint.innerHTML = '<div class="wheel-icon">🖱️</div>Γύρνα τη ροδέλα!';
+  stage.appendChild(hint);
+
+  var scrollY = 0;
+  var maxScroll = Math.max(0, pageH - stageH);
+  function updateScroll(){
+    content.style.transform = 'translateY(-'+scrollY+'px)';
+    var trackH = track.clientHeight;
+    var thumbH = Math.max(30, trackH * (stageH/pageH));
+    thumb.style.height = thumbH + 'px';
+    thumb.style.top = (maxScroll>0 ? (scrollY/maxScroll) : 0) * (trackH-thumbH) + 'px';
+  }
+  updateScroll();
+  var handler = function(e){
+    e.preventDefault();
+    if(scrollY > 20) hint.style.opacity = '0';
+    var delta = e.deltaY;
+    if(!cfg.bidirectional && delta < 0 && scrollY <= 0){ /* no-op */ }
+    scrollY = Math.max(0, Math.min(maxScroll, scrollY + delta*0.6));
+    updateScroll();
+  };
+  stage.addEventListener('wheel', handler, {passive:false});
+  stage._wheelHandler = handler;
+}
+
+/* ============================================================
+   ENGINE: CLIMB (scroll wheel single-value altitude, with waypoints)
+   ============================================================ */
+function initClimb(game, cfg, stage){
+  var wpIndex = 0;
+  updateGoal(game.id, 0, cfg.waypoints.length);
+  stage.innerHTML = '';
+  var ground = document.createElement('div'); ground.className='ground'; stage.appendChild(ground);
+  var badge = document.createElement('div'); badge.className='altitude-badge'; badge.innerHTML='Ύψος: <span id="climbAlt-g'+game.id+'">0</span>%'; stage.appendChild(badge);
+  var caption = document.createElement('div'); caption.className='waypoint-caption'; caption.id='climbCaption-g'+game.id; stage.appendChild(caption);
+  var track = document.createElement('div'); track.className='lift-track'; track.innerHTML='<div class="flag">🌴</div>'; stage.appendChild(track);
+  for(var i=0;i<4;i++){
+    var b = document.createElement('div'); b.className='banana'; b.textContent='🍌';
+    b.style.right = (70+Math.random()*10)+'px';
+    b.style.bottom = (90 + i*70) + 'px';
+    b.dataset.threshold = 20 + i*22;
+    stage.appendChild(b);
+  }
+  var climber = document.createElement('div'); climber.className='climber'; climber.textContent='🐒'; climber.style.bottom='56px';
+  stage.appendChild(climber);
+
+  var altitude = 0;
+  function setCaption(){
+    var target = cfg.waypoints[wpIndex];
+    caption.textContent = target > altitude+2 ? 'Ανέβα ψηλότερα! ⬆️' : (target < altitude-2 ? 'Κατέβα λίγο! ⬇️' : 'Πλησιάζεις!');
+    if(wpIndex===0 && cfg.waypoints.length===1) caption.textContent = 'Ανέβα μέχρι την κορυφή! 🌴';
+  }
+  setCaption();
+  function updateVisual(){
+    climber.style.bottom = (56 + altitude*2.9) + 'px';
+    document.getElementById('climbAlt-g'+game.id).textContent = Math.round(altitude);
+    stage.querySelectorAll('.banana').forEach(function(b){
+      if(altitude >= parseFloat(b.dataset.threshold) && !b.classList.contains('collected')){
+        b.classList.add('collected');
+      }
+    });
+  }
+  var handler = function(e){
+    e.preventDefault();
+    var delta = e.deltaY < 0 ? 3.2 : -3.2;
+    altitude = Math.max(0, Math.min(100, altitude + delta));
+    updateVisual();
+    var target = cfg.waypoints[wpIndex];
+    if(Math.abs(altitude - target) < 3){
+      wpIndex++;
+      updateGoal(game.id, wpIndex, cfg.waypoints.length);
+      if(wpIndex >= cfg.waypoints.length){
+        stage.removeEventListener('wheel', handler);
+        playChime();
+        var r = stage.getBoundingClientRect();
+        burstConfetti(r.left+r.width/2, r.top+80, 16);
+        setTimeout(function(){ levelComplete(game, currentLevel); }, 400);
+      } else {
+        playPop();
+        setCaption();
+      }
+    } else {
+      setCaption();
+    }
+  };
+  stage.addEventListener('wheel', handler, {passive:false});
+  stage._wheelHandler = handler;
+}
+
+/* ============================================================
+   ENGINE: DRAG MATCH (puzzle & mosaic — 1:1 shape matching)
+   ============================================================ */
+function makeDraggable(chip, zoneSelector, onDrop){
+  if(chip._dragBound) return;
+  chip._dragBound = true;
+  var state = null;
+  chip.addEventListener('pointerdown', function(e){
+    if(chip.classList.contains('placed')) return;
+    e.preventDefault();
+    var rect = chip.getBoundingClientRect();
+    state = {offsetX:e.clientX-rect.left, offsetY:e.clientY-rect.top, startLeft:rect.left, startTop:rect.top};
+    try{ chip.setPointerCapture(e.pointerId); }catch(err){}
+    chip.classList.add('dragging');
+    chip.style.position='fixed'; chip.style.width=rect.width+'px'; chip.style.height=rect.height+'px';
+    chip.style.left=rect.left+'px'; chip.style.top=rect.top+'px'; chip.style.margin='0';
+  });
+  chip.addEventListener('pointermove', function(e){
+    if(!state) return;
+    chip.style.left = (e.clientX-state.offsetX)+'px';
+    chip.style.top = (e.clientY-state.offsetY)+'px';
+    document.querySelectorAll(zoneSelector).forEach(function(z){ z.classList.remove('drag-over'); });
+    var under = document.elementFromPoint(e.clientX, e.clientY);
+    var zone = under ? under.closest(zoneSelector) : null;
+    if(zone) zone.classList.add('drag-over');
+  });
+  chip.addEventListener('pointerup', function(e){
+    if(!state) return;
+    document.querySelectorAll(zoneSelector).forEach(function(z){ z.classList.remove('drag-over'); });
+    var under = document.elementFromPoint(e.clientX, e.clientY);
+    var zone = under ? under.closest(zoneSelector) : null;
+    chip.classList.remove('dragging');
+    var matched = zone ? onDrop(chip, zone) : false;
+    if(!matched){
+      chip.style.transition = 'left .3s ease, top .3s ease';
+      chip.style.left = state.startLeft+'px'; chip.style.top = state.startTop+'px';
+      setTimeout(function(){ chip.style.transition=''; chip.style.position=''; chip.style.left=''; chip.style.top=''; chip.style.width=''; chip.style.height=''; }, 320);
+    } else {
+      chip.style.position=''; chip.style.left=''; chip.style.top=''; chip.style.width=''; chip.style.height=''; chip.style.transition='';
+    }
+    state = null;
+  });
+  chip.addEventListener('pointercancel', function(){
+    if(state){
+      chip.style.transition = 'left .3s ease, top .3s ease';
+      chip.style.left = state.startLeft+'px'; chip.style.top = state.startTop+'px';
+      state = null;
+    }
+  });
+}
+function initMatch(game, cfg, stage){
+  var matched = 0;
+  updateGoal(game.id, 0, cfg.count);
+  var chosen = game.pool.slice(0, cfg.count);
+  var wrap = document.createElement('div'); wrap.className = 'match-wrap';
+  var rail = document.createElement('div'); rail.className = 'chip-rail';
+  var zonesWrap = document.createElement('div'); zonesWrap.className = 'zones-wrap';
+  zonesWrap.style.gridTemplateColumns = 'repeat('+(cfg.cols||Math.min(3,cfg.count))+', 62px)';
+  wrap.appendChild(rail); wrap.appendChild(zonesWrap);
+  stage.appendChild(wrap);
+  var shuffledChips = chosen.map(function(pair,i){ return {id:i, emoji:pair[0]}; }).sort(function(){ return Math.random()-0.5; });
+  shuffledChips.forEach(function(item){
+    var slot = document.createElement('div'); slot.className='chip-slot';
+    var chip = document.createElement('div'); chip.className='drag-chip'; chip.textContent=item.emoji; chip.dataset.target='zone-'+game.id+'-'+item.id;
+    slot.appendChild(chip); rail.appendChild(slot);
+  });
+  chosen.forEach(function(pair,i){
+    var zone = document.createElement('div'); zone.className='dropzone'; zone.id='zone-'+game.id+'-'+i; zone.textContent = pair[1];
+    zonesWrap.appendChild(zone);
+  });
+  rail.querySelectorAll('.drag-chip').forEach(function(chip){
+    makeDraggable(chip, '.dropzone', function(chip, zone){
+      if(zone.id === chip.dataset.target && !zone.classList.contains('matched')){
+        zone.classList.add('matched');
+        chip.classList.add('placed');
+        playChime();
+        var r = zone.getBoundingClientRect();
+        burstConfetti(r.left+r.width/2, r.top+r.height/2, 6);
+        matched++;
+        updateGoal(game.id, matched, cfg.count);
+        if(matched >= cfg.count){ setTimeout(function(){ levelComplete(game, currentLevel); }, 400); }
+        return true;
+      }
+      playWrong();
+      return false;
+    });
+  });
+}
+
+/* ============================================================
+   ENGINE: SORT (drag items into category baskets)
+   ============================================================ */
+function initSort(game, cfg, stage){
+  var matched = 0;
+  var cats = game.categories.slice(0, cfg.catCount);
+  var total = cfg.catCount * cfg.perCat;
+  updateGoal(game.id, 0, total);
+  var wrap = document.createElement('div'); wrap.className = 'match-wrap';
+  var rail = document.createElement('div'); rail.className = 'chip-rail';
+  var basketsWrap = document.createElement('div'); basketsWrap.style.display='flex'; basketsWrap.style.gap='18px';
+  wrap.appendChild(rail); wrap.appendChild(basketsWrap);
+  stage.appendChild(wrap);
+
+  var items = [];
+  cats.forEach(function(c){
+    var picks = c.items.slice(0, cfg.perCat);
+    picks.forEach(function(emoji){ items.push({cat:c.cat, emoji:emoji}); });
+  });
+  items.sort(function(){ return Math.random()-0.5; });
+  items.forEach(function(item,i){
+    var slot = document.createElement('div'); slot.className='chip-slot';
+    var chip = document.createElement('div'); chip.className='drag-chip'; chip.textContent=item.emoji; chip.dataset.cat=item.cat;
+    slot.appendChild(chip); rail.appendChild(slot);
+  });
+  cats.forEach(function(c){
+    var b = document.createElement('div'); b.className='basket dropzone'; b.dataset.cat=c.cat;
+    b.innerHTML = '<div class="label-emoji">'+c.label+'</div><div class="held"></div>';
+    basketsWrap.appendChild(b);
+  });
+  rail.querySelectorAll('.drag-chip').forEach(function(chip){
+    makeDraggable(chip, '.basket', function(chip, zone){
+      if(zone.dataset.cat === chip.dataset.cat){
+        chip.classList.add('placed');
+        zone.querySelector('.held').innerHTML += chip.textContent;
+        playChime();
+        var r = zone.getBoundingClientRect();
+        burstConfetti(r.left+r.width/2, r.top+r.height/2, 6);
+        matched++;
+        updateGoal(game.id, matched, total);
+        if(matched >= total){ setTimeout(function(){ levelComplete(game, currentLevel); }, 400); }
+        return true;
+      }
+      playWrong();
+      zone.classList.add('shake-anim');
+      setTimeout(function(){ zone.classList.remove('shake-anim'); }, 300);
+      return false;
+    });
+  });
+}
+
+/* ============================================================
+   ENGINE: FINAL (sequence of reveal / climb / drag mini-steps)
+   ============================================================ */
+function initFinal(game, cfg, stage){
+  var totalActions = cfg.steps.reduce(function(a,s){ return a+s.count; }, 0);
+  updateGoal(game.id, 0, totalActions);
+  var doneActions = 0;
+  var caption = document.createElement('div'); caption.className='final-caption'; caption.id='finalCaption-g'+game.id;
+  var ground = document.createElement('div'); ground.className='ground';
+  stage.appendChild(caption); stage.appendChild(ground);
+
+  var stepIdx = 0, stepRemaining = 0;
+  function finishAction(){
+    doneActions++; updateGoal(game.id, doneActions, totalActions);
+    stepRemaining--;
+    if(stepRemaining <= 0){ stepIdx++; setTimeout(startStep, 400); }
+    else { spawnForCurrentStep(); }
+  }
+  function spawnForCurrentStep(){
+    var step = cfg.steps[stepIdx];
+    if(step.type === 'reveal'){
+      var el = document.createElement('div'); el.className='reveal-item';
+      el.style.left = (20+Math.random()*60)+'%'; el.style.top = (30+Math.random()*40)+'%';
+      el.innerHTML = '<div class="cover">🪨</div><div class="prize">⭐</div>';
+      stage.appendChild(el);
+      el.addEventListener('contextmenu', function(e){
+        e.preventDefault();
+        if(this.classList.contains('opened')) return;
+        this.classList.add('opened');
+        playOpen();
+        var r = this.getBoundingClientRect();
+        burstConfetti(r.left+r.width/2, r.top+r.height/2, 8);
+        var self = this;
+        setTimeout(function(){ if(self.parentNode) self.remove(); }, 400);
+        finishAction();
+      });
+    } else if(step.type === 'drag'){
+      var wrap = document.createElement('div'); wrap.style.position='absolute'; wrap.style.inset='40px 20px 50px';
+      wrap.style.display='flex'; wrap.style.alignItems='center'; wrap.style.justifyContent='space-between';
+      var chip = document.createElement('div'); chip.className='drag-chip'; chip.textContent='🧩'; chip.dataset.target='finalzone';
+      var zone = document.createElement('div'); zone.className='dropzone finalzone'; zone.id='finalzone'; zone.textContent='🧩';
+      wrap.appendChild(chip); wrap.appendChild(zone);
+      stage.appendChild(wrap);
+      makeDraggable(chip, '.finalzone', function(c,z){
+        z.classList.add('matched'); c.classList.add('placed');
+        playChime();
+        var r = z.getBoundingClientRect();
+        burstConfetti(r.left+r.width/2, r.top+r.height/2, 8);
+        setTimeout(function(){ if(wrap.parentNode) wrap.remove(); }, 400);
+        finishAction();
+        return true;
+      });
+    } else if(step.type === 'climb'){
+      var track = document.createElement('div'); track.className='lift-track'; track.innerHTML='<div class="flag">🌴</div>';
+      var climber = document.createElement('div'); climber.className='climber'; climber.textContent='🐒'; climber.style.bottom='56px';
+      var badge = document.createElement('div'); badge.className='altitude-badge'; badge.innerHTML='Ύψος: <span>0</span>%';
+      stage.appendChild(track); stage.appendChild(climber); stage.appendChild(badge);
+      var altitude = 0;
+      var handler = function(e){
+        e.preventDefault();
+        altitude = Math.max(0, Math.min(100, altitude + (e.deltaY<0?3.5:-3.5)));
+        climber.style.bottom = (56+altitude*2.9)+'px';
+        badge.querySelector('span').textContent = Math.round(altitude);
+        if(altitude >= 97){
+          stage.removeEventListener('wheel', handler); stage._wheelHandler=null;
+          playChime();
+          var r = stage.getBoundingClientRect();
+          burstConfetti(r.left+r.width/2, r.top+80, 10);
+          setTimeout(function(){ track.remove(); climber.remove(); badge.remove(); }, 300);
+          finishAction();
+        }
+      };
+      stage.addEventListener('wheel', handler, {passive:false});
+      stage._wheelHandler = handler;
+    }
+  }
+  function startStep(){
+    if(stepIdx >= cfg.steps.length){
+      playChime(); fullScreenConfetti();
+      var r = stage.getBoundingClientRect();
+      burstConfetti(r.left+r.width/2, r.top+80, 18);
+      setTimeout(function(){ levelComplete(game, currentLevel); }, 500);
+      return;
+    }
+    var step = cfg.steps[stepIdx];
+    stepRemaining = step.count;
+    var labels = {reveal:'Δεξί κλικ στον βράχο', climb:'Γύρνα τη ροδέλα ψηλά', drag:'Σύρε το κομμάτι στη θέση του'};
+    caption.textContent = labels[step.type] + ' ('+step.count+')';
+    spawnForCurrentStep();
+  }
+  startStep();
+}
+
+/* init */
+buildHome();
+</script>
+</body>
+</html>
