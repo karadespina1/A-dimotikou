@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Μάθημα 18: Γράφω στον υπολογιστή | Παιχνίδια Α΄ Δημοτικού</title>
+<style>
+:root{--ink:#26324b;--purple:#6948c6;--pink:#ff6584;--yellow:#ffd152;--mint:#a8f0d2;--blue:#bde3ff;--paper:#fffdf7}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#e4f3ff,#fff0f6 50%,#fff9db);font-family:"Trebuchet MS",Arial,sans-serif;color:var(--ink);font-size:18px;position:relative}
+header{padding:26px 16px 20px;text-align:center;background:#ffffffdb;border-bottom:4px dotted #c7b9ff}
+h1{font-size:clamp(24px,5vw,40px);margin:6px 0;color:#5438ac}
+header p{margin:6px auto;max-width:760px}
+main{max-width:980px;margin:20px auto;padding:0 14px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+button,select{font:inherit;border:0;border-radius:16px;padding:10px 18px;cursor:pointer;background:#6948c6;color:white;box-shadow:0 3px 0 #4a3092;font-weight:bold}
+button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+button:focus{outline:3px solid #ffbd4a;outline-offset:2px}
+select{background:white;color:var(--ink);border:2px solid #d8cffb;box-shadow:none}
+.btn-download{background:#00897b;box-shadow:0 3px 0 #005b52}
+.progress{background:white;border-radius:18px;padding:12px 18px;margin:10px 0 18px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-weight:bold;box-shadow:0 4px 12px rgba(89,67,189,0.08)}
+.card{background:#ffffffed;border:3px solid #fff;border-radius:24px;padding:clamp(16px,3vw,26px);box-shadow:0 8px 22px rgba(83,68,165,0.1);margin:18px 0;position:relative}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card h2{margin:0 0 6px;color:#5438ac;font-size:clamp(20px,3vw,26px)}
+.sub{color:#626b82;margin:4px 0 12px}
+.badge{display:inline-block;background:#fff0b9;border-radius:99px;padding:4px 12px;font-size:14px;margin-bottom:8px;font-weight:bold;color:#6d5410}
+.btn-speaker{background:#ffecb3;color:#8d6200;border:2px solid #ffd54f;width:44px;height:44px;border-radius:50%;box-shadow:0 2px 0 #d9a400;font-size:20px;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0}
+.btn-speaker:hover{background:#ffe082}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0}
+.choice{background:#f3efff;color:var(--ink);box-shadow:none;border:3px solid transparent;min-height:74px;font-weight:bold;font-size:17px;border-radius:16px;padding:10px}
+.choice.correct{background:#d6f8e7;border-color:#38b27f;color:#0f6b48}
+.choice.wrong{background:#ffe2ea;border-color:#f2688f;color:#9b1c3e}
+.feedback{min-height:30px;font-weight:bold;margin:8px 0;font-size:17px}
+.good{color:#158057}
+.bad{color:#b92d52}
+.emoji{font-size:32px;display:block;margin-bottom:4px}
+.memory-grid{display:grid;grid-template-columns:repeat(4,minmax(60px,1fr));gap:10px;margin:14px 0}
+.memory-grid button{min-height:80px;font-size:32px;background:#e1f2ff;color:#283b5b;box-shadow:none;border:2px solid #b8defe}
+.memory-grid button.open{background:#fff3c4;border-color:#ffca28}
+.memory-grid button.matched{background:#cbf6e1;border-color:#5bd69c}
+.match-row{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;align-items:center;margin:10px 0}
+.match-row label{font-weight:bold}
+
+/* Mini Keyboard & Typing Studio */
+.type-studio{display:flex;flex-direction:column;align-items:center;gap:10px;margin:14px 0}
+.screen-box{
+  width:100%;max-width:540px;min-height:75px;background:#fff;border:3px solid #b39ddb;
+  border-radius:16px;padding:12px 16px;font-size:26px;font-weight:bold;color:#311b92;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,0.06);display:flex;align-items:center;letter-spacing:2px;
+  overflow-x:auto;white-space:pre;
+}
+.cursor-blink{animation:blink 1s infinite;display:inline-block;width:3px;height:28px;background:#311b92;margin-left:4px;vertical-align:middle}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+.virtual-kbd{
+  display:flex;flex-direction:column;gap:6px;background:#ede7f6;padding:12px;border-radius:18px;
+  border:2px solid #d1c4e9;max-width:540px;width:100%;
+}
+.kbd-row{display:flex;gap:6px;justify-content:center}
+.key-btn{
+  background:#fff;color:#311b92;border:2px solid #b39ddb;border-radius:10px;font-size:18px;
+  font-weight:bold;padding:10px 12px;min-width:38px;height:44px;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;box-shadow:0 3px 0 #9575cd;transition:transform .1s;
+}
+.key-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #9575cd}
+.key-space{flex:1;max-width:240px;background:#fff8e1}
+.key-func{background:#e1bee7;font-size:15px;padding:10px 14px}
+
+footer{text-align:center;padding:22px;color:#6b7280;font-size:15px}
+#confettiCanvas{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999}
+
+@media(max-width:540px){.match-row{grid-template-columns:1fr}.choices{grid-template-columns:1fr 1fr}}
+@media print{.toolbar,button{display:none}body{background:white}.card{box-shadow:none;border-color:#ccc}}
+</style>
+</head>
+<body>
+
+<canvas id="confettiCanvas"></canvas>
+
+<header>
+  <div style="font-size:46px">⌨️ 📝 ↵ ⌫ ␣</div>
+  <h1>Γράφω στον υπολογιστή!</h1>
+  <p><b>Μάθημα 18: Γράφω στον υπολογιστή</b> · 8 Παιχνίδια για τους μαθητές της Α΄ Δημοτικού</p>
+  <p>Πάτα το μεγάφωνο 🔊 σε κάθε παιχνίδι για να ακούσεις την οδηγία!</p>
+</header>
+
+<main>
+  <div class="toolbar">
+    <button class="btn-download" onclick="downloadHTML()">💾 Λήψη αρχείου HTML</button>
+    <button onclick="resetAll()">🔄 Ξεκινάμε από την αρχή</button>
+    <button onclick="window.print()">🖨️ Εκτύπωση</button>
+  </div>
+
+  <div class="progress">
+    <span>⭐ Αστεράκια: <b id="stars">0</b> / 8</span>
+    <span>🎯 Παιχνίδια που έγιναν: <b id="done">0</b> / 8</span>
+    <span id="cheer" style="color:#5943bd">Πάμε να γνωρίσουμε τα μυστικά πλήκτρα! ⌨️</span>
+  </div>
+
+  <!-- ΠΑΙΧΝΙΔΙ 1 -->
+  <section class="card" id="a1">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 1 από 8</span>
+        <h2>🎯 Ποιο πλήκτρο χρειάζομαι;</h2>
+        <p class="sub">Πάτησε το σωστό πλήκτρο για κάθε ενέργεια στο κείμενο!</p>
+      </div>
+      <button class="btn-speaker" onclick="speakCurrentQ1()" title="Άκουσε την ερώτηση">🔊</button>
+    </div>
+    <div id="q1"></div>
+    <div class="feedback" id="f1" aria-live="polite"></div>
+    <button id="btnNextQ1" onclick="nextQ1()">➡️ Επόμενη ερώτηση</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 2 -->
+  <section class="card" id="a2">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 2 από 8</span>
+        <h2>🧺 Βρες τα ειδικά πλήκτρα γραφής!</h2>
+        <p class="sub">Πάτησε ΜΟΝΟ τα πλήκτρα που μας βοηθούν όταν γράφουμε κείμενο!</p>
+      </div>
+      <button class="btn-speaker" onclick="speakText('Πάτησε μόνο τα πλήκτρα που χρησιμοποιούμε όταν γράφουμε κείμενο στον υπολογιστή!')" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+    <div class="choices" id="q2"></div>
+    <div class="feedback" id="f2" aria-live="polite"></div>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 3 -->
+  <section class="card" id="a3">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 3 από 8</span>
+        <h2>🧠 Μνήμη: Τα πλήκτρα του πληκτρολογίου!</h2>
+        <p class="sub">Βρες τα ζευγάρια: Διάστημα (Space) ␣, Enter (Νέα γραμμή) ↵, Σβήσιμο (Backspace) ⌫, Δρομέας 📍.</p>
+      </div>
+      <button class="btn-speaker" onclick="speakText('Βρες τα ζευγάρια: πλήκτρο διαστήματος, έντερ, πλήκτρο διαγραφής και δρομέας!')" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+    <div class="memory-grid" id="memory"></div>
+    <div class="feedback" id="f3" aria-live="polite"></div>
+    <button onclick="newMemory()">🔀 Ανακάτεμα</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 4 -->
+  <section class="card" id="a4">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 4 από 8</span>
+        <h2>🔗 Τι κάνει το κάθε πλήκτρο;</h2>
+        <p class="sub">Διάλεξε ποια λειτουργία κάνει το κάθε πλήκτρο του υπολογιστή.</p>
+      </div>
+      <button class="btn-speaker" onclick="speakText('Διάλεξε τι κάνει το κάθε πλήκτρο όταν γράφουμε κείμενο!')" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+    <div id="q4"></div>
+    <div class="feedback" id="f4" aria-live="polite"></div>
+    <button onclick="checkMatch()">✅ Έλεγχος απαντήσεων</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 5 -->
+  <section class="card" id="a5">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 5 από 8</span>
+        <h2>🕵️ Σωστό ή Λάθος στο γράψιμο;</h2>
+        <p class="sub">Άκουσε την πρόταση και πάτησε το πράσινο ή το κόκκινο κουμπί!</p>
+      </div>
+      <button class="btn-speaker" onclick="speakCurrentTF()" title="Άκουσε την πρόταση">🔊</button>
+    </div>
+    <div id="q5"></div>
+    <div class="feedback" id="f5" aria-live="polite"></div>
+    <button id="btnNextTF" onclick="nextTF()">➡️ Επόμενη πρόταση</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 6 -->
+  <section class="card" id="a6">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 6 από 8</span>
+        <h2>📍 Πού βρίσκεται ο δρομέας (κέρσορας);</h2>
+        <p class="sub">Μάθε πού θα γραφτεί ή από πού θα σβηστεί το επόμενο γράμμα (σελ. 72-73)!</p>
+      </div>
+      <button class="btn-speaker" onclick="speakCurrentCursor()" title="Άκουσε την ερώτηση">🔊</button>
+    </div>
+    <div id="q6"></div>
+    <div class="feedback" id="f6" aria-live="polite"></div>
+    <button id="btnNextCursor" onclick="nextCursor()">➡️ Επόμενη ερώτηση</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 7 -->
+  <section class="card" id="a7">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 7 από 8</span>
+        <h2>🎒 Αινίγματα για το πληκτρολόγιο!</h2>
+        <p class="sub">Άκουσε το αίνιγμα και διάλεξε το σωστό πλήκτρο.</p>
+      </div>
+      <button class="btn-speaker" onclick="speakCurrentRiddle()" title="Άκουσε το αίνιγμα">🔊</button>
+    </div>
+    <div id="q7"></div>
+    <div class="feedback" id="f7" aria-live="polite"></div>
+    <button id="btnNextRiddle" onclick="nextRiddle()">➡️ Άλλο αίνιγμα</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 8 -->
+  <section class="card" id="a8">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 8 από 8</span>
+        <h2>🎨 Γράφω την πρώτη μου λέξη!</h2>
+        <p class="sub">Πάτησε τα πλήκτρα για να γράψεις λέξεις όπως ΣΧΟΛΕΙΟ, ΜΑΜΑ ή το όνομά σου!</p>
+      </div>
+      <button class="btn-speaker" onclick="speakText('Πάτησε τα πλήκτρα του πληκτρολογίου για να γράψεις ό,τι θέλεις στην οθόνη!')" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+    <div class="type-studio">
+      <div class="screen-box" id="screenText"><span id="typedContent"></span><span class="cursor-blink"></span></div>
+      
+      <!-- Virtual Kids Keyboard -->
+      <div class="virtual-kbd">
+        <div class="kbd-row">
+          <button class="key-btn" onclick="typeChar('Α')">Α</button>
+          <button class="key-btn" onclick="typeChar('Β')">Β</button>
+          <button class="key-btn" onclick="typeChar('Γ')">Γ</button>
+          <button class="key-btn" onclick="typeChar('Δ')">Δ</button>
+          <button class="key-btn" onclick="typeChar('Ε')">Ε</button>
+          <button class="key-btn" onclick="typeChar('Ζ')">Ζ</button>
+          <button class="key-btn" onclick="typeChar('Η')">Η</button>
+          <button class="key-btn" onclick="typeChar('Θ')">Θ</button>
+          <button class="key-btn" onclick="typeChar('Ι')">Ι</button>
+          <button class="key-btn" onclick="typeChar('Κ')">Κ</button>
+          <button class="key-btn" onclick="typeChar('Λ')">Λ</button>
+          <button class="key-btn" onclick="typeChar('Μ')">Μ</button>
+        </div>
+        <div class="kbd-row">
+          <button class="key-btn" onclick="typeChar('Ν')">Ν</button>
+          <button class="key-btn" onclick="typeChar('Ξ')">Ξ</button>
+          <button class="key-btn" onclick="typeChar('Ο')">Ο</button>
+          <button class="key-btn" onclick="typeChar('Π')">Π</button>
+          <button class="key-btn" onclick="typeChar('Ρ')">Ρ</button>
+          <button class="key-btn" onclick="typeChar('Σ')">Σ</button>
+          <button class="key-btn" onclick="typeChar('Τ')">Τ</button>
+          <button class="key-btn" onclick="typeChar('Υ')">Υ</button>
+          <button class="key-btn" onclick="typeChar('Φ')">Φ</button>
+          <button class="key-btn" onclick="typeChar('Χ')">Χ</button>
+          <button class="key-btn" onclick="typeChar('Ψ')">Ψ</button>
+          <button class="key-btn" onclick="typeChar('Ω')">Ω</button>
+        </div>
+        <div class="kbd-row">
+          <button class="key-btn key-func" onclick="typeBackspace()">⌫ Σβήσιμο</button>
+          <button class="key-btn key-space" onclick="typeChar(' ')">␣ Διάστημα (Space)</button>
+          <button class="key-btn key-func" onclick="typeEnter()">↵ Enter</button>
+          <button class="key-btn" onclick="clearTypeStudio()" style="background:#ffcdd2">🗑️</button>
+        </div>
+      </div>
+    </div>
+    <div class="feedback" id="f8" aria-live="polite"></div>
+    <button onclick="finishTyping()">🌟 Ολοκλήρωσα το γράψιμο!</button>
+  </section>
+
+  <!-- ΔΙΠΛΩΜΑ -->
+  <div class="card" style="text-align:center;background:#f3edff">
+    <h2>🏅 Το Μεγάλο μου Δίπλωμα Συγγραφέα</h2>
+    <p id="diploma">Ολοκλήρωσε και τα 8 παιχνίδια για να πάρεις το αστέρι σου!</p>
+    <button onclick="showDiploma()">🎉 Έλεγχος διπλώματος</button>
+  </div>
+</main>
+
+<footer>Πληροφορική Α΄ Δημοτικού · Μάθημα 18: Γράφω στον υπολογιστή</footer>
+
+<script>
+// Web Audio API με αυτόματη ενεργοποίηση
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+window.addEventListener('click', initAudio, { once: true });
+
+function playTone(freq, dur = 0.08) {
+  try {
+    initAudio();
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = freq;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function soundSuccess() {
+  playTone(523, 0.08);
+  setTimeout(() => playTone(659, 0.08), 70);
+  setTimeout(() => playTone(784, 0.12), 140);
+  setTimeout(() => playTone(1046, 0.22), 210);
+  startConfetti();
+}
+
+function soundError() {
+  playTone(220, 0.15);
+  setTimeout(() => playTone(180, 0.2), 100);
+}
+
+// Λήψη του αρχείου HTML
+function downloadHTML() {
+  const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+  const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "mathima_18_keimeno.html";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+// Εφέ Κομφετί με Canvas
+function startConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const confetti = Array.from({ length: 55 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * -canvas.height,
+    vx: (Math.random() - 0.5) * 4,
+    vy: Math.random() * 4 + 3,
+    size: Math.random() * 8 + 6,
+    color: ['#ff4081', '#ffd600', '#00e5ff', '#00c853', '#7c4dff', '#ff6d00'][Math.floor(Math.random() * 6)]
+  }));
+
+  let frames = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confetti.forEach(c => {
+      c.x += c.vx;
+      c.y += c.vy;
+      ctx.fillStyle = c.color;
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.size / 2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    frames++;
+    if (frames < 90) {
+      requestAnimationFrame(animate);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+  animate();
+}
+
+// Σύστημα Αστεριών & Ολοκλήρωσης
+let completed = new Set(), stars = 0;
+function mark(n, msg){
+  if(!completed.has(n)){ 
+    completed.add(n); 
+    stars++; 
+    soundSuccess();
+  }
+  document.getElementById('stars').textContent = stars;
+  document.getElementById('done').textContent = completed.size;
+  document.getElementById('cheer').textContent = msg || 'Μπράβο! Συνέχισε!';
+}
+function feedback(id, msg, good = true){
+  let el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'feedback ' + (good ? 'good' : 'bad');
+}
+
+// Φωνητική Ανάγνωση (Speech Synthesis)
+function speakText(txt){
+  if('speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+    let u = new SpeechSynthesisUtterance(txt);
+    u.lang = 'el-GR';
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 1: Ποιο πλήκτρο χρειάζομαι (σελ. 72-74) */
+const qs = [
+  { q: 'Ποιο είναι το μακρύ πλήκτρο που πατάμε για να αφήσουμε κενό ανάμεσα στις λέξεις;', a: ['␣ Πλήκτρο διαστήματος (Spacebar)', '🪑 Η καρέκλα', '🖱️ Το ποντίκι'], c: 0 },
+  { q: 'Ποιο πλήκτρο πατάμε για να αλλάξουμε γραμμή και να πάμε από κάτω;', a: ['↵ Πλήκτρο Enter', '⌫ Πλήκτρο Backspace', '🍎 Το μήλο'], c: 0 },
+  { q: 'Αν πατήσουμε λάθος γράμμα, με ποιο πλήκτρο το σβήνουμε;', a: ['⌫ Backspace (Σβήσιμο)', '␣ Space (Διάστημα)', '🚗 Το αυτοκινητάκι'], c: 0 },
+  { q: 'Τι είναι η γραμμούλα που αναβοσβήνει και μας δείχνει πού θα γραφτεί το γράμμα;', a: ['📍 Ο δρομέας (κέρσορας)', '📏 Ένας χάρακας', '🎈 Ένα μπαλόνι'], c: 0 }
+];
+let qi = 0;
+function showQ1(){
+  if (qi >= qs.length) {
+    document.getElementById('q1').innerHTML = `
+      <div style="text-align:center; padding:18px; background:#e8f8ed; border-radius:18px;">
+        <span style="font-size:40px;">🎉</span>
+        <h3 style="color:#158057; margin:6px 0;">Μπράβο! Έμαθες τα βασικά πλήκτρα γραφής!</h3>
+      </div>`;
+    document.getElementById('btnNextQ1').style.display = 'none';
+    feedback('f1', '⭐ Ολοκλήρωσες το Παιχνίδι 1!');
+    speakText('Μπράβο! Έμαθες τα βασικά πλήκτρα γραφής!');
+    mark(1, 'Υπέροχη απάντηση!');
+    return;
+  }
+  let item = qs[qi];
+  document.getElementById('q1').innerHTML = `<h3>${item.q}</h3><div class="choices">` +
+    item.a.map((x, i) => `<button class="choice" onclick="answerQ1(${i})">${x}</button>`).join('') + `</div>`;
+  feedback('f1', '');
+}
+function speakCurrentQ1(){ 
+  if (qi < qs.length) speakText(qs[qi].q); 
+}
+function answerQ1(i){
+  let item = qs[qi];
+  if(i === item.c){
+    feedback('f1', '⭐ Μπράβο! Αυτό είναι το σωστό πλήκτρο!');
+    speakText('Μπράβο! Αυτό είναι το σωστό πλήκτρο!');
+    soundSuccess();
+    if (qi === qs.length - 1) {
+      setTimeout(nextQ1, 1000);
+    }
+  } else {
+    feedback('f1', '❌ Για σκέψου ξανά! Δοκίμασε άλλο πλήκτρο.', false);
+    speakText('Για σκέψου ξανά! Δοκίμασε άλλο πλήκτρο.');
+    soundError();
+  }
+}
+function nextQ1(){ 
+  if (qi < qs.length) {
+    qi++; 
+    showQ1(); 
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 2: Ειδικά πλήκτρα (σελ. 72-74) */
+const cards = [
+  ['␣', 'Πλήκτρο Διαστήματος (Space)', true],
+  ['↵', 'Πλήκτρο Enter (Νέα γραμμή)', true],
+  ['⌫', 'Πλήκτρο Backspace (Σβήσιμο)', true],
+  ['🧦', 'Κάλτσα', false],
+  ['🔤', 'Πλήκτρα με γράμματα (Α-Ω)', true],
+  ['🔢', 'Πλήκτρα με αριθμούς (0-9)', true],
+  ['🥪', 'Τοστ', false],
+  ['🥄', 'Κουτάλι', false]
+];
+function renderQ2(){
+  document.getElementById('q2').innerHTML = cards.map((x, i) =>
+    `<button class="choice" onclick="pickCard(this, ${x[2]})"><span class="emoji">${x[0]}</span>${x[1]}</button>`
+  ).join('');
+  feedback('f2', '');
+}
+function pickCard(el, ok){
+  if(ok){
+    el.classList.add('correct');
+    feedback('f2', '🌟 Μπράβο! Αυτό είναι πλήκτρο του πληκτρολογίου!');
+    playTone(600, 0.08);
+    let goodSelected = document.querySelectorAll('#q2 button.correct').length;
+    let totalGood = cards.filter(c => c[2]).length;
+    if(goodSelected >= totalGood){
+      feedback('f2', '🎉 Τέλεια! Βρήκες όλα τα πλήκτρα του κειμένου!');
+      speakText('Τέλεια! Βρήκες όλα τα πλήκτρα του κειμένου!');
+      mark(2, 'Εξαιρετικός πληκτρολογητής!');
+    }
+  } else {
+    el.classList.add('wrong');
+    feedback('f2', '❌ Αυτό δεν είναι πλήκτρο του υπολογιστή!', false);
+    soundError();
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 3: Μνήμη συμβόλων πληκτρολογίου */
+const keyIcons = ['␣', '↵', '⌫', '📍'];
+let mem = [], firstCard = null, lock = false, pairs = 0;
+function newMemory(){
+  mem = [...keyIcons, ...keyIcons].sort(() => Math.random() - 0.5);
+  firstCard = null; lock = false; pairs = 0;
+  document.getElementById('memory').innerHTML = mem.map((x, i) =>
+    `<button onclick="flip(this, ${i})">❔</button>`
+  ).join('');
+  feedback('f3', 'Βρες τα 4 ζευγάρια πλήκτρων!');
+}
+function flip(el, i){
+  if(lock || el.classList.contains('open') || el.classList.contains('matched')) return;
+  el.textContent = mem[i];
+  el.classList.add('open');
+  playTone(550, 0.06);
+  if(!firstCard){
+    firstCard = el;
+    firstCard.dataset.icon = mem[i];
+  } else {
+    if(firstCard.dataset.icon === mem[i]){
+      firstCard.classList.add('matched');
+      el.classList.add('matched');
+      pairs++;
+      firstCard = null;
+      feedback('f3', '✨ Μπράβο! Βρήκες ένα ζευγάρι!');
+      playTone(700, 0.08);
+      if(pairs === mem.length / 2){
+        feedback('f3', '🏆 Τα βρήκες όλα! Έμαθες τα σύμβολα του πληκτρολογίου!');
+        speakText('Τα βρήκες όλα! Έμαθες τα σύμβολα του πληκτρολογίου!');
+        mark(3, 'Σούπερ μνήμη!');
+      }
+    } else {
+      lock = true;
+      let prev = firstCard;
+      firstCard = null;
+      soundError();
+      setTimeout(() => {
+        prev.textContent = '❔'; el.textContent = '❔';
+        prev.classList.remove('open'); el.classList.remove('open');
+        lock = false;
+      }, 700);
+    }
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 4: Τι κάνει το κάθε πλήκτρο; (σελ. 72-74) */
+const matchData = [
+  ['Αφήνει κενό ανάμεσα σε δύο λέξεις...', '␣ Πλήκτρο Διαστήματος (Space)'],
+  ['Κατεβαίνει στην από κάτω γραμμή...', '↵ Πλήκτρο Enter'],
+  ['Σβήνει το γράμμα που γράψαμε κατά λάθος...', '⌫ Πλήκτρο Backspace'],
+  ['Μας δείχνει πού θα μπει το νέο γράμμα...', '📍 Ο δρομέας που αναβοσβήνει']
+];
+function renderQ4(){
+  document.getElementById('q4').innerHTML = matchData.map((x, i) =>
+    `<div class="match-row">
+      <label>${x[0]}</label>
+      <select data-correct="${i}">
+        <option value="">Διάλεξε λειτουργία…</option>
+        ${matchData.map((y, j) => `<option value="${j}">${y[1]}</option>`).join('')}
+      </select>
+    </div>`
+  ).join('');
+}
+function checkMatch(){
+  let sels = [...document.querySelectorAll('#q4 select')];
+  let good = sels.filter(s => s.value !== '' && +s.value === +s.dataset.correct).length;
+  if(good === sels.length){
+    feedback('f4', '🌟 Όλα σωστά! Ξέρεις τι κάνει κάθε πλήκτρο!');
+    speakText('Όλα σωστά! Ξέρεις τι κάνει κάθε πλήκτρο!');
+    mark(4, 'Τέλεια αντιστοίχιση!');
+  } else {
+    feedback('f4', `Σωστά: ${good}/${sels.length}. Δοκίμασε ξανά!`, false);
+    soundError();
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 5: Σωστό ή Λάθος; (σελ. 72-75) */
+const tf = [
+  { t: 'Αν δεν πατήσουμε το διάστημα, οι λέξεις θα κολλήσουν μεταξύ τους.', v: true },
+  { t: 'Το πλήκτρο Enter σβήνει όλη την οθόνη του υπολογιστή.', v: false },
+  { t: 'Το πληκτρολόγιο έχει πάνω του γράμματα, αριθμούς και σύμβολα.', v: true },
+  { t: 'Ο δρομέας είναι ένα πουλάκι που πετάει στην οθόνη.', v: false },
+  { t: 'Μπορούμε να γράψουμε ιστορίες, τραγούδια και ποιήματα στον υπολογιστή.', v: true }
+];
+let ti = 0;
+function showTF(){
+  if (ti >= tf.length) {
+    document.getElementById('q5').innerHTML = `
+      <div style="text-align:center; padding:18px; background:#e8f8ed; border-radius:18px;">
+        <span style="font-size:40px;">🎉</span>
+        <h3 style="color:#158057; margin:6px 0;">Μπράβο! Απάντησες σε όλες τις ερωτήσεις γραφής!</h3>
+      </div>`;
+    document.getElementById('btnNextTF').style.display = 'none';
+    feedback('f5', '⭐ Ολοκλήρωσες το Παιχνίδι 5!');
+    speakText('Μπράβο! Απάντησες σε όλες τις ερωτήσεις γραφής!');
+    mark(5, 'Άριστα στη θεωρία κειμένου!');
+    return;
+  }
+  let item = tf[ti];
+  document.getElementById('q5').innerHTML = `<h3>${item.t}</h3>
+    <div class="choices">
+      <button class="choice" onclick="answerTF(true)" style="background:#e8f8ed">✅ Σωστό</button>
+      <button class="choice" onclick="answerTF(false)" style="background:#ffebee">❌ Λάθος</button>
+    </div>`;
+  feedback('f5', '');
+}
+function speakCurrentTF(){ 
+  if (ti < tf.length) speakText(tf[ti].t); 
+}
+function answerTF(val){
+  let item = tf[ti];
+  if(val === item.v){
+    feedback('f5', '🎉 Σωστά! Πολύ σωστή σκέψη!');
+    speakText('Σωστά! Πολύ σωστή σκέψη!');
+    soundSuccess();
+    if (ti === tf.length - 1) {
+      setTimeout(nextTF, 1000);
+    }
+  } else {
+    feedback('f5', '❌ Για σκέψου το λίγο ακόμα!', false);
+    soundError();
+  }
+}
+function nextTF(){ 
+  if (ti < tf.length) {
+    ti++; 
+    showTF(); 
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 6: Ο δρομέας (κέρσορας) (σελ. 72-73) */
+const cursorQs = [
+  { q: 'Πώς μοιάζει ο δρομέας μέσα στο κείμενο;', a: ['📍 Μια κατακόρυφη φωτεινή γραμμούλα που αναβοσβήνει', '⭕ Ένας τεράστιος κύκλος', '⬛ Ένα μαύρο τετράγωνο'], c: 0 },
+  { q: 'Όταν πατάμε ένα γράμμα, πού εμφανίζεται;', a: ['✨ Εκεί ακριβώς που βρίσκεται ο δρομέας', '🦶 Στο πληκτρολόγιο', '🚪 Έξω από την πόρτα'], c: 0 },
+  { q: 'Όταν πατάμε το πλήκτρο Backspace (σβήσιμο), ποιο γράμμα σβήνει;', a: ['⌫ Το γράμμα που είναι ακριβώς πριν από τον δρομέα', '🔮 Ένα τυχαίο γράμμα', '❌ Κανένα γράμμα'], c: 0 }
+];
+let ci = 0;
+function showCursor(){
+  if (ci >= cursorQs.length) {
+    document.getElementById('q6').innerHTML = `
+      <div style="text-align:center; padding:18px; background:#e8f8ed; border-radius:18px;">
+        <span style="font-size:40px;">🎉</span>
+        <h3 style="color:#158057; margin:6px 0;">Μπράβο! Έμαθες τα πάντα για τον δρομέα!</h3>
+      </div>`;
+    document.getElementById('btnNextCursor').style.display = 'none';
+    feedback('f6', '⭐ Ολοκλήρωσες το Παιχνίδι 6!');
+    speakText('Μπράβο! Έμαθες τα πάντα για τον δρομέα!');
+    mark(6, 'Ειδικός στον δρομέα!');
+    return;
+  }
+  let item = cursorQs[ci];
+  document.getElementById('q6').innerHTML = `<h3>${item.q}</h3><div class="choices">` +
+    item.a.map((x, i) => `<button class="choice" onclick="answerCursor(${i})">${x}</button>`).join('') + `</div>`;
+  feedback('f6', '');
+}
+function speakCurrentCursor(){
+  if (ci < cursorQs.length) speakText(cursorQs[ci].q);
+}
+function answerCursor(i){
+  let item = cursorQs[ci];
+  if(i === item.c){
+    feedback('f6', '⭐ Μπράβο! Αυτό κάνει ο δρομέας!');
+    speakText('Μπράβο! Αυτό κάνει ο δρομέας!');
+    soundSuccess();
+    if (ci === cursorQs.length - 1) {
+      setTimeout(nextCursor, 1000);
+    }
+  } else {
+    feedback('f6', '❌ Σκέψου τη μικρή γραμμούλα που αναβοσβήνει!', false);
+    speakText('Σκέψου τη μικρή γραμμούλα που αναβοσβήνει!');
+    soundError();
+  }
+}
+function nextCursor(){
+  if (ci < cursorQs.length) {
+    ci++; 
+    showCursor();
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 7: Αινίγματα πληκτρολογίου (σελ. 72-74) */
+const riddles = [
+  { q: 'Είμαι το πιο μακρύ πλήκτρο από όλα. Με πατάς και αφήνω ευγενικά χώρο ανάμεσα στις λέξεις! Τι είμαι;', a: ['␣ Το πλήκτρο διαστήματος (Space)', '👟 Ένα παπούτσι', '🥣 Ένα πιάτο'], c: 0 },
+  { q: 'Με πατάς όταν τελειώσεις μια πρόταση και σε κατεβάζω αμέσως στην από κάτω γραμμή! Τι είμαι;', a: ['↵ Το πλήκτρο Enter', '🚗 Ένα αυτοκινητάκι', '🛏️ Ένα κρεβάτι'], c: 0 },
+  { q: 'Αν σου ξεφύγει λάθος γράμμα, με πατάς και το εξαφανίζω στη στιγμή! Τι είμαι;', a: ['⌫ Το πλήκτρο Backspace (σβήσιμο)', '🍌 Μία μπανάνα', '🎒 Μία τσάντα'], c: 0 }
+];
+let ri = 0;
+function showRiddle(){
+  if (ri >= riddles.length) {
+    document.getElementById('q7').innerHTML = `
+      <div style="text-align:center; padding:18px; background:#e8f8ed; border-radius:18px;">
+        <span style="font-size:40px;">🎉</span>
+        <h3 style="color:#158057; margin:6px 0;">Μπράβο! Έλυσες όλα τα αινίγματα του πληκτρολογίου!</h3>
+      </div>`;
+    document.getElementById('btnNextRiddle').style.display = 'none';
+    feedback('f7', '⭐ Ολοκλήρωσες το Παιχνίδι 7!');
+    speakText('Μπράβο! Έλυσες όλα τα αινίγματα του πληκτρολογίου!');
+    mark(7, 'Λύτης αινιγμάτων!');
+    return;
+  }
+  let item = riddles[ri];
+  document.getElementById('q7').innerHTML = `<h3>${item.q}</h3><div class="choices">` +
+    item.a.map((a, i) => `<button class="choice" onclick="answerRiddle(${i})">${a}</button>`).join('') + `</div>`;
+  feedback('f7', '');
+}
+function speakCurrentRiddle(){ 
+  if (ri < riddles.length) speakText(riddles[ri].q); 
+}
+function answerRiddle(i){
+  if(i === riddles[ri].c){
+    feedback('f7', '🥳 Μπράβο! Έλυσες το αίνιγμα!');
+    speakText('Μπράβο! Έλυσες το αίνιγμα!');
+    soundSuccess();
+    if (ri === riddles.length - 1) {
+      setTimeout(nextRiddle, 1000);
+    }
+  } else {
+    feedback('f7', 'Κοντά είσαι! Άκουσε ξανά το αίνιγμα.', false);
+    soundError();
+  }
+}
+function nextRiddle(){ 
+  if (ri < riddles.length) {
+    ri++; 
+    showRiddle(); 
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 8: Εικονικό Πληκτρολόγιο & Γράψιμο */
+let typedString = "";
+function typeChar(ch){
+  typedString += ch;
+  updateScreen();
+  playTone(550, 0.05);
+}
+function typeBackspace(){
+  if(typedString.length > 0){
+    typedString = typedString.slice(0, -1);
+    updateScreen();
+    playTone(350, 0.06);
+  }
+}
+function typeEnter(){
+  typedString += "\n";
+  updateScreen();
+  playTone(450, 0.08);
+}
+function clearTypeStudio(){
+  typedString = "";
+  updateScreen();
+  playTone(300, 0.08);
+}
+function updateScreen(){
+  const el = document.getElementById('typedContent');
+  if(el) el.textContent = typedString;
+}
+function finishTyping(){
+  if(typedString.trim().length > 0){
+    feedback('f8', '📝 Μπράβο! Έγραψες την πρώτη σου όμορφη λέξη στον υπολογιστή!');
+    speakText('Μπράβο! Έγραψες την πρώτη σου όμορφη λέξη στον υπολογιστή!');
+    soundSuccess();
+    mark(8, 'Μικρός συγγραφέας!');
+  } else {
+    feedback('f8', '⚠️ Πάτησε μερικά πλήκτρα πρώτα για να γράψεις μια λεξούλα!', false);
+  }
+}
+
+// Υποστήριξη και από το φυσικό πληκτρολόγιο
+window.addEventListener('keydown', (e) => {
+  const activeGame = document.getElementById('a8');
+  if (!activeGame) return;
+  if (e.key === 'Backspace') {
+    typeBackspace();
+  } else if (e.key === 'Enter') {
+    typeEnter();
+  } else if (e.key === ' ') {
+    typeChar(' ');
+  } else if (e.key.length === 1 && /[a-zA-Zα-ωΑ-Ω0-9]/.test(e.key)) {
+    typeChar(e.key.toUpperCase());
+  }
+});
+
+/* Δίπλωμα */
+function showDiploma(){
+  let el = document.getElementById('diploma');
+  if(completed.size === 8){
+    el.innerHTML = '🏆 <b>ΣΥΓΧΑΡΗΤΗΡΙΑ!</b><br>Έπαιξες και τα 8 παιχνίδια! Είσαι επίσημα <b>ΑΣΤΕΡΙ ΣΤΗ ΣΥΓΓΡΑΦΗ ΣΤΟΝ ΥΠΟΛΟΓΙΣΤΗ!</b> ⭐';
+    speakText('Συγχαρητήρια! Έπαιξες και τα οκτώ παιχνίδια! Είσαι αστέρι στη συγγραφή στον υπολογιστή!');
+    soundSuccess();
+  } else {
+    el.textContent = `Έχεις ολοκληρώσει ${completed.size} από τα 8 παιχνίδια. Συνέχισε, τα πας περίφημα!`;
+  }
+}
+
+function resetAll(){
+  completed.clear(); stars = 0; qi = 0; ti = 0; ci = 0; ri = 0;
+  document.getElementById('stars').textContent = '0';
+  document.getElementById('done').textContent = '0';
+  document.getElementById('diploma').textContent = 'Ολοκλήρωσε και τα 8 παιχνίδια για να πάρεις το αστέρι σου!';
+  document.getElementById('btnNextQ1').style.display = 'inline-block';
+  document.getElementById('btnNextTF').style.display = 'inline-block';
+  document.getElementById('btnNextCursor').style.display = 'inline-block';
+  document.getElementById('btnNextRiddle').style.display = 'inline-block';
+  clearTypeStudio();
+  showQ1(); renderQ2(); newMemory(); renderQ4(); showTF(); showCursor(); showRiddle();
+  feedback('f8', '');
+}
+
+// Αρχική εκκίνηση
+showQ1();
+renderQ2();
+newMemory();
+renderQ4();
+showTF();
+showCursor();
+showRiddle();
+updateScreen();
+</script>
+</body>
+</html>
