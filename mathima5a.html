@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Μάθημα 5: Σχεδιάζοντας το μονοπάτι | Α΄ Δημοτικού</title>
+<style>
+:root{
+  --blue-main:#0288d1;--blue-light:#e1f5fe;--accent:#ffb300;
+  --green:#2e7d32;--red:#c62828;--panel:#ffffff;--text:#263238;
+  --up:#1976d2;--down:#388e3c;--left:#fbc02d;--right:#e64a19;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:radial-gradient(circle,#e1f5fe 0%,#b3e5fc 100%);
+  font-family:"Comfortaa","Trebuchet MS",sans-serif;color:var(--text);font-size:18px;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:12px;
+}
+header{
+  width:100%;max-width:980px;background:#ffffffcc;border-radius:24px;
+  padding:16px 20px;text-align:center;box-shadow:0 8px 24px rgba(2,136,209,0.15);
+  border:3px solid #81d4fa;margin-bottom:12px;
+}
+h1{margin:4px 0;color:var(--blue-main);font-size:clamp(22px,4vw,34px)}
+.status-bar{
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
+  gap:10px;margin-top:10px;font-weight:bold;background:#fff;padding:8px 16px;border-radius:16px;
+}
+.tabs{
+  display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:980px;margin-bottom:12px;
+}
+.tab-btn{
+  background:#fff;border:3px solid #81d4fa;color:var(--blue-main);font-weight:bold;
+  border-radius:18px;padding:8px 12px;cursor:pointer;font-size:15px;box-shadow:0 3px 0 #4fc3f7;
+  transition:all .15s;
+}
+.tab-btn:hover{transform:translateY(-2px);background:#e1f5fe}
+.tab-btn.active{background:var(--blue-main);color:#fff;border-color:#01579b;box-shadow:0 0 12px rgba(2,136,209,0.4)}
+.stage-card{
+  width:100%;max-width:980px;background:var(--panel);border-radius:28px;
+  border:4px solid #81d4fa;box-shadow:0 12px 32px rgba(0,0,0,0.1);padding:20px;
+  display:flex;flex-direction:column;align-items:center;position:relative;
+}
+.stage-header{
+  width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;
+}
+.mission-title{font-size:clamp(17px,2.5vw,22px);font-weight:bold;color:var(--blue-main)}
+.btn-speaker{
+  background:#ffe082;border:2px solid #ffa000;width:48px;height:48px;border-radius:50%;
+  font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 0 #ff8f00;
+}
+.btn-speaker:hover{transform:scale(1.08)}
+.grid-board{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:320px;width:100%;
+  aspect-ratio:1;background:#e0f2f1;padding:8px;border-radius:20px;border:3px solid #80cbc4;
+}
+.grid-cell{
+  background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:36px;border:2px solid #b2dfdb;box-shadow:inset 0 2px 4px rgba(0,0,0,0.04);
+}
+.grid-cell.target{background:#b2ebf2;border-color:#00acc1}
+.grid-cell.block{background:#efebe9;border-color:#bcaaa4}
+.arrow-controls{
+  display:flex;gap:10px;justify-content:center;margin:14px 0 8px;flex-wrap:wrap;
+}
+.arrow-btn{
+  width:64px;height:64px;border-radius:18px;border:0;font-size:30px;color:#fff;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s;
+}
+.arrow-btn:active{transform:scale(0.92)}
+.btn-up{background:var(--up);box-shadow:0 4px 0 #0d47a1}
+.btn-down{background:var(--down);box-shadow:0 4px 0 #1b5e20}
+.btn-left{background:var(--left);box-shadow:0 4px 0 #f57f17;color:#37474f}
+.btn-right{background:var(--right);box-shadow:0 4px 0 #bf360c}
+.code-tray{
+  min-height:56px;width:100%;max-width:500px;background:#f5f5f5;border:2px dashed #b0bec5;
+  border-radius:16px;display:flex;align-items:center;padding:6px 12px;gap:8px;overflow-x:auto;
+  margin:10px 0;
+}
+.code-chip{
+  font-size:24px;background:#fff;padding:6px 10px;border-radius:10px;border:2px solid #cfd8dc;
+}
+.run-bar{display:flex;gap:10px;margin-top:6px}
+.btn-run{background:var(--green);color:#fff;box-shadow:0 4px 0 #1b5e20;padding:12px 24px;font-size:20px;border-radius:18px;border:0;cursor:pointer;font-weight:bold}
+.btn-clear{background:#b0bec5;color:#fff;box-shadow:0 4px 0 #78909c;padding:12px 18px;font-size:17px;border-radius:18px;border:0;cursor:pointer;font-weight:bold}
+.choices-row{
+  display:flex;gap:12px;margin:12px 0;flex-wrap:wrap;justify-content:center;
+}
+.choice-btn{
+  background:#fff;border:3px solid #81d4fa;border-radius:18px;padding:12px 20px;
+  font-size:18px;font-weight:bold;cursor:pointer;box-shadow:0 4px 0 #4fc3f7;transition:transform .15s;
+}
+.choice-btn:hover{transform:translateY(-3px);border-color:var(--blue-main)}
+.feedback-box{min-height:36px;font-size:19px;font-weight:bold;margin-top:10px;text-align:center}
+#confettiCanvas{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999}
+</style>
+</head>
+<body>
+<canvas id="confettiCanvas"></canvas>
+
+<header>
+  <h1>🦆 Σχεδιάζοντας το μονοπάτι!</h1>
+  <div class="status-bar">
+    <span>⭐ Αστέρια: <span id="starCount">0</span> / 8</span>
+    <span id="cheerMsg">Βοήθησε το παπάκι να φτάσει στη λίμνη!</span>
+    <button onclick="downloadSelf()" style="background:#00897b;color:#fff;border:0;border-radius:12px;padding:6px 12px;cursor:pointer;font-weight:bold">💾 Λήψη</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="loadMission(1)">1. 🌊 Προς τη λίμνη</button>
+  <button class="tab-btn" onclick="loadMission(2)">2. 🌾 Αποφυγή καλαμιών</button>
+  <button class="tab-btn" onclick="loadMission(3)">3. 🛣️ Μονοπάτι 1</button>
+  <button class="tab-btn" onclick="loadMission(4)">4. 🛣️ Μονοπάτι 2</button>
+  <button class="tab-btn" onclick="loadMission(5)">5. ⚡ Ποιο είναι πιο σύντομο;</button>
+  <button class="tab-btn" onclick="loadMission(6)">6. 🪨 Πέτρα στον δρόμο</button>
+  <button class="tab-btn" onclick="loadMission(7)">7. 🐸 Ο βάτραχος φίλος</button>
+  <button class="tab-btn" onclick="loadMission(8)">8. 🎨 Δικό μου μονοπάτι</button>
+</div>
+
+<div class="stage-card">
+  <div class="stage-header">
+    <div id="missionHeading" class="mission-title">Αποστολή</div>
+    <button class="btn-speaker" onclick="speakMission()" title="Άκουσε την αποστολή">🔊</button>
+  </div>
+  <div id="gameArea" style="width:100%;display:flex;flex-direction:column;align-items:center;"></div>
+  <div id="feedbackBox" class="feedback-box"></div>
+</div>
+
+<script>
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playTone(freq, dur=0.1){
+  try{
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.frequency.value=freq; o.connect(g); g.connect(audioCtx.destination);
+    o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    o.stop(audioCtx.currentTime + dur);
+  }catch(e){}
+}
+function soundOk(){
+  playTone(523,0.08); setTimeout(()=>playTone(659,0.08),70);
+  setTimeout(()=>playTone(784,0.12),140); setTimeout(()=>playTone(1046,0.2),210);
+  fireConfetti();
+}
+function soundErr(){ playTone(220,0.18); setTimeout(()=>playTone(180,0.2),100); }
+
+function fireConfetti(){
+  const cv=document.getElementById('confettiCanvas'), ctx=cv.getContext('2d');
+  cv.width=window.innerWidth; cv.height=window.innerHeight;
+  const p=Array.from({length:55},()=>({
+    x:cv.width/2, y:cv.height/2, vx:(Math.random()-0.5)*14, vy:(Math.random()-0.5)*14-3,
+    size:Math.random()*8+6, col:['#0288d1','#ffb300','#2e7d32','#00e5ff','#e91e63'][Math.floor(Math.random()*5)]
+  }));
+  let f=0;
+  function anim(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    p.forEach(i=>{ i.x+=i.vx; i.y+=i.vy; i.vy+=0.3; ctx.fillStyle=i.col; ctx.beginPath(); ctx.arc(i.x,i.y,i.size/2,0,Math.PI*2); ctx.fill(); });
+    if(++f < 45) requestAnimationFrame(anim); else ctx.clearRect(0,0,cv.width,cv.height);
+  }
+  anim();
+}
+
+let completed=new Set(), stars=0, curMission=1;
+let duckPos=0, goalPos=15, obstacles=[], userCommands=[];
+
+function markDone(n, msg){
+  if(!completed.has(n)){ completed.add(n); stars++; }
+  document.getElementById('starCount').textContent=stars;
+  document.getElementById('cheerMsg').textContent=msg||'Μπράβο! Συνέχισε!';
+}
+
+function speakText(t){
+  if('speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(t);
+    u.lang='el-GR'; u.rate=0.88; window.speechSynthesis.speak(u);
+  }
+}
+
+const missions = {
+  1: {
+    title: "1. Σχεδίασε το μονοπάτι για τη λίμνη! 🌊",
+    speech: "Βάλε τα βελάκια στη σειρά για να οδηγήσεις το παπάκι στη λίμνη!",
+    start: 0, goal: 3, blocks: [],
+    render:()=>renderGridMission(0, 3, [])
+  },
+  2: {
+    title: "2. Προσοχή στα καλάμια! Απέφυγε το εμπόδιο! 🌾",
+    speech: "Σχεδίασε μονοπάτι γύρω από τα καλάμια για να φτάσει το παπάκι ασφαλές στο νερό!",
+    start: 0, goal: 10, blocks: [5],
+    render:()=>renderGridMission(0, 10, [5])
+  },
+  3: {
+    title: "3. Μονοπάτι 1: Από πάνω! ⬆️ ➡️",
+    speech: "Φτιάξε το πρώτο μονοπάτι πηγαίνοντας πρώτα δεξιά και μετά κάτω!",
+    start: 0, goal: 9, blocks: [4],
+    render:()=>renderGridMission(0, 9, [4])
+  },
+  4: {
+    title: "4. Μονοπάτι 2: Ένας άλλος δρόμος! ⬇️ ➡️",
+    speech: "Μπορούμε να φτάσουμε στο ίδιο σημείο από άλλο δρόμο; Δοκίμασε να πας πρώτα κάτω!",
+    start: 0, goal: 9, blocks: [1],
+    render:()=>renderGridMission(0, 9, [1])
+  },
+  5: {
+    title: "5. Ποιο μονοπάτι έχει λιγότερα βήματα; ⚡",
+    speech: "Κοίταξε τις δύο διαδρομές. Ποιο μονοπάτι είναι πιο σύντομο;",
+    type: "choice",
+    options: [
+      { text: "Μονοπάτι Α: ➡️ ➡️ ⬇️ (3 βήματα)", ok: true },
+      { text: "Μονοπάτι Β: ➡️ ⬇️ ➡️ ⬇️ ⬆️ (5 βήματα)", ok: false }
+    ],
+    render:()=>renderChoiceMission(5)
+  },
+  6: {
+    title: "6. Μεγάλη πέτρα στον δρόμο! 🪨",
+    speech: "Υπάρχει μια πέτρα μπροστά. Σχεδίασε διαδρομή από κάτω!",
+    start: 0, goal: 2, blocks: [1],
+    render:()=>renderGridMission(0, 2, [1])
+  },
+  7: {
+    title: "7. Πέρασε να χαιρετήσεις τον βάτραχο! 🐸",
+    speech: "Οδήγησε το παπάκι πρώτα στον βάτραχο και μετά στη λίμνη!",
+    start: 0, goal: 11, blocks: [6],
+    render:()=>renderGridMission(0, 11, [6])
+  },
+  8: {
+    title: "8. Φτιάξε το δικό σου ελεύθερο μονοπάτι! 🎨",
+    speech: "Σχεδίασε όποια διαδρομή θέλεις για να φτάσει το παπάκι στη σημαία!",
+    start: 12, goal: 3, blocks: [6, 9],
+    render:()=>renderGridMission(12, 3, [6, 9])
+  }
+};
+
+function loadMission(id){
+  curMission = id;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', i+1===id));
+  document.getElementById('missionHeading').textContent = missions[id].title;
+  document.getElementById('feedbackBox').textContent = '';
+  document.getElementById('feedbackBox').style.color = 'var(--green)';
+  userCommands = [];
+  missions[id].render();
+  speakMission();
+}
+
+function speakMission(){ speakText(missions[curMission].speech); }
+
+function renderGridMission(s, g, blk){
+  duckPos = s; goalPos = g; obstacles = blk; userCommands = [];
+  const area = document.getElementById('gameArea');
+  area.innerHTML = `
+    <div class="grid-board" id="boardGrid"></div>
+    <div class="arrow-controls">
+      <button class="arrow-btn btn-up" onclick="addCmd('⬆️')">⬆️</button>
+      <button class="arrow-btn btn-down" onclick="addCmd('⬇️')">⬇️</button>
+      <button class="arrow-btn btn-left" onclick="addCmd('⬅️')">⬅️</button>
+      <button class="arrow-btn btn-right" onclick="addCmd('➡️')">➡️</button>
+    </div>
+    <div class="code-tray" id="codeTray"><span>Μονοπάτι:</span></div>
+    <div class="run-bar">
+      <button class="btn-run" onclick="runPath()">▶️ Εκτέλεση</button>
+      <button class="btn-clear" onclick="clearPath()">🔄 Σβήσιμο</button>
+    </div>
+  `;
+  drawBoardGrid(duckPos);
+}
+
+function drawBoardGrid(cur){
+  const b = document.getElementById('boardGrid'); if(!b) return;
+  b.innerHTML = '';
+  for(let i=0; i<16; i++){
+    const cell = document.createElement('div');
+    const isGoal = (i === goalPos);
+    const isBlock = obstacles.includes(i);
+    cell.className = 'grid-cell' + (isGoal?' target':'') + (isBlock?' block':'');
+    
+    if(i === cur) cell.textContent = '🦆';
+    else if(isGoal) cell.textContent = (curMission === 8 ? '🚩' : '🌊');
+    else if(isBlock) cell.textContent = (curMission === 6 ? '🪨' : (curMission === 7 ? '🐸' : '🌾'));
+    
+    b.appendChild(cell);
+  }
+}
+
+function addCmd(dir){
+  playTone(600, 0.06);
+  userCommands.push(dir);
+  updateTray();
+}
+
+function updateTray(){
+  const t = document.getElementById('codeTray');
+  t.innerHTML = '<span>Μονοπάτι:</span> ' + userCommands.map(c=>`<span class="code-chip">${c}</span>`).join(' ');
+}
+
+function clearPath(){
+  userCommands = []; updateTray();
+  drawBoardGrid(missions[curMission].start);
+  document.getElementById('feedbackBox').textContent = '';
+}
+
+function runPath(){
+  let pos = missions[curMission].start;
+  let i = 0;
+  if(userCommands.length === 0){
+    document.getElementById('feedbackBox').textContent = '⚠️ Βάλε πρώτα βελάκια για να φτιάξεις το μονοπάτι!';
+    return;
+  }
+  function step(){
+    if(i < userCommands.length){
+      const c = userCommands[i];
+      let next = pos;
+      if(c === '➡️' && pos%4 < 3) next++;
+      else if(c === '⬅️' && pos%4 > 0) next--;
+      else if(c === '⬇️' && pos < 12) next += 4;
+      else if(c === '⬆️' && pos >= 4) next -= 4;
+
+      if(obstacles.includes(next)){
+        soundErr();
+        document.getElementById('feedbackBox').style.color = 'var(--red)';
+        document.getElementById('feedbackBox').textContent = '🌾 Προσοχή! Το παπάκι βρήκε σε εμπόδιο! Διάλεξε άλλο δρόμο!';
+        return;
+      }
+
+      pos = next;
+      playTone(480 + i*60, 0.08);
+      drawBoardGrid(pos);
+      i++;
+      setTimeout(step, 350);
+    } else {
+      if(pos === goalPos){
+        soundOk();
+        document.getElementById('feedbackBox').style.color = 'var(--green)';
+        document.getElementById('feedbackBox').textContent = '🎉 ΜΠΡΑΒΟ! Το παπάκι έφτασε στη λίμνη με ασφάλεια!';
+        markDone(curMission, 'Τέλειος σχεδιασμός μονοπατιού!');
+      } else {
+        soundErr();
+        document.getElementById('feedbackBox').style.color = 'var(--red)';
+        document.getElementById('feedbackBox').textContent = '❌ Το παπάκι δεν έφτασε στη λίμνη. Πρόσθεσε κι άλλα βελάκια!';
+      }
+    }
+  }
+  step();
+}
+
+function renderChoiceMission(id){
+  const m = missions[id];
+  const area = document.getElementById('gameArea');
+  area.innerHTML = `
+    <div style="font-size:50px;margin:10px 0;">⚡ 🦆 🌊</div>
+    <p style="font-size:20px;font-weight:bold;margin:10px 0;">Ποιος δρόμος είναι πιο γρήγορος (έχει λιγότερα βήματα);</p>
+    <div class="choices-row">
+      ${m.options.map((opt, idx)=>`<button class="choice-btn" onclick="checkChoice(${opt.ok})">${opt.text}</button>`).join('')}
+    </div>
+  `;
+}
+
+function checkChoice(isOk){
+  const fb = document.getElementById('feedbackBox');
+  if(isOk){
+    soundOk();
+    fb.style.color = 'var(--green)';
+    fb.textContent = '🌟 ΣΩΣΤΑ! Το μονοπάτι με τα 3 βήματα είναι το πιο σύντομο!';
+    markDone(5, 'Σωστή επιλογή συντομότερου δρόμου!');
+  } else {
+    soundErr();
+    fb.style.color = 'var(--red)';
+    fb.textContent = '❌ Αυτό το μονοπάτι έχει πιο πολλά βήματα. Μέτρησε ξανά!';
+  }
+}
+
+function downloadSelf(){
+  const blob = new Blob(["<!DOCTYPE html>\n" + document.documentElement.outerHTML], {type: "text/html;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "mathima_05_monopati.html";
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(a.href);
+}
+
+window.onload = () => loadMission(1);
+</script>
+</body>
+</html>
