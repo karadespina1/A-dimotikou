@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Μάθημα 3: Φτιάχνω το πρώτο μου πρόγραμμα | Α΄ Δημοτικού</title>
+<style>
+:root{
+  --purple:#5e35b1;--accent-yellow:#ffd54f;--bg:#ede7f6;--panel:#ffffff;
+  --green:#2e7d32;--red:#c62828;--blue:#1565c0;--orange:#ef6c00;
+  --up:#1976d2;--down:#388e3c;--left:#fbc02d;--right:#e64a19;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:radial-gradient(circle,#f3e5f5 0%,#d1c4e9 100%);
+  font-family:"Comfortaa","Trebuchet MS",sans-serif;color:#263238;font-size:18px;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:12px;
+}
+header{
+  width:100%;max-width:980px;background:#ffffffcc;border-radius:24px;
+  padding:16px 20px;text-align:center;box-shadow:0 8px 24px rgba(94,53,177,0.12);
+  border:3px solid #b39ddb;margin-bottom:12px;
+}
+h1{margin:4px 0;color:var(--purple);font-size:clamp(22px,4vw,34px)}
+.status-bar{
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
+  gap:10px;margin-top:10px;font-weight:bold;background:#fff;padding:8px 16px;border-radius:16px;
+}
+.tabs{
+  display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:980px;margin-bottom:12px;
+}
+.tab-btn{
+  background:#fff;border:3px solid #b39ddb;color:var(--purple);font-weight:bold;
+  border-radius:18px;padding:8px 12px;cursor:pointer;font-size:15px;box-shadow:0 3px 0 #9575cd;
+  transition:all .15s;
+}
+.tab-btn:hover{transform:translateY(-2px);background:#f3e5f5}
+.tab-btn.active{background:var(--purple);color:#fff;border-color:#4527a0;box-shadow:0 0 12px rgba(94,53,177,0.4)}
+.stage-card{
+  width:100%;max-width:980px;background:var(--panel);border-radius:28px;
+  border:4px solid #b39ddb;box-shadow:0 12px 32px rgba(0,0,0,0.1);padding:20px;
+  display:flex;flex-direction:column;align-items:center;position:relative;
+}
+.stage-header{
+  width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;
+}
+.mission-title{font-size:clamp(17px,2.5vw,22px);font-weight:bold;color:var(--purple)}
+.btn-speaker{
+  background:#ffe082;border:2px solid #ffa000;width:48px;height:48px;border-radius:50%;
+  font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 0 #ff8f00;
+}
+.btn-speaker:hover{transform:scale(1.08)}
+.grid-board{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:320px;width:100%;
+  aspect-ratio:1;background:#efebe9;padding:8px;border-radius:20px;border:3px solid #bcaaa4;
+}
+.grid-cell{
+  background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:36px;border:2px solid #d7ccc8;box-shadow:inset 0 2px 4px rgba(0,0,0,0.04);
+}
+.grid-cell.target{background:#c8e6c9;border-color:#81c784}
+.arrow-controls{
+  display:flex;gap:10px;justify-content:center;margin:16px 0 10px;flex-wrap:wrap;
+}
+.arrow-btn{
+  width:64px;height:64px;border-radius:18px;border:0;font-size:30px;color:#fff;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s;
+}
+.arrow-btn:active{transform:scale(0.92)}
+.btn-up{background:var(--up);box-shadow:0 4px 0 #0d47a1}
+.btn-down{background:var(--down);box-shadow:0 4px 0 #1b5e20}
+.btn-left{background:var(--left);box-shadow:0 4px 0 #f57f17;color:#37474f}
+.btn-right{background:var(--right);box-shadow:0 4px 0 #bf360c}
+.code-tray{
+  min-height:56px;width:100%;max-width:500px;background:#f5f5f5;border:2px dashed #b0bec5;
+  border-radius:16px;display:flex;align-items:center;padding:6px 12px;gap:8px;overflow-x:auto;
+  margin:10px 0;
+}
+.code-chip{
+  font-size:24px;background:#fff;padding:6px 10px;border-radius:10px;border:2px solid #cfd8dc;
+}
+.run-bar{display:flex;gap:10px;margin-top:8px}
+.btn-run{background:var(--green);color:#fff;box-shadow:0 4px 0 #1b5e20;padding:12px 24px;font-size:20px;border-radius:18px;border:0;cursor:pointer;font-weight:bold}
+.btn-clear{background:#b0bec5;color:#fff;box-shadow:0 4px 0 #78909c;padding:12px 18px;font-size:17px;border-radius:18px;border:0;cursor:pointer;font-weight:bold}
+.feedback-box{min-height:36px;font-size:19px;font-weight:bold;margin-top:12px;text-align:center}
+#confettiCanvas{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999}
+</style>
+</head>
+<body>
+<canvas id="confettiCanvas"></canvas>
+
+<header>
+  <h1>🤖 Φτιάχνω το πρώτο μου πρόγραμμα!</h1>
+  <div class="status-bar">
+    <span>⭐ Αστέρια: <span id="starCount">0</span> / 8</span>
+    <span id="cheerMsg">Διάλεξε αποστολή και ξεκίνα!</span>
+    <button onclick="downloadSelf()" style="background:#00897b;color:#fff;border:0;border-radius:12px;padding:6px 12px;cursor:pointer;font-weight:bold">💾 Λήψη</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="loadMission(1)">1. 🐿️ Σκίουρος</button>
+  <button class="tab-btn" onclick="loadMission(2)">2. 🤖 Ρομποτάκι</button>
+  <button class="tab-btn" onclick="loadMission(3)">3. 🦆 Παπάκι</button>
+  <button class="tab-btn" onclick="loadMission(4)">4. ⬆️ Βρες το πάνω</button>
+  <button class="tab-btn" onclick="loadMission(5)">5. ➡️ Βρες το δεξιά</button>
+  <button class="tab-btn" onclick="loadMission(6)">6. 🕵️ Βρες το λάθος</button>
+  <button class="tab-btn" onclick="loadMission(7)">7. 💃 Χορευτής</button>
+  <button class="tab-btn" onclick="loadMission(8)">8. 🎨 Δικό μου πλέγμα</button>
+</div>
+
+<div class="stage-card">
+  <div class="stage-header">
+    <div id="missionHeading" class="mission-title">Αποστολή</div>
+    <button class="btn-speaker" onclick="speakMission()" title="Άκουσε την αποστολή">🔊</button>
+  </div>
+  <div id="gameArea" style="width:100%;display:flex;flex-direction:column;align-items:center;"></div>
+  <div id="feedbackBox" class="feedback-box"></div>
+</div>
+
+<script>
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playTone(freq, dur=0.1){
+  try{
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.frequency.value=freq; o.connect(g); g.connect(audioCtx.destination);
+    o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    o.stop(audioCtx.currentTime + dur);
+  }catch(e){}
+}
+function soundOk(){
+  playTone(523,0.08); setTimeout(()=>playTone(659,0.08),70);
+  setTimeout(()=>playTone(784,0.12),140); setTimeout(()=>playTone(1046,0.2),210);
+  fireConfetti();
+}
+function soundErr(){ playTone(220,0.18); setTimeout(()=>playTone(180,0.2),100); }
+
+function fireConfetti(){
+  const cv=document.getElementById('confettiCanvas'), ctx=cv.getContext('2d');
+  cv.width=window.innerWidth; cv.height=window.innerHeight;
+  const p=Array.from({length:55},()=>({
+    x:cv.width/2, y:cv.height/2, vx:(Math.random()-0.5)*14, vy:(Math.random()-0.5)*14-3,
+    size:Math.random()*8+6, col:['#5e35b1','#ffca28','#2e7d32','#00b0ff','#f50057'][Math.floor(Math.random()*5)]
+  }));
+  let f=0;
+  function anim(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    p.forEach(i=>{ i.x+=i.vx; i.y+=i.vy; i.vy+=0.3; ctx.fillStyle=i.col; ctx.beginPath(); ctx.arc(i.x,i.y,i.size/2,0,Math.PI*2); ctx.fill(); });
+    if(++f < 45) requestAnimationFrame(anim); else ctx.clearRect(0,0,cv.width,cv.height);
+  }
+  anim();
+}
+
+let completed=new Set(), stars=0, curMission=1;
+let heroPos=0, targetPos=0, userCommands=[];
+
+function markDone(n, msg){
+  if(!completed.has(n)){ completed.add(n); stars++; }
+  document.getElementById('starCount').textContent=stars;
+  document.getElementById('cheerMsg').textContent=msg||'Μπράβο! Συνέχισε!';
+}
+
+function speakText(t){
+  if('speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(t);
+    u.lang='el-GR'; u.rate=0.88; window.speechSynthesis.speak(u);
+  }
+}
+
+const missions = {
+  1: {
+    title: "1. Βοήθησε τον σκίουρο 🐿️ να φτάσει στο βελανίδι 🌰!",
+    speech: "Βάλε τα βελάκια στη σειρά και πάτα εκτέλεση για να φτάσει ο σκίουρος στο βελανίδι!",
+    hero:"🐿️", target:"🌰", start:0, goal:3,
+    render:()=>renderGridMission(0,3,"🐿️","🌰")
+  },
+  2: {
+    title: "2. Οδήγησε το ρομποτάκι 🤖 στο αστέρι ⭐!",
+    speech: "Οδήγησε το ρομποτάκι κάτω και δεξιά για να πιάσει το αστέρι!",
+    hero:"🤖", target:"⭐", start:0, goal:9,
+    render:()=>renderGridMission(0,9,"🤖","⭐")
+  },
+  3: {
+    title: "3. Βοήθησε το παπάκι 🦆 να πάει στη λίμνη 🌊!",
+    speech: "Φτιάξε το πρόγραμμα με τα βελάκια για να κολυμπήσει το παπάκι στη λίμνη!",
+    hero:"🦆", target:"🌊", start:12, goal:3,
+    render:()=>renderGridMission(12,3,"🦆","🌊")
+  },
+  4: {
+    title: "4. Ποιο βέλος πάει ΠΑΝΩ; ⬆️",
+    speech: "Πάτησε το βέλος που δείχνει προς τα πάνω!",
+    render:()=>renderPickArrow(0)
+  },
+  5: {
+    title: "5. Ποιο βέλος πάει ΔΕΞΙΑ; ➡️",
+    speech: "Πάτησε το βέλος που δείχνει προς τα δεξιά!",
+    render:()=>renderPickArrow(3)
+  },
+  6: {
+    title: "6. Βρες το λάθος βελάκι! 🕵️",
+    speech: "Ένα βέλος δείχνει λάθος κατεύθυνση. Πάτησέ το για να το διορθώσεις!",
+    render:()=>renderDebugMission()
+  },
+  7: {
+    title: "7. Ο Ρυθμός του Χορού! 💃",
+    speech: "Πάτησε τα βελάκια με τη σειρά για να χορέψει ο ήρωας!",
+    render:()=>renderDanceMission()
+  },
+  8: {
+    title: "8. Φτιάξε το δικό σου ελεύθερο πρόγραμμα! 🎨",
+    speech: "Βάλε όσα βελάκια θέλεις και δες το ρομποτάκι να κινείται ελεύθερα!",
+    hero:"🤖", target:"🚩", start:5, goal:10,
+    render:()=>renderGridMission(5,10,"🤖","🚩")
+  }
+};
+
+function loadMission(id){
+  curMission=id;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i+1===id));
+  document.getElementById('missionHeading').textContent=missions[id].title;
+  document.getElementById('feedbackBox').textContent='';
+  document.getElementById('feedbackBox').style.color='var(--green)';
+  userCommands=[];
+  missions[id].render();
+  speakMission();
+}
+
+function speakMission(){ speakText(missions[curMission].speech); }
+
+function renderGridMission(s, g, hero, target){
+  heroPos=s; targetPos=g; userCommands=[];
+  const area=document.getElementById('gameArea');
+  area.innerHTML=`
+    <div class="grid-board" id="boardGrid"></div>
+    <div class="arrow-controls">
+      <button class="arrow-btn btn-up" onclick="addCmd('⬆️')">⬆️</button>
+      <button class="arrow-btn btn-down" onclick="addCmd('⬇️')">⬇️</button>
+      <button class="arrow-btn btn-left" onclick="addCmd('⬅️')">⬅️</button>
+      <button class="arrow-btn btn-right" onclick="addCmd('➡️')">➡️</button>
+    </div>
+    <div class="code-tray" id="codeTray"><span>Εντολές:</span></div>
+    <div class="run-bar">
+      <button class="btn-run" onclick="runProgram('${hero}','${target}')">▶️ Εκτέλεση</button>
+      <button class="btn-clear" onclick="clearCmds()">🔄 Σβήσιμο</button>
+    </div>
+  `;
+  drawGrid(heroPos, hero, target);
+}
+
+function drawGrid(cur, hero, target){
+  const b=document.getElementById('boardGrid'); if(!b) return;
+  b.innerHTML='';
+  for(let i=0;i<16;i++){
+    const cell=document.createElement('div');
+    cell.className='grid-cell'+(i===targetPos?' target':'');
+    if(i===cur) cell.textContent=hero;
+    else if(i===targetPos) cell.textContent=target;
+    b.appendChild(cell);
+  }
+}
+
+function addCmd(dir){
+  playTone(600,0.06);
+  userCommands.push(dir);
+  updateTray();
+}
+
+function updateTray(){
+  const t=document.getElementById('codeTray');
+  t.innerHTML='<span>Εντολές:</span> '+userCommands.map(c=>`<span class="code-chip">${c}</span>`).join(' ');
+}
+
+function clearCmds(){
+  userCommands=[]; updateTray();
+  drawGrid(missions[curMission].start, missions[curMission].hero, missions[curMission].target);
+  document.getElementById('feedbackBox').textContent='';
+}
+
+function runProgram(hero, target){
+  let pos=missions[curMission].start;
+  let i=0;
+  if(userCommands.length===0){
+    document.getElementById('feedbackBox').textContent='⚠️ Πάτησε πρώτα μερικά βελάκια!';
+    return;
+  }
+  function step(){
+    if(i<userCommands.length){
+      const c=userCommands[i];
+      if(c==='➡️' && pos%4<3) pos++;
+      else if(c==='⬅️' && pos%4>0) pos--;
+      else if(c==='⬇️' && pos<12) pos+=4;
+      else if(c==='⬆️' && pos>=4) pos-=4;
+      playTone(450+i*60,0.08);
+      drawGrid(pos, hero, target);
+      i++;
+      setTimeout(step, 350);
+    } else {
+      if(pos===targetPos){
+        soundOk();
+        document.getElementById('feedbackBox').style.color='var(--green)';
+        document.getElementById('feedbackBox').textContent='🎉 ΜΠΡΑΒΟ! Το πρόγραμμά σου πέτυχε τον στόχο!';
+        markDone(curMission, 'Τέλειος προγραμματισμός!');
+      } else {
+        soundErr();
+        document.getElementById('feedbackBox').style.color='var(--red)';
+        document.getElementById('feedbackBox').textContent='❌ Ο ήρωας σταμάτησε σε άλλο τετράγωνο. Δοκίμασε ξανά!';
+      }
+    }
+  }
+  step();
+}
+
+function renderPickArrow(correctIdx){
+  const arrows=[
+    {icon:'⬆️',cls:'btn-up',idx:0},
+    {icon:'⬇️',cls:'btn-down',idx:1},
+    {icon:'⬅️',cls:'btn-left',idx:2},
+    {icon:'➡️',cls:'btn-right',idx:3}
+  ].sort(()=>Math.random()-0.5);
+
+  const area=document.getElementById('gameArea');
+  area.innerHTML=`
+    <div style="display:flex;gap:16px;margin:30px 0;flex-wrap:wrap;justify-content:center;">
+      ${arrows.map(a=>`<button class="arrow-btn ${a.cls}" style="width:84px;height:84px;font-size:44px;" onclick="checkArrow(${a.idx},${correctIdx})">${a.icon}</button>`).join('')}
+    </div>
+  `;
+}
+
+function checkArrow(clicked, needed){
+  const fb=document.getElementById('feedbackBox');
+  if(clicked===needed){
+    soundOk();
+    fb.style.color='var(--green)'; fb.textContent='🌟 ΣΩΣΤΑ! Βρήκες το σωστό βελάκι!';
+    markDone(curMission, 'Άριστη αναγνώριση!');
+  } else {
+    soundErr();
+    fb.style.color='var(--red)'; fb.textContent='❌ Πρόσεξε καλά πού δείχνει η μύτη του βέλους!';
+  }
+}
+
+function renderDebugMission(){
+  const area=document.getElementById('gameArea');
+  area.innerHTML=`
+    <p style="font-size:20px;font-weight:bold;margin:10px 0;">Θέλουμε να πάμε ΔΕΞΙΑ: ➡️ ➡️ ➡️</p>
+    <div style="display:flex;gap:12px;margin:20px 0;">
+      <button class="arrow-btn btn-right" onclick="debugClick(false)">➡️</button>
+      <button class="arrow-btn btn-up" id="wrongBug" onclick="debugClick(true)">⬆️</button>
+      <button class="arrow-btn btn-right" onclick="debugClick(false)">➡️</button>
+    </div>
+    <p style="color:#666">Πάτα το λάθος βελάκι για να το διορθώσεις!</p>
+  `;
+}
+
+function debugClick(isBug){
+  const fb=document.getElementById('feedbackBox');
+  if(isBug){
+    soundOk();
+    document.getElementById('wrongBug').className='arrow-btn btn-right';
+    document.getElementById('wrongBug').textContent='➡️';
+    fb.style.color='var(--green)'; fb.textContent='🔧 ΜΠΡΑΒΟ! Διόρθωσες το πρόγραμμα (Debugging)!';
+    markDone(6, 'Μικρός μηχανικός!');
+  } else {
+    soundErr();
+    fb.style.color='var(--red)'; fb.textContent='Αυτό το βελάκι είναι ήδη σωστό!';
+  }
+}
+
+let danceIdx=0;
+const danceSteps=['⬆️','⬇️','⬅️','➡️'];
+function renderDanceMission(){
+  danceIdx=0;
+  const area=document.getElementById('gameArea');
+  area.innerHTML=`
+    <div style="font-size:70px;margin:10px 0;" id="dancerIcon">💃</div>
+    <div style="display:flex;gap:10px;font-size:26px;font-weight:bold;" id="targetDance">
+      <span>1. ⬆️</span> <span>2. ⬇️</span> <span>3. ⬅️</span> <span>4. ➡️</span>
+    </div>
+    <div class="arrow-controls" style="margin-top:20px;">
+      <button class="arrow-btn btn-up" onclick="stepDance('⬆️')">⬆️</button>
+      <button class="arrow-btn btn-down" onclick="stepDance('⬇️')">⬇️</button>
+      <button class="arrow-btn btn-left" onclick="stepDance('⬅️')">⬅️</button>
+      <button class="arrow-btn btn-right" onclick="stepDance('➡️')">➡️</button>
+    </div>
+  `;
+}
+
+function stepDance(dir){
+  const fb=document.getElementById('feedbackBox');
+  if(dir===danceSteps[danceIdx]){
+    playTone(500+danceIdx*120,0.08);
+    danceIdx++;
+    document.getElementById('dancerIcon').textContent=['🕺','💃','✨','🎉'][danceIdx%4];
+    if(danceIdx>=4){
+      soundOk();
+      fb.style.color='var(--green)'; fb.textContent='🏆 ΥΠΕΡΟΧΟΣ ΧΟΡΟΣ! Εκτέλεσες όλο το πρόγραμμα ρυθμού!';
+      markDone(7, 'Χορευτής του κώδικα!');
+    } else {
+      fb.style.color='var(--purple)'; fb.textContent=`✨ Σωστά! Τώρα πάτα το ${danceSteps[danceIdx]}`;
+    }
+  } else {
+    soundErr();
+    danceIdx=0;
+    fb.style.color='var(--red)'; fb.textContent='❌ Λάθος βήμα! Ξεκίνα τον χορό από την αρχή με το ⬆️!';
+  }
+}
+
+function downloadSelf(){
+  const blob=new Blob(["<!DOCTYPE html>\n"+document.documentElement.outerHTML],{type:"text/html;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="mathima_03_programma.html";
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(a.href);
+}
+
+window.onload=()=>loadMission(1);
+</script>
+</body>
+</html>
