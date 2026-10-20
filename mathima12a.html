@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Μάθημα 12: Πώς χρησιμοποιώ τον υπολογιστή; | Παιχνίδια Α΄ Δημοτικού</title>
+<style>
+:root{--ink:#26324b;--purple:#6948c6;--pink:#ff6584;--yellow:#ffd152;--mint:#a8f0d2;--blue:#bde3ff;--paper:#fffdf7}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#e4f3ff,#fff0f6 50%,#fff9db);font-family:"Trebuchet MS",Arial,sans-serif;color:var(--ink);font-size:18px;position:relative}
+header{padding:26px 16px 20px;text-align:center;background:#ffffffdb;border-bottom:4px dotted #c7b9ff}
+h1{font-size:clamp(26px,5vw,42px);margin:6px 0;color:#5438ac}
+header p{margin:6px auto;max-width:760px}
+main{max-width:980px;margin:20px auto;padding:0 14px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+button,select{font:inherit;border:0;border-radius:16px;padding:10px 18px;cursor:pointer;background:#6948c6;color:white;box-shadow:0 3px 0 #4a3092;font-weight:bold}
+button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+button:focus{outline:3px solid #ffbd4a;outline-offset:2px}
+select{background:white;color:var(--ink);border:2px solid #d8cffb;box-shadow:none}
+.progress{background:white;border-radius:18px;padding:12px 18px;margin:10px 0 18px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-weight:bold;box-shadow:0 4px 12px rgba(89,67,189,0.08)}
+.card{background:#ffffffed;border:3px solid #fff;border-radius:24px;padding:clamp(16px,3vw,26px);box-shadow:0 8px 22px rgba(83,68,165,0.1);margin:18px 0;position:relative}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card h2{margin:0 0 6px;color:#5438ac;font-size:clamp(21px,3vw,28px)}
+.sub{color:#626b82;margin:4px 0 12px}
+.badge{display:inline-block;background:#fff0b9;border-radius:99px;padding:4px 12px;font-size:14px;margin-bottom:8px;font-weight:bold;color:#6d5410}
+.btn-speaker{background:#ffecb3;color:#8d6200;border:2px solid #ffd54f;width:44px;height:44px;border-radius:50%;box-shadow:0 2px 0 #d9a400;font-size:20px;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0}
+.btn-speaker:hover{background:#ffe082}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0}
+.choice{background:#f3efff;color:var(--ink);box-shadow:none;border:3px solid transparent;min-height:74px;font-weight:bold;font-size:17px;border-radius:16px;padding:10px}
+.choice.correct{background:#d6f8e7;border-color:#38b27f;color:#0f6b48}
+.choice.wrong{background:#ffe2ea;border-color:#f2688f;color:#9b1c3e}
+.feedback{min-height:30px;font-weight:bold;margin:8px 0;font-size:17px}
+.good{color:#158057}
+.bad{color:#b92d52}
+.emoji{font-size:32px;display:block;margin-bottom:4px}
+.memory-grid{display:grid;grid-template-columns:repeat(4,minmax(60px,1fr));gap:10px;margin:14px 0}
+.memory-grid button{min-height:80px;font-size:32px;background:#e1f2ff;color:#283b5b;box-shadow:none;border:2px solid #b8defe}
+.memory-grid button.open{background:#fff3c4;border-color:#ffca28}
+.memory-grid button.matched{background:#cbf6e1;border-color:#5bd69c}
+.match-row{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;align-items:center;margin:10px 0}
+.match-row label{font-weight:bold}
+input[type=text]{font:inherit;padding:10px 14px;border:2px solid #d8cffb;border-radius:12px;width:100%;max-width:320px}
+footer{text-align:center;padding:22px;color:#6b7280;font-size:15px}
+
+/* Canvas κομφετί */
+#confettiCanvas{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999}
+
+@media(max-width:540px){.match-row{grid-template-columns:1fr}.choices{grid-template-columns:1fr 1fr}}
+@media print{.toolbar,button{display:none}body{background:white}.card{box-shadow:none;border-color:#ccc}}
+</style>
+</head>
+<body>
+
+<canvas id="confettiCanvas"></canvas>
+
+<header>
+  <div style="font-size:46px">🔘 🖥️ 🖼️ ❌ 🛑</div>
+  <h1>Πώς χρησιμοποιώ τον υπολογιστή μου!</h1>
+  <p><b>Μάθημα 12: Πώς χρησιμοποιώ τον υπολογιστή;</b> · 8 Παιχνίδια για τους μαθητές της Α΄ Δημοτικού[cite: 10, 52, 117]</p>
+  <p>Πάτα το μεγάφωνο 🔊 σε κάθε παιχνίδι για να ακούσεις την οδηγία![cite: 117]</p>
+</header>
+
+<main>
+  <div class="toolbar">
+    <button onclick="resetAll()">🔄 Ξεκινάμε από την αρχή</button>
+    <button onclick="window.print()">🖨️ Εκτύπωση</button>
+  </div>
+
+  <div class="progress">
+    <span>⭐ Αστεράκια: <b id="stars">0</b> / 8</span>
+    <span>🎯 Παιχνίδια που έγιναν: <b id="done">0</b> / 8</span>
+    <span id="cheer" style="color:#5943bd">Πάμε να παίξουμε! 😊</span>
+  </div>
+
+  <!-- ΠΑΙΧΝΙΔΙ 1 -->
+  <section class="card" id="a1">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 1 από 8</span>
+        <h2>🎯 Πώς ανοίγει ο υπολογιστής;</h2>
+        <p class="sub">Πάτησε τη σωστή ενέργεια για να ξεκινήσεις!</p>
+      </div>
+      <button class="btn-speaker" onclick="speakCurrentQ1()" title="Άκουσε την ερώτηση">🔊</button>
+    </div>
+    <div id="q1"></div>
+    <div class="feedback" id="f1" aria-live="polite"></div>
+    <button id="btnNextQ1" onclick="nextQ1()">➡️ Επόμενη ερώτηση</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 2 -->
+  <section class="card" id="a2">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 2 από 8</span>
+        <h2>🧺 Βρες τα εικονίδια της οθόνης!</h2>
+        <p class="sub">Πάτησε ΜΟΝΟ τα εικονίδια που ανοίγουν εφαρμογές στην οθόνη.</p>
+      </div>
+      <button class="btn-speaker" onclick="speakText('Πάτησε μόνο τα εικονίδια που ανοίγουν εφαρμογές στην οθόνη του υπολογιστή!')" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+    <div class="choices" id="q2"></div>
+    <div class="feedback" id="f2" aria-live="polite"></div>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 3 -->
+  <section class="card" id="a3">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 3 από 8</span>
+        <h2>🧠 Μνήμη: Τα σύμβολα του υπολογιστή!</h2>
+        <p class="sub">Βρες τα ζευγάρια: Κουμπί ανοίγματος 🔘, Εικονίδιο 🖼️, Παράθυρο 🪟, Κλείσιμο με Χ ❌.</p>
+      </div>
+      <button class="btn-speaker" onclick="speakText('Βρες τα ζευγάρια: κουμπί ανοίγματος, εικονίδιο εφαρμογής, παράθυρο και κλείσιμο με χι!')" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+    <div class="memory-grid" id="memory"></div>
+    <div class="feedback" id="f3" aria-live="polite"></div>
+    <button onclick="newMemory()">🔀 Ανακάτεμα</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 4 -->
+  <section class="card" id="a4">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 4 από 8</span>
+        <h2>🔗 Πώς κάνω την κάθε ενέργεια;</h2>
+        <p class="sub">Διάλεξε ποια κίνηση κάνουμε για κάθε δουλειά.</p>
+      </div>
+      <button class="btn-speaker" onclick="speakText('Διάλεξε ποια κίνηση κάνουμε για κάθε δουλειά στον υπολογιστή!')" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+    <div id="q4"></div>
+    <div class="feedback" id="f4" aria-live="polite"></div>
+    <button onclick="checkMatch()">✅ Έλεγχος απαντήσεων</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 5 -->
+  <section class="card" id="a5">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 5 από 8</span>
+        <h2>🕵️ Σωστό ή Λάθος;</h2>
+        <p class="sub">Άκουσε την πρόταση και πάτησε το πράσινο ή το κόκκινο κουμπί!</p>
+      </div>
+      <button class="btn-speaker" onclick="speakCurrentTF()" title="Άκουσε την πρόταση">🔊</button>
+    </div>
+    <div id="q5"></div>
+    <div class="feedback" id="f5" aria-live="polite"></div>
+    <button id="btnNextTF" onclick="nextTF()">➡️ Επόμενη πρόταση</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 6 -->
+  <section class="card" id="a6">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 6 από 8</span>
+        <h2>🛑 Πώς κλείνω σωστά τον υπολογιστή;</h2>
+        <p class="sub">Ποιος είναι ο σωστός τρόπος για να τερματίσουμε;</p>
+      </div>
+      <button class="btn-speaker" onclick="speakCurrentShutdown()" title="Άκουσε την ερώτηση">🔊</button>
+    </div>
+    <div id="q6"></div>
+    <div class="feedback" id="f6" aria-live="polite"></div>
+    <button id="btnNextShutdown" onclick="nextShutdown()">➡️ Επόμενη ερώτηση</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 7 -->
+  <section class="card" id="a7">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 7 από 8</span>
+        <h2>🎒 Αινίγματα λειτουργίας!</h2>
+        <p class="sub">Άκουσε το αίνιγμα και διάλεξε τη σωστή εικόνα.</p>
+      </div>
+      <button class="btn-speaker" onclick="speakCurrentRiddle()" title="Άκουσε το αίνιγμα">🔊</button>
+    </div>
+    <div id="q7"></div>
+    <div class="feedback" id="f7" aria-live="polite"></div>
+    <button id="btnNextRiddle" onclick="nextRiddle()">➡️ Άλλο αίνιγμα</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 8 -->
+  <section class="card" id="a8">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 8 από 8</span>
+        <h2>🎨 Η επιφάνεια εργασίας μου!</h2>
+        <p class="sub">Πάτησε τα εικονίδια που θέλεις να έχεις στην οθόνη σου!</p>
+      </div>
+      <button class="btn-speaker" onclick="speakText('Πάτησε τα εικονίδια που θέλεις να έχεις στην οθόνη του υπολογιστή σου!')" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+    <div class="choices" id="artChoices"></div>
+    <p>Όνομα της οθόνης μου: <input id="artTitle" type="text" placeholder="Η όμορφη οθόνη μου!"></p>
+    <div class="choices" id="artPreview" style="background:#fff9db;border-radius:18px;padding:15px;min-height:75px"></div>
+    <div class="feedback" id="f8" aria-live="polite"></div>
+    <button onclick="finishArt()">🌟 Ολοκλήρωσα την οθόνη μου!</button>
+  </section>
+
+  <!-- ΔΙΠΛΩΜΑ -->
+  <div class="card" style="text-align:center;background:#f3edff">
+    <h2>🏅 Το Μεγάλο μου Δίπλωμα Χειρισμού</h2>
+    <p id="diploma">Ολοκλήρωσε και τα 8 παιχνίδια για να πάρεις το αστέρι σου![cite: 117]</p>
+    <button onclick="showDiploma()">🎉 Έλεγχος διπλώματος</button>
+  </div>
+</main>
+
+<footer>Πληροφορική Α΄ Δημοτικού · Μάθημα 12: Πώς χρησιμοποιώ τον υπολογιστή;[cite: 10, 52]</footer>
+
+<script>
+// Εφέ Κομφετί με Canvas
+function startConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const confetti = Array.from({ length: 60 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * -canvas.height,
+    vx: (Math.random() - 0.5) * 4,
+    vy: Math.random() * 4 + 3,
+    size: Math.random() * 8 + 6,
+    color: ['#ff4081', '#ffd600', '#00e5ff', '#00c853', '#7c4dff', '#ff6d00'][Math.floor(Math.random() * 6)]
+  }));
+
+  let frames = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confetti.forEach(c => {
+      c.x += c.vx;
+      c.y += c.vy;
+      ctx.fillStyle = c.color;
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.size / 2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    frames++;
+    if (frames < 100) {
+      requestAnimationFrame(animate);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+  animate();
+}
+
+// Σύστημα Αστεριών & Ολοκλήρωσης
+let completed = new Set(), stars = 0;
+function mark(n, msg){
+  if(!completed.has(n)){ 
+    completed.add(n); 
+    stars++; 
+    startConfetti();
+  }
+  document.getElementById('stars').textContent = stars;
+  document.getElementById('done').textContent = completed.size;
+  document.getElementById('cheer').textContent = msg || 'Μπράβο! Συνέχισε!';
+}
+function feedback(id, msg, good = true){
+  let el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'feedback ' + (good ? 'good' : 'bad');
+}
+
+// Φωνητική Ανάγνωση (Speech Synthesis)
+function speakText(txt){
+  if('speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+    let u = new SpeechSynthesisUtterance(txt);
+    u.lang = 'el-GR';
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 1: Άνοιγμα υπολογιστή & εικονίδια (σελ. 50-51) */
+const qs = [
+  { q: 'Πώς ανοίγει ο υπολογιστής για να πάρει ρεύμα;', a: ['🔘 Πατάω το κουμπί του', '🗣️ Του φωνάζω δυνατά', '🪟 Ανοίγω την πόρτα'], c: 0 },
+  { q: 'Τι βλέπουμε στην οθόνη μόλις ανοίξει ο υπολογιστής;', a: ['🖼️ Μικρές εικόνες (εικονίδια)', '🥣 Ένα πιάτο σούπα', '👟 Ένα ζευγάρι παπούτσια'], c: 0 },
+  { q: 'Πώς ανοίγω μια εφαρμογή στον υπολογιστή γραφείου;', a: ['🖱️ Με διπλό κλικ στο εικονίδιο', '👊 Χτυπώντας την οθόνη', '🧲 Με έναν μαγνήτη'], c: 0 },
+  { q: 'Πώς ανοίγω μια εφαρμογή στην ταμπλέτα ή στο κινητό;', a: ['👆 Πατάω το εικονίδιο με το δάχτυλο', '🪥 Με την οδοντόβουρτσα', '🔑 Με το κλειδί του σπιτιού'], c: 0 }
+];
+let qi = 0;
+function showQ1(){
+  if (qi >= qs.length) {
+    document.getElementById('q1').innerHTML = `
+      <div style="text-align:center; padding:18px; background:#e8f8ed; border-radius:18px;">
+        <span style="font-size:40px;">🎉</span>
+        <h3 style="color:#158057; margin:6px 0;">Μπράβο! Απάντησες σε όλες τις ερωτήσεις!</h3>
+      </div>`;
+    document.getElementById('btnNextQ1').style.display = 'none';
+    feedback('f1', '⭐ Ολοκλήρωσες το Παιχνίδι 1!');
+    speakText('Μπράβο! Απάντησες σε όλες τις ερωτήσεις!');
+    mark(1, 'Υπέροχη απάντηση!');
+    return;
+  }
+  let item = qs[qi];
+  document.getElementById('q1').innerHTML = `<h3>${item.q}</h3><div class="choices">` +
+    item.a.map((x, i) => `<button class="choice" onclick="answerQ1(${i})">${x}</button>`).join('') + `</div>`;
+  feedback('f1', '');
+}
+function speakCurrentQ1(){ 
+  if (qi < qs.length) speakText(qs[qi].q); 
+}
+function answerQ1(i){
+  let item = qs[qi];
+  if(i === item.c){
+    feedback('f1', '⭐ Μπράβο! Το βρήκες σωστά!');
+    speakText('Μπράβο! Το βρήκες σωστά!');
+    startConfetti();
+    if (qi === qs.length - 1) {
+      setTimeout(nextQ1, 1000);
+    }
+  } else {
+    feedback('f1', '❌ Για σκέψου ξανά! Δοκίμασε άλλη απάντηση.', false);
+    speakText('Για σκέψου ξανά! Δοκίμασε άλλη απάντηση.');
+  }
+}
+function nextQ1(){ 
+  if (qi < qs.length) {
+    qi++; 
+    showQ1(); 
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 2: Εικονίδια Εφαρμογών (σελ. 51-52) */
+const cards = [
+  ['🎨', 'Εικονίδιο Ζωγραφικής', true],
+  ['📝', 'Εικονίδιο Κειμένου', true],
+  ['🌐', 'Εικονίδιο Διαδικτύου', true],
+  ['🎮', 'Εικονίδιο Παιχνιδιού', true],
+  ['🥪', 'Τοστ', false],
+  ['🧦', 'Κάλτσα', false],
+  ['📁', 'Εικονίδιο Φακέλου', true],
+  ['🍎', 'Μήλο', false]
+];
+function renderQ2(){
+  document.getElementById('q2').innerHTML = cards.map((x, i) =>
+    `<button class="choice" onclick="pickCard(this, ${x[2]})"><span class="emoji">${x[0]}</span>${x[1]}</button>`
+  ).join('');
+  feedback('f2', '');
+}
+function pickCard(el, ok){
+  if(ok){
+    el.classList.add('correct');
+    feedback('f2', '🌟 Μπράβο! Αυτό είναι εικονίδιο εφαρμογής!');
+    let goodSelected = document.querySelectorAll('#q2 button.correct').length;
+    let totalGood = cards.filter(c => c[2]).length;
+    if(goodSelected >= totalGood){
+      feedback('f2', '🎉 Τέλεια! Βρήκες όλα τα εικονίδια της οθόνης!');
+      speakText('Τέλεια! Βρήκες όλα τα εικονίδια της οθόνης!');
+      mark(2, 'Εξαιρετική ταξινόμηση!');
+    }
+  } else {
+    el.classList.add('wrong');
+    feedback('f2', '❌ Αυτό δεν είναι εικονίδιο υπολογιστή!', false);
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 3: Μνήμη Συμβόλων Χρήσης */
+const useIcons = ['🔘', '🖼️', '🪟', '❌'];
+let mem = [], firstCard = null, lock = false, pairs = 0;
+function newMemory(){
+  mem = [...useIcons, ...useIcons].sort(() => Math.random() - 0.5);
+  firstCard = null; lock = false; pairs = 0;
+  document.getElementById('memory').innerHTML = mem.map((x, i) =>
+    `<button onclick="flip(this, ${i})">❔</button>`
+  ).join('');
+  feedback('f3', 'Βρες τα 4 ζευγάρια συμβόλων!');
+}
+function flip(el, i){
+  if(lock || el.classList.contains('open') || el.classList.contains('matched')) return;
+  el.textContent = mem[i];
+  el.classList.add('open');
+  if(!firstCard){
+    firstCard = el;
+    firstCard.dataset.icon = mem[i];
+  } else {
+    if(firstCard.dataset.icon === mem[i]){
+      firstCard.classList.add('matched');
+      el.classList.add('matched');
+      pairs++;
+      firstCard = null;
+      feedback('f3', '✨ Μπράβο! Βρήκες ένα ζευγάρι!');
+      if(pairs === mem.length / 2){
+        feedback('f3', '🏆 Τα βρήκες όλα! Έμαθες τα σύμβολα του υπολογιστή!');
+        speakText('Τα βρήκες όλα! Έμαθες τα σύμβολα του υπολογιστή!');
+        mark(3, 'Σούπερ μνήμη!');
+      }
+    } else {
+      lock = true;
+      let prev = firstCard;
+      firstCard = null;
+      setTimeout(() => {
+        prev.textContent = '❔'; el.textContent = '❔';
+        prev.classList.remove('open'); el.classList.remove('open');
+        lock = false;
+      }, 700);
+    }
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 4: Πώς κάνω την κάθε ενέργεια; (σελ. 51-52) */
+const matchData = [
+  ['Ανοίγω εφαρμογή στον υπολογιστή', '🖱️ Διπλό κλικ στο εικονίδιο'],
+  ['Κλείνω το παράθυρο της εργασίας μου', '❌ Κλικ στο κόκκινο Χ δεξιά'],
+  ['Ανοίγω εφαρμογή στην ταμπλέτα', '👆 Πατάω με το δάχτυλο'],
+  ['Κλείνω σωστά τον υπολογιστή', '🛑 Κλικ στη λέξη Τερματισμός']
+];
+function renderQ4(){
+  document.getElementById('q4').innerHTML = matchData.map((x, i) =>
+    `<div class="match-row">
+      <label>${x[0]}</label>
+      <select data-correct="${i}">
+        <option value="">Διάλεξε ενέργεια…</option>
+        ${matchData.map((y, j) => `<option value="${j}">${y[1]}</option>`).join('')}
+      </select>
+    </div>`
+  ).join('');
+}
+function checkMatch(){
+  let sels = [...document.querySelectorAll('#q4 select')];
+  let good = sels.filter(s => s.value !== '' && +s.value === +s.dataset.correct).length;
+  if(good === sels.length){
+    feedback('f4', '🌟 Όλα σωστά! Ξέρεις πώς λειτουργεί ο υπολογιστής!');
+    speakText('Όλα σωστά! Ξέρεις πώς λειτουργεί ο υπολογιστής!');
+    mark(4, 'Τέλεια αντιστοίχιση!');
+  } else {
+    feedback('f4', `Σωστά: ${good}/${sels.length}. Δοκίμασε ξανά!`, false);
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 5: Σωστό ή Λάθος; (σελ. 50-52) */
+const tf = [
+  { t: 'Το πλαίσιο της εφαρμογής που ανοίγει στην οθόνη λέγεται παράθυρο.', v: true },
+  { t: 'Κλείνουμε τον υπολογιστή τραβώντας το καλώδιο από την πρίζα.', v: false },
+  { t: 'Κλείνουμε το παράθυρο κάνοντας κλικ στο Χ πάνω δεξιά.', v: true },
+  { t: 'Στην ταμπλέτα πατάμε το εικονίδιο με το δαχτυλάκι μας.', v: true },
+  { t: 'Κλείνουμε τον υπολογιστή γραφείου πατώντας Τερματισμός.', v: true }
+];
+let ti = 0;
+function showTF(){
+  if (ti >= tf.length) {
+    document.getElementById('q5').innerHTML = `
+      <div style="text-align:center; padding:18px; background:#e8f8ed; border-radius:18px;">
+        <span style="font-size:40px;">🎉</span>
+        <h3 style="color:#158057; margin:6px 0;">Μπράβο! Τις απάντησες όλες!</h3>
+      </div>`;
+    document.getElementById('btnNextTF').style.display = 'none';
+    feedback('f5', '⭐ Ολοκλήρωσες το Παιχνίδι 5!');
+    speakText('Μπράβο! Τις απάντησες όλες!');
+    mark(5, 'Άριστα στις ερωτήσεις!');
+    return;
+  }
+  let item = tf[ti];
+  document.getElementById('q5').innerHTML = `<h3>${item.t}</h3>
+    <div class="choices">
+      <button class="choice" onclick="answerTF(true)" style="background:#e8f8ed">✅ Σωστό</button>
+      <button class="choice" onclick="answerTF(false)" style="background:#ffebee">❌ Λάθος</button>
+    </div>`;
+  feedback('f5', '');
+}
+function speakCurrentTF(){ 
+  if (ti < tf.length) speakText(tf[ti].t); 
+}
+function answerTF(val){
+  let item = tf[ti];
+  if(val === item.v){
+    feedback('f5', '🎉 Σωστά! Πολύ ωραία σκέψη!');
+    speakText('Σωστά! Πολύ ωραία σκέψη!');
+    startConfetti();
+    if (ti === tf.length - 1) {
+      setTimeout(nextTF, 1000);
+    }
+  } else {
+    feedback('f5', '❌ Για σκέψου το λίγο ακόμα!', false);
+  }
+}
+function nextTF(){ 
+  if (ti < tf.length) {
+    ti++; 
+    showTF(); 
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 6: Σωστός Τερματισμός (σελ. 51-52) */
+const shutQs = [
+  { q: 'Πώς κλείνουμε σωστά τον υπολογιστή γραφείου;', a: ['🛑 Με κλικ στη λέξη Τερματισμός', '🔌 Τραβώντας το καλώδιο', '🔘 Πατώντας το κουμπί ρεύματος'], c: 0 },
+  { q: 'Πού κάνουμε κλικ για να κλείσουμε ένα παράθυρο εφαρμογής;', a: ['❌ Στο κόκκινο Χ πάνω δεξιά', '⭐ Στο αστέρι', '🎨 Στα χρώματα'], c: 0 },
+  { q: 'Πώς κλείνουμε την ταμπλέτα ή το κινητό;', a: ['👆 Πατάμε με το δάχτυλο το σύμβολο κλεισίματος', '🚿 Τη ρίχνουμε στο νερό', '🔨 Με ένα σφυρί'], c: 0 }
+];
+let si = 0;
+function showShutdown(){
+  if (si >= shutQs.length) {
+    document.getElementById('q6').innerHTML = `
+      <div style="text-align:center; padding:18px; background:#e8f8ed; border-radius:18px;">
+        <span style="font-size:40px;">🎉</span>
+        <h3 style="color:#158057; margin:6px 0;">Μπράβο! Ξέρεις πώς να κλείνεις σωστά τον υπολογιστή!</h3>
+      </div>`;
+    document.getElementById('btnNextShutdown').style.display = 'none';
+    feedback('f6', '⭐ Ολοκλήρωσες το Παιχνίδι 6!');
+    speakText('Μπράβο! Ξέρεις πώς να κλείνεις σωστά τον υπολογιστή!');
+    mark(6, 'Προσεκτικός χρήστης!');
+    return;
+  }
+  let item = shutQs[si];
+  document.getElementById('q6').innerHTML = `<h3>${item.q}</h3><div class="choices">` +
+    item.a.map((x, i) => `<button class="choice" onclick="answerShutdown(${i})">${x}</button>`).join('') + `</div>`;
+  feedback('f6', '');
+}
+function speakCurrentShutdown(){
+  if (si < shutQs.length) speakText(shutQs[si].q);
+}
+function answerShutdown(i){
+  let item = shutQs[si];
+  if(i === item.c){
+    feedback('f6', '⭐ Μπράβο! Πολύ σωστά!');
+    speakText('Μπράβο! Πολύ σωστά!');
+    startConfetti();
+    if (si === shutQs.length - 1) {
+      setTimeout(nextShutdown, 1000);
+    }
+  } else {
+    feedback('f6', '❌ Προσοχή! Αυτός ο τρόπος μπορεί να χαλάσει τον υπολογιστή!', false);
+    speakText('Προσοχή! Αυτός ο τρόπος μπορεί να χαλάσει τον υπολογιστή!');
+  }
+}
+function nextShutdown(){
+  if (si < shutQs.length) {
+    si++;
+    showShutdown();
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 7: Αινίγματα Λειτουργίας (σελ. 50-52) */
+const riddles = [
+  { q: 'Είμαι ένα μικρό κουμπί, με πατάς και ο υπολογιστής παίρνει ρεύμα και ξυπνάει! Τι είμαι;', a: ['🔘 Κουμπί ανοίγματος (Power)', '👟 Παπούτσι', '✏️ Μολύβι'], c: 0 },
+  { q: 'Είμαι μια μικρή εικόνα στην οθόνη. Μου κάνεις διπλό κλικ και ανοίγω παιχνίδι! Τι είμαι;', a: ['🖼️ Εικονίδιο εφαρμογής', '🧀 Τυρί', '⚽ Μπάλα'], c: 0 },
+  { q: 'Είμαι ένα πλαίσιο στην οθόνη όπου μέσα ζωγραφίζεις ή γράφεις. Έχω και όνομα σπιτιού! Τι είμαι;', a: ['🪟 Παράθυρο', '🚪 Πόρτα', '🛏️ Κρεβάτι'], c: 0 },
+  { q: 'Είμαι ένα κόκκινο σημαδάκι ψηλά δεξιά. Με πατάς και το παράθυρο φεύγει! Τι είμαι;', a: ['❌ Το κουμπί κλεισίματος (Χ)', '🍎 Μήλο', '🎈 Μπαλόνι'], c: 0 }
+];
+let ri = 0;
+function showRiddle(){
+  if (ri >= riddles.length) {
+    document.getElementById('q7').innerHTML = `
+      <div style="text-align:center; padding:18px; background:#e8f8ed; border-radius:18px;">
+        <span style="font-size:40px;">🎉</span>
+        <h3 style="color:#158057; margin:6px 0;">Μπράβο! Έλυσες όλα τα αινίγματα!</h3>
+      </div>`;
+    document.getElementById('btnNextRiddle').style.display = 'none';
+    feedback('f7', '⭐ Ολοκλήρωσες το Παιχνίδι 7!');
+    speakText('Μπράβο! Έλυσες όλα τα αινίγματα!');
+    mark(7, 'Λύτης αινιγμάτων!');
+    return;
+  }
+  let item = riddles[ri];
+  document.getElementById('q7').innerHTML = `<h3>${item.q}</h3><div class="choices">` +
+    item.a.map((a, i) => `<button class="choice" onclick="answerRiddle(${i})">${a}</button>`).join('') + `</div>`;
+  feedback('f7', '');
+}
+function speakCurrentRiddle(){ 
+  if (ri < riddles.length) speakText(riddles[ri].q); 
+}
+function answerRiddle(i){
+  if(i === riddles[ri].c){
+    feedback('f7', '🥳 Μπράβο! Έλυσες το αίνιγμα!');
+    speakText('Μπράβο! Έλυσες το αίνιγμα!');
+    startConfetti();
+    if (ri === riddles.length - 1) {
+      setTimeout(nextRiddle, 1000);
+    }
+  } else {
+    feedback('f7', 'Κοντά είσαι! Άκουσε ξανά το αίνιγμα.', false);
+  }
+}
+function nextRiddle(){ 
+  if (ri < riddles.length) {
+    ri++; 
+    showRiddle(); 
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 8: Φτιάξε την Επιφάνεια Εργασίας σου (σελ. 51-52) */
+const art = [
+  ['🎨', 'Εφαρμογή Ζωγραφικής'],
+  ['📝', 'Εφαρμογή Κειμένου'],
+  ['🌐', 'Εφαρμογή Διαδικτύου'],
+  ['🎮', 'Εκπαιδευτικό Παιχνίδι'],
+  ['🎵', 'Μουσική'],
+  ['📁', 'Φάκελος με Ζωγραφιές']
+];
+function initArt(){
+  document.getElementById('artChoices').innerHTML = art.map((x, i) =>
+    `<button class="choice" onclick="addArt(${i})"><span class="emoji">${x[0]}</span>${x[1]}</button>`
+  ).join('');
+}
+function addArt(i){
+  let p = document.getElementById('artPreview');
+  let s = document.createElement('span');
+  s.style.cssText = 'font-size:36px;margin:8px;cursor:pointer;';
+  s.textContent = art[i][0];
+  s.title = art[i][1];
+  p.appendChild(s);
+}
+function finishArt(){
+  feedback('f8', '🎨 Υπέροχη επιφάνεια εργασίας! Γέμισε με τα αγαπημένα σου εικονίδια!');
+  speakText('Υπέροχη επιφάνεια εργασίας! Γέμισε με τα αγαπημένα σου εικονίδια!');
+  mark(8, 'Ειδικός στον υπολογιστή!');
+}
+
+/* Δίπλωμα */
+function showDiploma(){
+  let el = document.getElementById('diploma');
+  if(completed.size === 8){
+    el.innerHTML = '🏆 <b>ΣΥΓΧΑΡΗΤΗΡΙΑ!</b><br>Έπαιξες και τα 8 παιχνίδια! Είσαι επίσημα <b>ΑΣΤΕΡΙ ΣΤΗ ΧΡΗΣΗ ΤΟΥ ΥΠΟΛΟΓΙΣΤΗ!</b> ⭐';
+    speakText('Συγχαρητήρια! Έπαιξες και τα οκτώ παιχνίδια! Είσαι αστέρι στη χρήση του υπολογιστή!');
+    startConfetti();
+  } else {
+    el.textContent = `Έχεις ολοκληρώσει ${completed.size} από τα 8 παιχνίδια. Συνέχισε, τα πας περίφημα!`;
+  }
+}
+
+function resetAll(){
+  completed.clear(); stars = 0; qi = 0; ti = 0; si = 0; ri = 0;
+  document.getElementById('stars').textContent = '0';
+  document.getElementById('done').textContent = '0';
+  document.getElementById('artPreview').innerHTML = '';
+  document.getElementById('diploma').textContent = 'Ολοκλήρωσε και τα 8 παιχνίδια για να πάρεις το αστέρι σου!';
+  document.getElementById('btnNextQ1').style.display = 'inline-block';
+  document.getElementById('btnNextTF').style.display = 'inline-block';
+  document.getElementById('btnNextShutdown').style.display = 'inline-block';
+  document.getElementById('btnNextRiddle').style.display = 'inline-block';
+  showQ1(); renderQ2(); newMemory(); renderQ4(); showTF(); showShutdown(); showRiddle();
+  feedback('f8', '');
+}
+
+// Αρχική εκκίνηση
+showQ1();
+renderQ2();
+newMemory();
+renderQ4();
+showTF();
+showShutdown();
+showRiddle();
+initArt();
+</script>
+</body>
+</html>
