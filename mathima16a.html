@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Μάθημα 16: Κανόνες ασφάλειας και υγείας | Πληροφορική Α΄ Δημοτικού</title>
+<style>
+:root{--ink:#26324b;--purple:#6948c6;--pink:#ff6584;--yellow:#ffd152;--mint:#a8f0d2;--blue:#bde3ff;--paper:#fffdf7}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#e4f3ff,#fff0f6 50%,#fff9db);font-family:"Trebuchet MS",Arial,sans-serif;color:var(--ink);font-size:18px;position:relative}
+header{padding:26px 16px 20px;text-align:center;background:#ffffffdb;border-bottom:4px dotted #c7b9ff}
+h1{font-size:clamp(24px,5vw,40px);margin:6px 0;color:#5438ac}
+header p{margin:6px auto;max-width:760px}
+main{max-width:980px;margin:20px auto;padding:0 14px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+button,select{font:inherit;border:0;border-radius:16px;padding:10px 18px;cursor:pointer;background:#6948c6;color:white;box-shadow:0 3px 0 #4a3092;font-weight:bold}
+button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+button:focus{outline:3px solid #ffbd4a;outline-offset:2px}
+select{background:white;color:var(--ink);border:2px solid #d8cffb;box-shadow:none}
+.btn-download{background:#00897b;box-shadow:0 3px 0 #005b52}
+.progress{background:white;border-radius:18px;padding:12px 18px;margin:10px 0 18px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-weight:bold;box-shadow:0 4px 12px rgba(89,67,189,0.08)}
+.card{background:#ffffffed;border:3px solid #fff;border-radius:24px;padding:clamp(16px,3vw,26px);box-shadow:0 8px 22px rgba(83,68,165,0.1);margin:18px 0;position:relative}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card h2{margin:0 0 6px;color:#5438ac;font-size:clamp(20px,3vw,26px)}
+.sub{color:#626b82;margin:4px 0 12px}
+.badge{display:inline-block;background:#fff0b9;border-radius:99px;padding:4px 12px;font-size:14px;margin-bottom:8px;font-weight:bold;color:#6d5410}
+.btn-speaker{background:#ffecb3;color:#8d6200;border:2px solid #ffd54f;width:44px;height:44px;border-radius:50%;box-shadow:0 2px 0 #d9a400;font-size:20px;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0}
+.btn-speaker:hover{background:#ffe082}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0}
+.choice{background:#f3efff;color:var(--ink);box-shadow:none;border:3px solid transparent;min-height:74px;font-weight:bold;font-size:17px;border-radius:16px;padding:10px}
+.choice.correct{background:#d6f8e7;border-color:#38b27f;color:#0f6b48}
+.choice.wrong{background:#ffe2ea;border-color:#f2688f;color:#9b1c3e}
+.feedback{min-height:30px;font-weight:bold;margin:8px 0;font-size:17px}
+.good{color:#158057}
+.bad{color:#b92d52}
+.emoji{font-size:32px;display:block;margin-bottom:4px}
+.memory-grid{display:grid;grid-template-columns:repeat(4,minmax(60px,1fr));gap:10px;margin:14px 0}
+.memory-grid button{min-height:80px;font-size:32px;background:#e1f2ff;color:#283b5b;box-shadow:none;border:2px solid #b8defe}
+.memory-grid button.open{background:#fff3c4;border-color:#ffca28}
+.memory-grid button.matched{background:#cbf6e1;border-color:#5bd69c}
+.match-row{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;align-items:center;margin:10px 0}
+.match-row label{font-weight:bold}
+input[type=text]{font:inherit;padding:10px 14px;border:2px solid #d8cffb;border-radius:12px;width:100%;max-width:320px}
+footer{text-align:center;padding:22px;color:#6b7280;font-size:15px}
+
+/* Canvas κομφετί */
+#confettiCanvas{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999}
+
+@media(max-width:540px){.match-row{grid-template-columns:1fr}.choices{grid-template-columns:1fr 1fr}}
+@media print{.toolbar,button{display:none}body{background:white}.card{box-shadow:none;border-color:#ccc}}
+</style>
+</head>
+<body>
+
+<canvas id="confettiCanvas"></canvas>
+
+<header>
+  <div style="font-size:46px">🪑 👀 🔌 🚫 ⚽</div>
+  <h1>Κανόνες ασφάλειας και υγείας!</h1>
+  <p><b>Μάθημα 16: Κανόνες ασφάλειας και υγείας στον υπολογιστή</b> · 8 Παιχνίδια για τους μαθητές της Α΄ Δημοτικού</p>
+  <p>Πάτα το μεγάφωνο 🔊 σε κάθε παιχνίδι για να ακούσεις την οδηγία!</p>
+</header>
+
+<main>
+  <div class="toolbar">
+    <button class="btn-download" onclick="downloadHTML()">💾 Λήψη αρχείου HTML</button>
+    <button onclick="resetAll()">🔄 Ξεκινάμε από την αρχή</button>
+    <button onclick="window.print()">🖨️ Εκτύπωση</button>
+  </div>
+
+  <div class="progress">
+    <span>⭐ Αστεράκια: <b id="stars">0</b> / 8</span>
+    <span>🎯 Παιχνίδια που έγιναν: <b id="done">0</b> / 8</span>
+    <span id="cheer" style="color:#5943bd">Πάμε να παίξουμε με ασφάλεια! 😊</span>
+  </div>
+
+  <!-- ΠΑΙΧΝΙΔΙ 1 -->
+  <section class="card" id="a1">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 1 από 8</span>
+        <h2>🎯 Πώς καθόμαστε σωστά στην καρέκλα;</h2>
+        <p class="sub">Πάτησε τη σωστή συνήθεια για να προστατέψεις το σώμα σου!</p>
+      </div>
+      <button class="btn-speaker" onclick="speakCurrentQ1()" title="Άκουσε την ερώτηση">🔊</button>
+    </div>
+    <div id="q1"></div>
+    <div class="feedback" id="f1" aria-live="polite"></div>
+    <button id="btnNextQ1" onclick="nextQ1()">➡️ Επόμενη ερώτηση</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 2 -->
+  <section class="card" id="a2">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 2 από 8</span>
+        <h2>🧺 Σωστό ή Επικίνδυνο στο εργαστήριο;</h2>
+        <p class="sub">Πάτησε ΜΟΝΟ τις ασφαλείς και σωστές συμπεριφορές!</p>
+      </div>
+      <button class="btn-speaker" onclick="speakText('Πάτησε μόνο όσα είναι ασφαλή και σωστά να κάνουμε στο εργαστήριο υπολογιστών!')" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+    <div class="choices" id="q2"></div>
+    <div class="feedback" id="f2" aria-live="polite"></div>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 3 -->
+  <section class="card" id="a3">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 3 από 8</span>
+        <h2>🧠 Μνήμη: Σύμβολα υγείας και ασφάλειας!</h2>
+        <p class="sub">Βρες τα ζευγάρια: Ίσια πλάτη 🪑, Μάτια 👀, Όχι καλώδια 🔌, Διάλειμμα ⚽.</p>
+      </div>
+      <button class="btn-speaker" onclick="speakText('Βρες τα ζευγάρια: ίσια πλάτη, ξεκούραστα μάτια, προσοχή στα καλώδια και διάλειμμα με παιχνίδι!')" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+    <div class="memory-grid" id="memory"></div>
+    <div class="feedback" id="f3" aria-live="polite"></div>
+    <button onclick="newMemory()">🔀 Ανακάτεμα</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 4 -->
+  <section class="card" id="a4">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 4 από 8</span>
+        <h2>🔗 Ποιος είναι ο σωστός κανόνας;</h2>
+        <p class="sub">Διάλεξε ποιος κανόνας ταιριάζει σε κάθε μέρος του σώματος ή του χώρου.</p>
+      </div>
+      <button class="btn-speaker" onclick="speakText('Διάλεξε ποιος κανόνας προστατεύει το σώμα μας και το εργαστήριο!')" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+    <div id="q4"></div>
+    <div class="feedback" id="f4" aria-live="polite"></div>
+    <button onclick="checkMatch()">✅ Έλεγχος απαντήσεων</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 5 -->
+  <section class="card" id="a5">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 5 από 8</span>
+        <h2>🕵️ Σωστό ή Λάθος;</h2>
+        <p class="sub">Άκουσε τον κανόνα και πάτησε το πράσινο ή το κόκκινο κουμπί!</p>
+      </div>
+      <button class="btn-speaker" onclick="speakCurrentTF()" title="Άκουσε τον κανόνα">🔊</button>
+    </div>
+    <div id="q5"></div>
+    <div class="feedback" id="f5" aria-live="polite"></div>
+    <button id="btnNextTF" onclick="nextTF()">➡️ Επόμενος κανόνας</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 6 -->
+  <section class="card" id="a6">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 6 από 8</span>
+        <h2>⏰ Ώρα για διάλειμμα!</h2>
+        <p class="sub">Τι κάνουμε όταν τελειώσει ο χρόνος στον υπολογιστή;</p>
+      </div>
+      <button class="btn-speaker" onclick="speakCurrentBreak()" title="Άκουσε την ερώτηση">🔊</button>
+    </div>
+    <div id="q6"></div>
+    <div class="feedback" id="f6" aria-live="polite"></div>
+    <button id="btnNextBreak" onclick="nextBreak()">➡️ Επόμενη ερώτηση</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 7 -->
+  <section class="card" id="a7">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 7 από 8</span>
+        <h2>🎒 Αινίγματα για την υγεία μας!</h2>
+        <p class="sub">Άκουσε το αίνιγμα και διάλεξε τη σωστή εικόνα.</p>
+      </div>
+      <button class="btn-speaker" onclick="speakCurrentRiddle()" title="Άκουσε το αίνιγμα">🔊</button>
+    </div>
+    <div id="q7"></div>
+    <div class="feedback" id="f7" aria-live="polite"></div>
+    <button id="btnNextRiddle" onclick="nextRiddle()">➡️ Άλλο αίνιγμα</button>
+  </section>
+
+  <!-- ΠΑΙΧΝΙΔΙ 8 -->
+  <section class="card" id="a8">
+    <div class="card-header">
+      <div>
+        <span class="badge">Παιχνίδι 8 από 8</span>
+        <h2>🎨 Το ασφαλές μου γραφείο!</h2>
+        <p class="sub">Διάλεξε τα σωστά αντικείμενα για ένα υγιεινό και ασφαλές γραφείο!</p>
+      </div>
+      <button class="btn-speaker" onclick="speakText('Διάλεξε τα σωστά πράγματα για να φτιάξεις ένα ασφαλές γραφείο υπολογιστή!')" title="Άκουσε την οδηγία">🔊</button>
+    </div>
+    <div class="choices" id="artChoices"></div>
+    <p>Τίτλος του γραφείου μου: <input id="artTitle" type="text" placeholder="π.χ. Το ασφαλές γραφείο μου"></p>
+    <div class="choices" id="artPreview" style="background:#fff9db;border-radius:18px;padding:15px;min-height:75px"></div>
+    <div class="feedback" id="f8" aria-live="polite"></div>
+    <button onclick="finishArt()">🌟 Ολοκλήρωσα το γραφείο μου!</button>
+  </section>
+
+  <!-- ΔΙΠΛΩΜΑ -->
+  <div class="card" style="text-align:center;background:#f3edff">
+    <h2>🏅 Το Μεγάλο μου Δίπλωμα Ασφάλειας & Υγείας</h2>
+    <p id="diploma">Ολοκλήρωσε και τα 8 παιχνίδια για να πάρεις το αστέρι σου!</p>
+    <button onclick="showDiploma()">🎉 Έλεγχος διπλώματος</button>
+  </div>
+</main>
+
+<footer>Πληροφορική Α΄ Δημοτικού · Μάθημα 16: Κανόνες ασφάλειας και υγείας στον υπολογιστή</footer>
+
+<script>
+// Web Audio API με αυτόματη ενεργοποίηση στο πρώτο κλικ
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+window.addEventListener('click', initAudio, { once: true });
+
+function playTone(freq, dur = 0.1) {
+  try {
+    initAudio();
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = freq;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+
+function soundSuccess() {
+  playTone(523, 0.08);
+  setTimeout(() => playTone(659, 0.08), 70);
+  setTimeout(() => playTone(784, 0.12), 140);
+  setTimeout(() => playTone(1046, 0.22), 210);
+  startConfetti();
+}
+
+function soundError() {
+  playTone(220, 0.15);
+  setTimeout(() => playTone(180, 0.2), 100);
+}
+
+// Λήψη του αρχείου HTML
+function downloadHTML() {
+  const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+  const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "mathima_16_asfaleia.html";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+// Εφέ Κομφετί με Canvas
+function startConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const confetti = Array.from({ length: 55 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * -canvas.height,
+    vx: (Math.random() - 0.5) * 4,
+    vy: Math.random() * 4 + 3,
+    size: Math.random() * 8 + 6,
+    color: ['#ff4081', '#ffd600', '#00e5ff', '#00c853', '#7c4dff', '#ff6d00'][Math.floor(Math.random() * 6)]
+  }));
+
+  let frames = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confetti.forEach(c => {
+      c.x += c.vx;
+      c.y += c.vy;
+      ctx.fillStyle = c.color;
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.size / 2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    frames++;
+    if (frames < 90) {
+      requestAnimationFrame(animate);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+  animate();
+}
+
+// Σύστημα Αστεριών & Ολοκλήρωσης
+let completed = new Set(), stars = 0;
+function mark(n, msg){
+  if(!completed.has(n)){ 
+    completed.add(n); 
+    stars++; 
+    soundSuccess();
+  }
+  document.getElementById('stars').textContent = stars;
+  document.getElementById('done').textContent = completed.size;
+  document.getElementById('cheer').textContent = msg || 'Μπράβο! Συνέχισε!';
+}
+function feedback(id, msg, good = true){
+  let el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'feedback ' + (good ? 'good' : 'bad');
+}
+
+// Φωνητική Ανάγνωση (Speech Synthesis)
+function speakText(txt){
+  if('speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+    let u = new SpeechSynthesisUtterance(txt);
+    u.lang = 'el-GR';
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 1: Στάση σώματος (σελ. 64-65) */
+const qs = [
+  { q: 'Πώς πρέπει να κάθεται η πλάτη μας στην καρέκλα;', a: ['🪑 Ίσια και ακουμπισμένη στην πλάτη της καρέκλας', '🍤 Καμπουριαστή σαν γαριδούλα', '🛌 Ξαπλωμένη στο πάτωμα'], c: 0 },
+  { q: 'Πού πρέπει να πατούν τα πόδια μας όταν καθόμαστε;', a: ['👣 Σταθερά κάτω στο πάτωμα', '🪑 Πάνω στην καρέκλα', '☁️ Στον αέρα να κουνιούνται'], c: 0 },
+  { q: 'Σε ποιο ύψος πρέπει να βρίσκεται η οθόνη του υπολογιστή;', a: ['👀 Στην ευθεία με τα μάτια μας', '🦶 Χαμηλά στα πόδια μας', '☁️ Ψηλά στο ταβάνι'], c: 0 }
+];
+let qi = 0;
+function showQ1(){
+  if (qi >= qs.length) {
+    document.getElementById('q1').innerHTML = `
+      <div style="text-align:center; padding:18px; background:#e8f8ed; border-radius:18px;">
+        <span style="font-size:40px;">🎉</span>
+        <h3 style="color:#158057; margin:6px 0;">Μπράβο! Ξέρεις πώς να κάθεσαι σωστά!</h3>
+      </div>`;
+    document.getElementById('btnNextQ1').style.display = 'none';
+    feedback('f1', '⭐ Ολοκλήρωσες το Παιχνίδι 1!');
+    speakText('Μπράβο! Ξέρεις πώς να κάθεσαι σωστά!');
+    mark(1, 'Υπέροχη απάντηση!');
+    return;
+  }
+  let item = qs[qi];
+  document.getElementById('q1').innerHTML = `<h3>${item.q}</h3><div class="choices">` +
+    item.a.map((x, i) => `<button class="choice" onclick="answerQ1(${i})">${x}</button>`).join('') + `</div>`;
+  feedback('f1', '');
+}
+function speakCurrentQ1(){ 
+  if (qi < qs.length) speakText(qs[qi].q); 
+}
+function answerQ1(i){
+  let item = qs[qi];
+  if(i === item.c){
+    feedback('f1', '⭐ Μπράβο! Αυτή είναι η σωστή στάση σώματος!');
+    speakText('Μπράβο! Αυτή είναι η σωστή στάση σώματος!');
+    soundSuccess();
+    if (qi === qs.length - 1) {
+      setTimeout(nextQ1, 1000);
+    }
+  } else {
+    feedback('f1', '❌ Για σκέψου ξανά! Αυτό μπορεί να πονέσει το σωματάκι σου.', false);
+    speakText('Για σκέψου ξανά! Αυτό μπορεί να πονέσει το σωματάκι σου.');
+    soundError();
+  }
+}
+function nextQ1(){ 
+  if (qi < qs.length) {
+    qi++; 
+    showQ1(); 
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 2: Ασφαλείς συμπεριφορές (σελ. 64-66) */
+const cards = [
+  ['🪑', 'Κάθομαι με ίσια πλάτη', true],
+  ['💧', 'Ποτήρι με νερό δίπλα στο πληκτρολόγιο', false],
+  ['🔌', 'Τραβάω τα καλώδια και τις πρίζες', false],
+  ['👀', 'Κοιτάζω την οθόνη από απόσταση', true],
+  ['🥪', 'Τρώω τοστ πάνω από το πληκτρολόγιο', false],
+  ['⚽', 'Κάνω διάλειμμα για παιχνίδι', true],
+  ['🧼', 'Έχω καθαρά χεράκια', true],
+  ['🏃', 'Τρέχω μέσα στο εργαστήριο', false]
+];
+function renderQ2(){
+  document.getElementById('q2').innerHTML = cards.map((x, i) =>
+    `<button class="choice" onclick="pickCard(this, ${x[2]})"><span class="emoji">${x[0]}</span>${x[1]}</button>`
+  ).join('');
+  feedback('f2', '');
+}
+function pickCard(el, ok){
+  if(ok){
+    el.classList.add('correct');
+    feedback('f2', '🌟 Μπράβο! Αυτό είναι ασφαλές και σωστό!');
+    playTone(600, 0.08);
+    let goodSelected = document.querySelectorAll('#q2 button.correct').length;
+    let totalGood = cards.filter(c => c[2]).length;
+    if(goodSelected >= totalGood){
+      feedback('f2', '🎉 Τέλεια! Βρήκες όλες τις ασφαλείς συνήθειες!');
+      speakText('Τέλεια! Βρήκες όλες τις ασφαλείς συνήθειες!');
+      mark(2, 'Εξαιρετική ασφάλεια!');
+    }
+  } else {
+    el.classList.add('wrong');
+    feedback('f2', '❌ Προσοχή! Αυτό είναι επικίνδυνο για σένα ή τον υπολογιστή!', false);
+    speakText('Προσοχή! Αυτό είναι επικίνδυνο!');
+    soundError();
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 3: Μνήμη συμβόλων ασφάλειας */
+const safeIcons = ['🪑', '👀', '🔌', '⚽'];
+let mem = [], firstCard = null, lock = false, pairs = 0;
+function newMemory(){
+  mem = [...safeIcons, ...safeIcons].sort(() => Math.random() - 0.5);
+  firstCard = null; lock = false; pairs = 0;
+  document.getElementById('memory').innerHTML = mem.map((x, i) =>
+    `<button onclick="flip(this, ${i})">❔</button>`
+  ).join('');
+  feedback('f3', 'Βρες τα 4 ζευγάρια ασφάλειας!');
+}
+function flip(el, i){
+  if(lock || el.classList.contains('open') || el.classList.contains('matched')) return;
+  el.textContent = mem[i];
+  el.classList.add('open');
+  playTone(550, 0.06);
+  if(!firstCard){
+    firstCard = el;
+    firstCard.dataset.icon = mem[i];
+  } else {
+    if(firstCard.dataset.icon === mem[i]){
+      firstCard.classList.add('matched');
+      el.classList.add('matched');
+      pairs++;
+      firstCard = null;
+      feedback('f3', '✨ Μπράβο! Βρήκες ένα ζευγάρι!');
+      playTone(700, 0.08);
+      if(pairs === mem.length / 2){
+        feedback('f3', '🏆 Τα βρήκες όλα! Έμαθες τα σύμβολα ασφάλειας!');
+        speakText('Τα βρήκες όλα! Έμαθες τα σύμβολα ασφάλειας!');
+        mark(3, 'Σούπερ μνήμη!');
+      }
+    } else {
+      lock = true;
+      let prev = firstCard;
+      firstCard = null;
+      soundError();
+      setTimeout(() => {
+        prev.textContent = '❔'; el.textContent = '❔';
+        prev.classList.remove('open'); el.classList.remove('open');
+        lock = false;
+      }, 700);
+    }
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 4: Σωστός κανόνας (σελ. 64-66) */
+const matchData = [
+  ['Για να μην πονάει η πλάτη μου...', '🪑 Κάθομαι ίσια στην καρέκλα'],
+  ['Για να μην κουράζονται τα μάτια μου...', '👀 Κοιτάζω μακριά και κάνω διάλειμμα'],
+  ['Για να μην πάθουμε ηλεκτροπληξία...', '🔌 Δεν αγγίζουμε καλώδια και πρίζες'],
+  ['Για να μην χαλάσει ο υπολογιστής...', '🚫 Δεν πίνουμε νερό και χυμούς κοντά του']
+];
+function renderQ4(){
+  document.getElementById('q4').innerHTML = matchData.map((x, i) =>
+    `<div class="match-row">
+      <label>${x[0]}</label>
+      <select data-correct="${i}">
+        <option value="">Διάλεξε κανόνα…</option>
+        ${matchData.map((y, j) => `<option value="${j}">${y[1]}</option>`).join('')}
+      </select>
+    </div>`
+  ).join('');
+}
+function checkMatch(){
+  let sels = [...document.querySelectorAll('#q4 select')];
+  let good = sels.filter(s => s.value !== '' && +s.value === +s.dataset.correct).length;
+  if(good === sels.length){
+    feedback('f4', '🌟 Όλα σωστά! Ξέρεις όλους τους κανόνες υγείας και ασφάλειας!');
+    speakText('Όλα σωστά! Ξέρεις όλους τους κανόνες υγείας και ασφάλειας!');
+    mark(4, 'Τέλεια αντιστοίχιση!');
+  } else {
+    feedback('f4', `Σωστά: ${good}/${sels.length}. Δοκίμασε ξανά!`, false);
+    soundError();
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 5: Σωστό ή Λάθος; (σελ. 64-67) */
+const tf = [
+  { t: 'Πρέπει να καθόμαστε πολύ κοντά στην οθόνη για να βλέπουμε καλά.', v: false },
+  { t: 'Δεν πρέπει ποτέ να τραβάμε τα καλώδια από την πρίζα.', v: true },
+  { t: 'Κάνουμε διάλειμμα κάθε λίγη ώρα για να ξεκουράζονται τα ματάκια μας.', v: true },
+  { t: 'Είναι καλό να παίζουμε στον υπολογιστή όλη μέρα χωρίς να βγαίνουμε στην αυλή.', v: false },
+  { t: 'Πριν αγγίξουμε τον υπολογιστή, πλένουμε τα χέρια μας για να είναι καθαρά.', v: true }
+];
+let ti = 0;
+function showTF(){
+  if (ti >= tf.length) {
+    document.getElementById('q5').innerHTML = `
+      <div style="text-align:center; padding:18px; background:#e8f8ed; border-radius:18px;">
+        <span style="font-size:40px;">🎉</span>
+        <h3 style="color:#158057; margin:6px 0;">Μπράβο! Απάντησες σε όλους τους κανόνες!</h3>
+      </div>`;
+    document.getElementById('btnNextTF').style.display = 'none';
+    feedback('f5', '⭐ Ολοκλήρωσες το Παιχνίδι 5!');
+    speakText('Μπράβο! Απάντησες σε όλους τους κανόνες!');
+    mark(5, 'Άριστα στην ασφάλεια!');
+    return;
+  }
+  let item = tf[ti];
+  document.getElementById('q5').innerHTML = `<h3>${item.t}</h3>
+    <div class="choices">
+      <button class="choice" onclick="answerTF(true)" style="background:#e8f8ed">✅ Σωστό</button>
+      <button class="choice" onclick="answerTF(false)" style="background:#ffebee">❌ Λάθος</button>
+    </div>`;
+  feedback('f5', '');
+}
+function speakCurrentTF(){ 
+  if (ti < tf.length) speakText(tf[ti].t); 
+}
+function answerTF(val){
+  let item = tf[ti];
+  if(val === item.v){
+    feedback('f5', '🎉 Σωστά! Πολύ σωστή σκέψη!');
+    speakText('Σωστά! Πολύ σωστή σκέψη!');
+    soundSuccess();
+    if (ti === tf.length - 1) {
+      setTimeout(nextTF, 1000);
+    }
+  } else {
+    feedback('f5', '❌ Για σκέψου το λίγο ακόμα!', false);
+    soundError();
+  }
+}
+function nextTF(){ 
+  if (ti < tf.length) {
+    ti++; 
+    showTF(); 
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 6: Διάλειμμα & Υγεία (σελ. 66) */
+const breakQs = [
+  { q: 'Όταν τελειώσει ο χρόνος μας στον υπολογιστή, τι είναι καλύτερο να κάνουμε;', a: ['⚽ Να παίξουμε έξω στην αυλή με φίλους', '📱 Να πάρουμε αμέσως το κινητό', '📺 Να κάτσουμε μπροστά στην τηλεόραση'], c: 0 },
+  { q: 'Πώς ξεκουράζονται τα μάτια μας;', a: ['🌳 Κοιτάζοντας μακριά έξω από το παράθυρο', '👀 Κοιτάζοντας πιο κοντά την οθόνη', '🔦 Ανάβοντας φακό στα μάτια'], c: 0 },
+  { q: 'Αν ένα καλώδιο είναι φθαρμένο ή βγάζει σπίθες, τι κάνουμε;', a: ['🗣️ Φωνάζουμε αμέσως τη δασκάλα ή τους γονείς μας', '✋ Το πιάνουμε με τα χέρια μας', '💧 Του ρίχνουμε νερό'], c: 0 }
+];
+let bi = 0;
+function showBreak(){
+  if (bi >= breakQs.length) {
+    document.getElementById('q6').innerHTML = `
+      <div style="text-align:center; padding:18px; background:#e8f8ed; border-radius:18px;">
+        <span style="font-size:40px;">🎉</span>
+        <h3 style="color:#158057; margin:6px 0;">Μπράβο! Ξέρεις πώς να προστατεύεις την υγεία σου!</h3>
+      </div>`;
+    document.getElementById('btnNextBreak').style.display = 'none';
+    feedback('f6', '⭐ Ολοκλήρωσες το Παιχνίδι 6!');
+    speakText('Μπράβο! Ξέρεις πώς να προστατεύεις την υγεία σου!');
+    mark(6, 'Υπεύθυνος μαθητής!');
+    return;
+  }
+  let item = breakQs[bi];
+  document.getElementById('q6').innerHTML = `<h3>${item.q}</h3><div class="choices">` +
+    item.a.map((x, i) => `<button class="choice" onclick="answerBreak(${i})">${x}</button>`).join('') + `</div>`;
+  feedback('f6', '');
+}
+function speakCurrentBreak(){
+  if (bi < breakQs.length) speakText(breakQs[bi].q);
+}
+function answerBreak(i){
+  let item = breakQs[bi];
+  if(i === item.c){
+    feedback('f6', '⭐ Μπράβο! Αυτό είναι το πιο σωστό!');
+    speakText('Μπράβο! Αυτό είναι το πιο σωστό!');
+    soundSuccess();
+    if (bi === breakQs.length - 1) {
+      setTimeout(nextBreak, 1000);
+    }
+  } else {
+    feedback('f6', '❌ Αυτό δεν βοηθά την υγεία σου. Σκέψου ξανά!', false);
+    speakText('Αυτό δεν βοηθά την υγεία σου. Σκέψου ξανά!');
+    soundError();
+  }
+}
+function nextBreak(){
+  if (bi < breakQs.length) {
+    bi++; 
+    showBreak();
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 7: Αινίγματα (σελ. 64-67) */
+const riddles = [
+  { q: 'Με βάζεις κάτω από το σώμα σου, έχεις ίσια την πλάτη και δεν καμπουριάζεις ποτέ! Τι είμαι;', a: ['🪑 Η καρέκλα γραφείου', '🥣 Ένα πιάτο', '👟 Ένα παπούτσι'], c: 0 },
+  { q: 'Κουράζομαι αν με κοιτάς για πολλές ώρες χωρίς διάλειμμα. Χρειάζομαι ξεκούραση και ύπνο! Τι είμαι;', a: ['👀 Τα ματάκια σου', '🚲 Ένα ποδήλατο', '🚗 Ένα αυτοκίνητο'], c: 0 },
+  { q: 'Είμαι μαύρο και μακρύ, περνάει ηλεκτρικό ρεύμα από μέσα μου και δεν με αγγίζεις ποτέ! Τι είμαι;', a: ['🔌 Το ηλεκτρικό καλώδιο', '🍌 Μία μπανάνα', '✏️ Ένα μολύβι'], c: 0 }
+];
+let ri = 0;
+function showRiddle(){
+  if (ri >= riddles.length) {
+    document.getElementById('q7').innerHTML = `
+      <div style="text-align:center; padding:18px; background:#e8f8ed; border-radius:18px;">
+        <span style="font-size:40px;">🎉</span>
+        <h3 style="color:#158057; margin:6px 0;">Μπράβο! Έλυσες όλα τα αινίγματα ασφάλειας!</h3>
+      </div>`;
+    document.getElementById('btnNextRiddle').style.display = 'none';
+    feedback('f7', '⭐ Ολοκλήρωσες το Παιχνίδι 7!');
+    speakText('Μπράβο! Έλυσες όλα τα αινίγματα ασφάλειας!');
+    mark(7, 'Λύτης αινιγμάτων!');
+    return;
+  }
+  let item = riddles[ri];
+  document.getElementById('q7').innerHTML = `<h3>${item.q}</h3><div class="choices">` +
+    item.a.map((a, i) => `<button class="choice" onclick="answerRiddle(${i})">${a}</button>`).join('') + `</div>`;
+  feedback('f7', '');
+}
+function speakCurrentRiddle(){ 
+  if (ri < riddles.length) speakText(riddles[ri].q); 
+}
+function answerRiddle(i){
+  if(i === riddles[ri].c){
+    feedback('f7', '🥳 Μπράβο! Έλυσες το αίνιγμα!');
+    speakText('Μπράβο! Έλυσες το αίνιγμα!');
+    soundSuccess();
+    if (ri === riddles.length - 1) {
+      setTimeout(nextRiddle, 1000);
+    }
+  } else {
+    feedback('f7', 'Κοντά είσαι! Άκουσε ξανά το αίνιγμα.', false);
+    soundError();
+  }
+}
+function nextRiddle(){ 
+  if (ri < riddles.length) {
+    ri++; 
+    showRiddle(); 
+  }
+}
+
+/* ΠΑΙΧΝΙΔΙ 8: Το ασφαλές μου γραφείο (σελ. 65) */
+const art = [
+  ['🪑', 'Άνετη καρέκλα'],
+  ['💡', 'Καλό φως στο δωμάτιο'],
+  ['👀', 'Οθόνη στο σωστό ύψος'],
+  ['⏰', 'Ρολόι για διάλειμμα'],
+  ['⚽', 'Μπάλα για την αυλή'],
+  ['🧼', 'Καθαρά χεράκια']
+];
+function initArt(){
+  document.getElementById('artChoices').innerHTML = art.map((x, i) =>
+    `<button class="choice" onclick="addArt(${i})"><span class="emoji">${x[0]}</span>${x[1]}</button>`
+  ).join('');
+}
+function addArt(i){
+  let p = document.getElementById('artPreview');
+  let s = document.createElement('span');
+  s.style.cssText = 'font-size:36px;margin:8px;cursor:pointer;';
+  s.textContent = art[i][0];
+  s.title = art[i][1];
+  playTone(650, 0.05);
+  p.appendChild(s);
+}
+function finishArt(){
+  feedback('f8', '🌟 Υπέροχο και ασφαλές γραφείο! Τώρα προστατεύεις το σώμα και τα μάτια σου!');
+  speakText('Υπέροχο και ασφαλές γραφείο! Τώρα προστατεύεις το σώμα και τα μάτια σου!');
+  soundSuccess();
+  mark(8, 'Ειδικός στην ασφάλεια και υγεία!');
+}
+
+/* Δίπλωμα */
+function showDiploma(){
+  let el = document.getElementById('diploma');
+  if(completed.size === 8){
+    el.innerHTML = '🏆 <b>ΣΥΓΧΑΡΗΤΗΡΙΑ!</b><br>Έπαιξες και τα 8 παιχνίδια! Είσαι επίσημα <b>ΑΣΤΕΡΙ ΣΤΗΝ ΑΣΦΑΛΕΙΑ ΚΑΙ ΣΤΗΝ ΥΓΕΙΑ!</b> ⭐';
+    speakText('Συγχαρητήρια! Έπαιξες και τα οκτώ παιχνίδια! Είσαι αστέρι στην ασφάλεια και στην υγεία!');
+    soundSuccess();
+  } else {
+    el.textContent = `Έχεις ολοκληρώσει ${completed.size} από τα 8 παιχνίδια. Συνέχισε, τα πας περίφημα!`;
+  }
+}
+
+function resetAll(){
+  completed.clear(); stars = 0; qi = 0; ti = 0; bi = 0; ri = 0;
+  document.getElementById('stars').textContent = '0';
+  document.getElementById('done').textContent = '0';
+  document.getElementById('artPreview').innerHTML = '';
+  document.getElementById('diploma').textContent = 'Ολοκλήρωσε και τα 8 παιχνίδια για να πάρεις το αστέρι σου!';
+  document.getElementById('btnNextQ1').style.display = 'inline-block';
+  document.getElementById('btnNextTF').style.display = 'inline-block';
+  document.getElementById('btnNextBreak').style.display = 'inline-block';
+  document.getElementById('btnNextRiddle').style.display = 'inline-block';
+  showQ1(); renderQ2(); newMemory(); renderQ4(); showTF(); showBreak(); showRiddle();
+  feedback('f8', '');
+}
+
+// Αρχική εκκίνηση
+showQ1();
+renderQ2();
+newMemory();
+renderQ4();
+showTF();
+showBreak();
+showRiddle();
+initArt();
+</script>
+</body>
+</html>
