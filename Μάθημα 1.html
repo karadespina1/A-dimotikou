@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μικρά Βήματα, Εύκολες Λύσεις! - Ο Μικρός Προγραμματιστής</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Comic Neue & Fredoka for playful typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Fredoka', 'Nunito', sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .custom-shadow {
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.12), 0 12px 24px rgba(0, 0, 0, 0.08);
+    }
+    .btn-bounce {
+      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .btn-bounce:hover {
+      transform: translateY(-3px) scale(1.02);
+    }
+    .btn-bounce:active {
+      transform: translateY(2px) scale(0.98);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+    }
+    .pulse-glow {
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 4px 6px rgba(251, 191, 36, 0.4)); }
+      50% { transform: scale(1.03); filter: drop-shadow(0 8px 16px rgba(251, 191, 36, 0.7)); }
+    }
+    .bubble-float {
+      animation: floatBubble 4s ease-in-out infinite;
+    }
+    @keyframes floatBubble {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .step-badge {
+      box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-sky-100 via-sky-50 to-amber-50 min-h-screen text-slate-800 flex flex-col items-center justify-between p-3 sm:p-6 overflow-x-hidden">
+
+  <!-- Top Floating Header Bar -->
+  <header class="w-full max-w-4xl bg-white/90 backdrop-blur-md rounded-3xl p-3 sm:p-4 mb-4 custom-shadow border-4 border-white flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 sm:w-14 sm:h-14 bg-amber-400 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shadow-inner border-2 border-amber-300">
+        🧩
+      </div>
+      <div>
+        <h1 class="text-lg sm:text-2xl font-bold text-sky-700 leading-tight">Μικρά Βήματα, Εύκολες Λύσεις!</h1>
+        <p class="text-xs sm:text-sm font-semibold text-amber-600">Γίνε ο Προγραμματιστής της ημέρας σου!</p>
+      </div>
+    </div>
+    
+    <!-- Sound Toggle & Progress Stars -->
+    <div class="flex items-center gap-2 sm:gap-4">
+      <div id="stars-display" class="flex items-center gap-1 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-300 text-amber-700 font-bold text-sm sm:text-base">
+        <span>⭐</span>
+        <span id="star-count">0</span>/4
+      </div>
+      <button id="sound-btn" onclick="toggleSound()" class="w-11 h-11 bg-sky-200 hover:bg-sky-300 active:scale-95 text-sky-800 rounded-2xl flex items-center justify-center text-xl transition-all border-2 border-sky-300">
+        🔊
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Game Container -->
+  <main class="w-full max-w-4xl flex-1 flex flex-col justify-center items-center relative">
+    
+    <!-- Screen 1: Welcome Screen -->
+    <section id="screen-welcome" class="w-full bg-white rounded-3xl p-6 sm:p-10 custom-shadow border-4 border-sky-200 text-center relative overflow-hidden">
+      <!-- Mascot Avatars -->
+      <div class="flex justify-center items-center gap-4 sm:gap-8 mb-6">
+        <!-- Mascot Girl -->
+        <div class="bubble-float flex flex-col items-center">
+          <svg class="w-24 h-24 sm:w-32 sm:h-32 drop-shadow-md" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="50" fill="#FCE7F3" stroke="#F472B6" stroke-width="4"/>
+            <!-- Hair -->
+            <path d="M30 55 C 30 25, 90 25, 90 55 C 95 65, 88 80, 80 80 C 70 80, 70 65, 60 65 C 50 65, 50 80, 40 80 C 32 80, 25 65, 30 55 Z" fill="#92400E"/>
+            <path d="M36 40 Q 60 18 84 40" stroke="#EC4899" stroke-width="6" stroke-linecap="round" fill="none"/>
+            <circle cx="48" cy="58" r="4" fill="#1E293B"/>
+            <circle cx="72" cy="58" r="4" fill="#1E293B"/>
+            <path d="M52 68 Q 60 76 68 68" stroke="#E11D48" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <circle cx="42" cy="64" r="5" fill="#F472B6" opacity="0.5"/>
+            <circle cx="78" cy="64" r="5" fill="#F472B6" opacity="0.5"/>
+          </svg>
+          <span class="text-xs sm:text-sm font-bold text-pink-600 mt-1">Άλκηστις</span>
+        </div>
+
+        <!-- VS/AND badge -->
+        <div class="w-12 h-12 bg-amber-400 text-white font-black text-xl rounded-full flex items-center justify-center shadow-lg border-2 border-white transform rotate-6">
+          &amp;
+        </div>
+
+        <!-- Mascot Boy -->
+        <div class="bubble-float flex flex-col items-center" style="animation-delay: -2s;">
+          <svg class="w-24 h-24 sm:w-32 sm:h-32 drop-shadow-md" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="50" fill="#E0F2FE" stroke="#38BDF8" stroke-width="4"/>
+            <!-- Hair -->
+            <path d="M32 50 C 35 25, 85 20, 88 50 C 92 40, 75 25, 60 25 C 45 25, 30 40, 32 50 Z" fill="#B45309"/>
+            <circle cx="48" cy="58" r="4" fill="#1E293B"/>
+            <circle cx="72" cy="58" r="4" fill="#1E293B"/>
+            <path d="M52 68 Q 60 76 68 68" stroke="#0284C7" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <circle cx="42" cy="64" r="5" fill="#38BDF8" opacity="0.5"/>
+            <circle cx="78" cy="64" r="5" fill="#38BDF8" opacity="0.5"/>
+          </svg>
+          <span class="text-xs sm:text-sm font-bold text-sky-600 mt-1">Νικόλας</span>
+        </div>
+      </div>
+
+      <div class="bg-sky-50 border-2 border-sky-200 rounded-2xl p-4 sm:p-5 mb-6 max-w-xl mx-auto">
+        <p class="text-base sm:text-lg font-bold text-sky-900 leading-relaxed">
+          «Γεια σας μικροί προγραμματιστές! Κάθε μεγάλη δουλειά γίνεται πανεύκολη όταν τη χωρίζουμε σε <span class="text-amber-600 font-extrabold underline decoration-amber-400">μικρά βήματα</span> στη σωστή σειρά!»
+        </p>
+      </div>
+
+      <!-- Quick Name input -->
+      <div class="mb-6 max-w-xs mx-auto">
+        <label for="student-name" class="block text-sm font-bold text-slate-600 mb-2">Γράψε το όνομά σου για το πτυχίο:</label>
+        <input type="text" id="student-name" placeholder="π.χ. Μαρία, Γιώργος..." class="w-full text-center px-4 py-2.5 rounded-2xl border-2 border-sky-300 focus:outline-none focus:ring-4 focus:ring-sky-200 text-lg font-bold text-sky-800 bg-sky-50/50">
+      </div>
+
+      <button onclick="startGame()" class="btn-bounce pulse-glow px-8 sm:px-12 py-3.5 sm:py-4 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-500 hover:to-orange-500 text-white font-extrabold text-xl sm:text-2xl rounded-full shadow-lg border-b-4 border-amber-600 flex items-center justify-center gap-3 mx-auto">
+        <span>🚀 ΠΑΙΞΕ ΤΩΡΑ!</span>
+      </button>
+    </section>
+
+    <!-- Screen 2: Game Board (Levels 1 - 3: Step Sequencing) -->
+    <section id="screen-game" class="w-full bg-white rounded-3xl p-4 sm:p-8 custom-shadow border-4 border-sky-200 hidden">
+      <!-- Level Indicator & Mascot Cheer -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 pb-4 border-b-2 border-slate-100">
+        <div class="flex items-center gap-3">
+          <div id="level-badge" class="px-4 py-1.5 bg-sky-500 text-white font-bold rounded-2xl text-sm sm:text-base shadow">
+            Επίπεδο 1 από 4
+          </div>
+          <h2 id="level-title" class="text-lg sm:text-xl font-black text-sky-900">
+            Ετοιμάζω τη Σχολική Τσάντα!
+          </h2>
+        </div>
+        <div class="flex items-center gap-2 bg-emerald-50 px-3 py-1 rounded-2xl border border-emerald-200">
+          <span class="text-xl">💡</span>
+          <span id="level-hint" class="text-xs sm:text-sm font-bold text-emerald-800">Βάλε τα 4 βήματα στη σωστή σειρά!</span>
+        </div>
+      </div>
+
+      <!-- Sequence Slots (1, 2, 3, 4) -->
+      <div class="mb-4">
+        <p class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">1. Η Σειρά σου (Πάτησε ή σύρε εδώ):</p>
+        <div id="drop-slots" class="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:gap-3">
+          <!-- Filled dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Scrambled Step Cards Bank -->
+      <div class="mt-6 mb-6">
+        <p class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">2. Διαθέσιμα Βήματα (Πάτησε για επιλογή):</p>
+        <div id="source-cards" class="grid grid-cols-1 sm:grid-cols-2 gap-3 min-h-[140px]">
+          <!-- Filled dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-between gap-3 pt-4 border-t-2 border-slate-100">
+        <button onclick="resetCurrentLevel()" class="btn-bounce px-4 sm:px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-2xl text-sm sm:text-base flex items-center gap-2">
+          <span>🔄</span> Επαναφορά
+        </button>
+
+        <button id="check-btn" onclick="checkSequence()" class="btn-bounce px-6 sm:px-10 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg sm:text-xl rounded-2xl shadow-md border-b-4 border-emerald-700 flex items-center gap-2">
+          <span>✔️</span> ΕΛΕΓΧΟΣ!
+        </button>
+      </div>
+    </section>
+
+    <!-- Screen 3: Quiz Screen (Level 4) -->
+    <section id="screen-quiz" class="w-full bg-white rounded-3xl p-5 sm:p-8 custom-shadow border-4 border-amber-300 hidden">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b-2 border-amber-100">
+        <span class="px-4 py-1.5 bg-amber-500 text-white font-bold rounded-2xl text-sm sm:text-base shadow">
+          Επίπεδο 4: Κουίζ Προγραμματιστή
+        </span>
+        <span id="quiz-question-number" class="text-xs sm:text-sm font-extrabold text-amber-700">
+          Ερώτηση 1 από 3
+        </span>
+      </div>
+
+      <div class="bg-amber-50/80 rounded-2xl p-4 sm:p-6 mb-6 border-2 border-amber-200 text-center">
+        <h3 id="quiz-question-text" class="text-base sm:text-xl font-bold text-amber-950 leading-snug">
+          Ποιο είναι το πρώτο πράγμα που κάνουμε όταν ετοιμάζουμε την τσάντα μας;
+        </h3>
+      </div>
+
+      <!-- Multiple Choice Options -->
+      <div id="quiz-options-container" class="grid grid-cols-1 gap-3 mb-6">
+        <!-- Options rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- Screen 4: Final Victory & Diploma Screen -->
+    <section id="screen-finish" class="w-full bg-white rounded-3xl p-5 sm:p-8 custom-shadow border-4 border-emerald-300 text-center hidden">
+      
+      <!-- Trophy Animation Icon -->
+      <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-tr from-amber-400 to-yellow-300 rounded-3xl mx-auto flex items-center justify-center text-4xl sm:text-5xl shadow-lg border-4 border-white mb-4 animate-bounce">
+        🏆
+      </div>
+
+      <h2 class="text-2xl sm:text-4xl font-black text-sky-900 mb-2">
+        Συγχαρητήρια, Μικρέ Προγραμματιστή!
+      </h2>
+      <p class="text-slate-600 font-semibold mb-6 max-w-lg mx-auto text-sm sm:text-base">
+        Έμαθες ότι κάθε μεγάλη δουλειά γίνεται απλή όταν τη χωρίζουμε σε μικρά βήματα με τη σωστή σειρά!
+      </p>
+
+      <!-- Printable Certificate Box -->
+      <div id="diploma-card" class="bg-gradient-to-br from-amber-50 via-white to-sky-50 border-8 border-double border-amber-400 rounded-3xl p-6 sm:p-8 max-w-2xl mx-auto shadow-inner relative text-left mb-6">
+        <!-- Certificate Stamp -->
+        <div class="absolute top-4 right-4 text-3xl sm:text-4xl opacity-80">
+          🏅
+        </div>
+
+        <div class="text-center">
+          <p class="text-xs sm:text-sm tracking-widest text-amber-600 font-black uppercase mb-1">Βραβείο Ολοκλήρωσης &amp; Αξίας</p>
+          <h3 class="text-xl sm:text-3xl font-extrabold text-sky-950 mb-3">ΔΙΠΛΩΜΑ ΠΡΟΓΡΑΜΜΑΤΙΣΤΗ</h3>
+          <p class="text-xs sm:text-sm text-slate-500 font-semibold">Απονέμεται με υπερηφάνεια στον/στην:</p>
+          
+          <div id="diploma-name" class="my-3 py-1.5 px-6 border-b-4 border-amber-500 text-xl sm:text-3xl font-black text-sky-700 tracking-wide inline-block">
+            Μαθητής
+          </div>
+
+          <p class="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-2 max-w-md mx-auto">
+            Γιατί έμαθε με επιτυχία να σκέφτεται σε βήματα (Αλγόριθμος), να βρίσκει τη σωστή σειρά και να λύνει κάθε καθημερινό πρόβλημα σαν αληθινός προγραμματιστής!
+          </p>
+
+          <div class="flex justify-between items-end mt-6 pt-4 border-t-2 border-dashed border-amber-200 text-xs font-bold text-slate-500">
+            <div>
+              <span>🏫 Εργαστήριο Πληροφορικής</span>
+            </div>
+            <div>
+              <span>⭐⭐⭐⭐⭐ Άριστα!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons for Certificate -->
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <button onclick="window.print()" class="btn-bounce px-6 py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-2xl shadow-md flex items-center gap-2">
+          <span>🖨️</span> Εκτύπωση Διπλώματος
+        </button>
+        <button onclick="restartGame()" class="btn-bounce px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-2xl shadow-md flex items-center gap-2">
+          <span>🔄</span> Παίξε Ξανά!
+        </button>
+      </div>
+    </section>
+
+    <!-- Mascot Feedback Toast Modal -->
+    <div id="toast-modal" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 opacity-0 pointer-events-none w-11/12 max-w-md">
+      <div id="toast-inner" class="bg-white rounded-3xl p-4 custom-shadow border-4 border-emerald-400 flex items-center gap-4">
+        <div id="toast-avatar" class="text-3xl">🎉</div>
+        <div class="flex-1">
+          <p id="toast-title" class="text-base font-extrabold text-slate-800">Μπράβο!</p>
+          <p id="toast-desc" class="text-xs sm:text-sm text-slate-600 font-semibold">Βρήκες την απόλυτη σειρά!</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Friendly Footer -->
+  <footer class="w-full max-w-4xl text-center text-xs font-bold text-slate-500 mt-4 py-2">
+    <span>💡 Μαθαίνω να σκέφτομαι αλγοριθμικά • Πληροφορική Δημοτικού</span>
+  </footer>
+
+  <!-- Game Logic & Sound Engine Script -->
+  <script>
+    /* ==========================================================
+       1. WEB AUDIO API SYNTHESIZER (No External Sound Files)
+       ========================================================== */
+    let audioCtx = null;
+    let isSoundMuted = false;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type, duration, delay = 0, gainLevel = 0.15) {
+      if (isSoundMuted) return;
+      initAudio();
+      setTimeout(() => {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          
+          gain.gain.setValueAtTime(gainLevel, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {
+          console.error(e);
+        }
+      }, delay * 1000);
+    }
+
+    // Sound effect presets
+    function sfxClick() {
+      playTone(420, 'sine', 0.08, 0, 0.1);
+    }
+    function sfxCardSelect() {
+      playTone(560, 'triangle', 0.1, 0, 0.12);
+      playTone(720, 'sine', 0.12, 0.05, 0.1);
+    }
+    function sfxSuccess() {
+      playTone(523.25, 'triangle', 0.15, 0);     // C5
+      playTone(659.25, 'triangle', 0.15, 0.1);   // E5
+      playTone(783.99, 'triangle', 0.18, 0.2);   // G5
+      playTone(1046.50, 'sine', 0.4, 0.3);      // C6
+    }
+    function sfxError() {
+      playTone(220, 'sawtooth', 0.25, 0, 0.12);
+      playTone(180, 'sawtooth', 0.35, 0.15, 0.12);
+    }
+    function sfxVictoryFanfare() {
+      const notes = [440, 554.37, 659.25, 880, 880, 880, 1108.73];
+      const times = [0, 0.12, 0.24, 0.36, 0.48, 0.60, 0.75];
+      notes.forEach((freq, i) => {
+        playTone(freq, 'triangle', 0.3, times[i], 0.18);
+      });
+    }
+
+    function toggleSound() {
+      isSoundMuted = !isSoundMuted;
+      document.getElementById('sound-btn').innerText = isSoundMuted ? '🔇' : '🔊';
+    }
+
+    /* ==========================================================
+       2. GAME DATA (Sequencing Levels & Quiz)
+       ========================================================== */
+    const sequencingLevels = [
+      {
+        id: 1,
+        title: "Ετοιμάζω τη Σχολική Τσάντα!",
+        badge: "Επίπεδο 1 από 4",
+        hint: "Ποια είναι τα 4 βήματα για να μην ξεχάσουμε τίποτα;",
+        steps: [
+          { id: 'step-1', order: 1, text: "Δες το πρόγραμμα της επόμενης ημέρας", icon: "📅" },
+          { id: 'step-2', order: 2, text: "Διάλεξε τα σωστά βιβλία και τετράδια", icon: "📚" },
+          { id: 'step-3', order: 3, text: "Βάλτα προσεκτικά μέσα στην τσάντα", icon: "🎒" },
+          { id: 'step-4', order: 4, text: "Κλείσε καλά το φερμουάρ της τσάντας!", icon: "🔒" }
+        ]
+      },
+      {
+        id: 2,
+        title: "Πλένω τα Δόντια μου!",
+        badge: "Επίπεδο 2 από 4",
+        hint: "Πώς βουρτσίζουμε σωστά τα δόντια μας πρωί και βράδυ;",
+        steps: [
+          { id: 'step-1', order: 1, text: "Βάζω οδοντόκρεμα στην οδοντόβουρτσα", icon: "🪥" },
+          { id: 'step-2', order: 2, text: "Βουρτσίζω κυκλικά όλα τα δόντια μου", icon: "✨" },
+          { id: 'step-3', order: 3, text: "Ξεπλένω καλά το στόμα με νερό", icon: "🚰" },
+          { id: 'step-4', order: 4, text: "Σκουπίζω το πρόσωπο με την πετσέτα μου", icon: "🧖" }
+        ]
+      },
+      {
+        id: 3,
+        title: "Φτιάχνω Λαχταριστά Κουλουράκια!",
+        badge: "Επίπεδο 3 από 4",
+        hint: "Γινόμαστε ζαχαροπλάστες ακολουθώντας τη συνταγή;",
+        steps: [
+          { id: 'step-1', order: 1, text: "Ανακατεύω όλα τα υλικά μαζί στο μπολ", icon: "🥣" },
+          { id: 'step-2', order: 2, text: "Πλάθω τη ζύμη σε όμορφα σχήματα", icon: "🍪" },
+          { id: 'step-3', order: 3, text: "Τα απλώνω στο ταψί και ψήνω στον φούρνο", icon: "🔥" },
+          { id: 'step-4', order: 4, text: "Αφήνω να κρυώσουν και απολαμβάνω!", icon: "😋" }
+        ]
+      }
+    ];
+
+    const quizQuestions = [
+      {
+        question: "Τι πρέπει να κάνουμε ΠΡΩΤΑ πριν βάλουμε την κασετίνα μέσα στην τσάντα μας;",
+        options: [
+          { text: "Να ελέγξουμε αν βάλαμε μέσα τα μολύβια και τις γόμες!", correct: true },
+          { text: "Να πάμε για ύπνο", correct: false },
+          { text: "Να πετάξουμε την τσάντα στην αυλή", correct: false }
+        ],
+        explanation: "Μπράβο! Πρώτα ετοιμάζουμε την κασετίνα και μετά τη βάζουμε στην τσάντα!"
+      },
+      {
+        question: "Γιατί οι προγραμματιστές χωρίζουν μια μεγάλη δουλειά σε ΜΙΚΡΑ ΒΗΜΑΤΑ;",
+        options: [
+          { text: "Γιατί βαριούνται να δουλέψουν", correct: false },
+          { text: "Γιατί έτσι γίνεται πιο απλή και δεν ξεχνάμε τίποτα σημαντικό!", correct: true },
+          { text: "Για να χαλάσει ο υπολογιστής", correct: false }
+        ],
+        explanation: "Ακριβώς! «Μικρά Βήματα, Εύκολες Λύσεις!»"
+      },
+      {
+        question: "Τι ονομάζουμε «Αλγόριθμο» στην Πληροφορική;",
+        options: [
+          { text: "Ένα είδος παγωτού σοκολάτας", correct: false },
+          { text: "Μια σειρά από σαφείς οδηγίες/βήματα για να πετύχουμε έναν στόχο!", correct: true },
+          { text: "Ένα χαλασμένο καλώδιο", correct: false }
+        ],
+        explanation: "Τέλεια! Ο αλγόριθμος είναι τα βήματα με τη σωστή σειρά!"
+      }
+    ];
+
+    /* ==========================================================
+       3. APPLICATION STATE
+       ========================================================== */
+    let currentLevelIndex = 0; // 0, 1, 2 = Sequencing, 3 = Quiz
+    let userSlots = [null, null, null, null]; // placed steps
+    let availableSteps = [];
+    let currentQuizIndex = 0;
+    let earnedStars = 0;
+    let playerName = "Μικρός Προγραμματιστής";
+
+    /* ==========================================================
+       4. GAME PROGRESSION CONTROLS
+       ========================================================== */
+    function startGame() {
+      initAudio();
+      sfxClick();
+
+      const inputVal = document.getElementById('student-name').value.trim();
+      if (inputVal.length > 0) {
+        playerName = inputVal;
+      }
+      document.getElementById('diploma-name').innerText = playerName;
+
+      currentLevelIndex = 0;
+      earnedStars = 0;
+      updateStarsUI();
+
+      showScreen('screen-game');
+      loadSequencingLevel(currentLevelIndex);
+    }
+
+    function showScreen(screenId) {
+      const screens = ['screen-welcome', 'screen-game', 'screen-quiz', 'screen-finish'];
+      screens.forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    function updateStarsUI() {
+      document.getElementById('star-count').innerText = earnedStars;
+    }
+
+    /* ==========================================================
+       5. SEQUENCING LEVEL LOGIC (Levels 1 - 3)
+       ========================================================== */
+    function loadSequencingLevel(index) {
+      const lvl = sequencingLevels[index];
+      document.getElementById('level-badge').innerText = lvl.badge;
+      document.getElementById('level-title').innerText = lvl.title;
+      document.getElementById('level-hint').innerText = lvl.hint;
+
+      userSlots = [null, null, null, null];
+      // Clone and shuffle steps
+      availableSteps = [...lvl.steps].sort(() => Math.random() - 0.5);
+
+      renderSlots();
+      renderSourceCards();
+    }
+
+    function renderSlots() {
+      const slotsContainer = document.getElementById('drop-slots');
+      slotsContainer.innerHTML = '';
+
+      userSlots.forEach((step, idx) => {
+        const slotEl = document.createElement('div');
+        slotEl.className = `min-h-[105px] sm:min-h-[125px] rounded-2xl p-2.5 sm:p-3 border-3 transition-all flex flex-col justify-between items-center text-center cursor-pointer relative ${
+          step 
+            ? 'bg-sky-50 border-sky-400 shadow-sm' 
+            : 'bg-slate-50 border-dashed border-slate-300 hover:border-sky-300'
+        }`;
+
+        slotEl.onclick = () => {
+          if (step) {
+            // Remove from slot back to available pool
+            removeStepFromSlot(idx);
+          }
+        };
+
+        if (step) {
+          slotEl.innerHTML = `
+            <div class="w-full flex items-center justify-between">
+              <span class="w-6 h-6 rounded-full bg-sky-600 text-white font-black text-xs flex items-center justify-center step-badge">${idx + 1}</span>
+              <span class="text-xs text-rose-500 font-bold hover:underline">✕ Αφαίρεση</span>
+            </div>
+            <div class="text-2xl sm:text-3xl my-1">${step.icon}</div>
+            <p class="text-xs font-bold text-slate-800 leading-tight">${step.text}</p>
+          `;
+        } else {
+          slotEl.innerHTML = `
+            <span class="w-7 h-7 rounded-full bg-slate-200 text-slate-500 font-black text-sm flex items-center justify-center">${idx + 1}</span>
+            <span class="text-xs font-bold text-slate-400 mt-2">Βήμα ${idx + 1}<br><span class="text-[10px] text-slate-400 font-normal">(κενό)</span></span>
+          `;
+        }
+
+        slotsContainer.appendChild(slotEl);
+      });
+    }
+
+    function renderSourceCards() {
+      const sourceContainer = document.getElementById('source-cards');
+      sourceContainer.innerHTML = '';
+
+      if (availableSteps.length === 0) {
+        sourceContainer.innerHTML = `
+          <div class="col-span-full py-6 text-center text-slate-400 font-bold bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl">
+            ✨ Όλα τα βήματα τοποθετήθηκαν! Πάτησε το κουμπί «ΕΛΕΓΧΟΣ» παρακάτω!
+          </div>
+        `;
+        return;
+      }
+
+      availableSteps.forEach((step) => {
+        const card = document.createElement('button');
+        card.className = "btn-bounce w-full bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border-2 border-amber-300 rounded-2xl p-3 flex items-center gap-3 text-left shadow-sm active:scale-95";
+        card.innerHTML = `
+          <div class="w-12 h-12 bg-white rounded-xl shadow-inner border border-amber-200 flex items-center justify-center text-2xl flex-shrink-0">
+            ${step.icon}
+          </div>
+          <div class="flex-1">
+            <p class="text-xs sm:text-sm font-bold text-slate-800 leading-snug">${step.text}</p>
+          </div>
+          <span class="text-amber-500 text-sm font-bold">➕</span>
+        `;
+
+        card.onclick = () => {
+          placeStepInNextSlot(step);
+        };
+
+        sourceContainer.appendChild(card);
+      });
+    }
+
+    function placeStepInNextSlot(step) {
+      sfxCardSelect();
+      const emptyIndex = userSlots.findIndex(slot => slot === null);
+      if (emptyIndex !== -1) {
+        userSlots[emptyIndex] = step;
+        availableSteps = availableSteps.filter(s => s.id !== step.id);
+        renderSlots();
+        renderSourceCards();
+      } else {
+        showToast("Οι θέσεις γέμισαν!", "Αφαίρεσε κάποιο βήμα αν θες να αλλάξεις τη σειρά.", "⚠️", "border-amber-400");
+      }
+    }
+
+    function removeStepFromSlot(slotIndex) {
+      sfxClick();
+      const removedStep = userSlots[slotIndex];
+      if (removedStep) {
+        userSlots[slotIndex] = null;
+        availableSteps.push(removedStep);
+        renderSlots();
+        renderSourceCards();
+      }
+    }
+
+    function resetCurrentLevel() {
+      sfxClick();
+      loadSequencingLevel(currentLevelIndex);
+    }
+
+    function checkSequence() {
+      // Check if all 4 slots are filled
+      if (userSlots.some(slot => slot === null)) {
+        sfxError();
+        showToast("Συμπλήρωσε όλα τα βήματα!", "Τοποθέτησε και τα 4 βήματα στα κουτάκια πριν τον έλεγχο.", "👀", "border-amber-400");
+        return;
+      }
+
+      // Check correctness (orders: 1, 2, 3, 4)
+      const isCorrect = userSlots.every((step, index) => step.order === (index + 1));
+
+      if (isCorrect) {
+        sfxSuccess();
+        triggerConfettiMini();
+        earnedStars++;
+        updateStarsUI();
+
+        showToast("ΜΠΡΑΒΟ! ΣΩΣΤΗ ΣΕΙΡΑ!", "Σκέφτηκες σαν φοβερός προγραμματιστής!", "🌟", "border-emerald-400");
+
+        setTimeout(() => {
+          currentLevelIndex++;
+          if (currentLevelIndex < sequencingLevels.length) {
+            loadSequencingLevel(currentLevelIndex);
+          } else {
+            // Move to Level 4 (Quiz)
+            startQuizLevel();
+          }
+        }, 1500);
+
+      } else {
+        sfxError();
+        showToast("Σχεδόν το βρήκες!", "Κοίταξε προσεκτικά: κάποιο βήμα πρέπει να γίνει πριν από κάποιο άλλο!", "🤔", "border-rose-400");
+      }
+    }
+
+    /* ==========================================================
+       6. QUIZ LEVEL LOGIC (Level 4)
+       ========================================================== */
+    function startQuizLevel() {
+      currentQuizIndex = 0;
+      showScreen('screen-quiz');
+      renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+      const q = quizQuestions[currentQuizIndex];
+      document.getElementById('quiz-question-number').innerText = `Ερώτηση ${currentQuizIndex + 1} από ${quizQuestions.length}`;
+      document.getElementById('quiz-question-text').innerText = q.question;
+
+      const container = document.getElementById('quiz-options-container');
+      container.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "btn-bounce w-full bg-sky-50 hover:bg-sky-100 border-2 border-sky-300 rounded-2xl p-4 text-left font-bold text-sky-950 text-sm sm:text-base flex items-center gap-3 transition-all";
+        btn.innerHTML = `
+          <span class="w-8 h-8 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-black flex-shrink-0">${['Α', 'Β', 'Γ'][idx]}</span>
+          <span class="flex-1">${opt.text}</span>
+        `;
+
+        btn.onclick = () => handleQuizAnswer(opt, btn, q.explanation);
+        container.appendChild(btn);
+      });
+    }
+
+    function handleQuizAnswer(selectedOption, buttonEl, explanation) {
+      const allButtons = document.querySelectorAll('#quiz-options-container button');
+      allButtons.forEach(b => b.disabled = true);
+
+      if (selectedOption.correct) {
+        sfxSuccess();
+        buttonEl.classList.remove('bg-sky-50', 'border-sky-300');
+        buttonEl.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-950');
+
+        showToast("Σωστά!", explanation, "💡", "border-emerald-400");
+
+        setTimeout(() => {
+          currentQuizIndex++;
+          if (currentQuizIndex < quizQuestions.length) {
+            renderQuizQuestion();
+          } else {
+            // Quiz completed!
+            earnedStars++;
+            updateStarsUI();
+            finishGame();
+          }
+        }, 1800);
+
+      } else {
+        sfxError();
+        buttonEl.classList.remove('bg-sky-50', 'border-sky-300');
+        buttonEl.classList.add('bg-rose-100', 'border-rose-400', 'text-rose-950');
+
+        showToast("Δοκίμασε ξανά!", "Σκέψου ποιο βήμα πρέπει να γίνει πρώτο ή ποιος είναι ο σκοπός μας.", "❌", "border-rose-400");
+
+        setTimeout(() => {
+          allButtons.forEach(b => b.disabled = false);
+          buttonEl.classList.remove('bg-rose-100', 'border-rose-400', 'text-rose-950');
+          buttonEl.classList.add('bg-sky-50', 'border-sky-300');
+        }, 1400);
+      }
+    }
+
+    /* ==========================================================
+       7. FINISH & DIPLOMA
+       ========================================================== */
+    function finishGame() {
+      sfxVictoryFanfare();
+      triggerConfettiBig();
+      showScreen('screen-finish');
+    }
+
+    function restartGame() {
+      sfxClick();
+      startGame();
+    }
+
+    /* ==========================================================
+       8. NOTIFICATION TOAST & VISUAL CELEBRATIONS
+       ========================================================== */
+    let toastTimeout = null;
+
+    function showToast(title, desc, avatar = "✨", borderColorClass = "border-sky-400") {
+      const modal = document.getElementById('toast-modal');
+      const inner = document.getElementById('toast-inner');
+      const toastTitle = document.getElementById('toast-title');
+      const toastDesc = document.getElementById('toast-desc');
+      const toastAvatar = document.getElementById('toast-avatar');
+
+      inner.className = `bg-white rounded-3xl p-4 custom-shadow border-4 ${borderColorClass} flex items-center gap-4`;
+      toastTitle.innerText = title;
+      toastDesc.innerText = desc;
+      toastAvatar.innerText = avatar;
+
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      modal.classList.add('opacity-100');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        modal.classList.remove('opacity-100');
+        modal.classList.add('opacity-0', 'pointer-events-none');
+      }, 2400);
+    }
+
+    function triggerConfettiMini() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 40,
+          spread: 60,
+          origin: { y: 0.7 }
+        });
+      }
+    }
+
+    function triggerConfettiBig() {
+      if (typeof confetti === 'function') {
+        const end = Date.now() + 2.5 * 1000;
+        const colors = ['#38BDF8', '#FBBF24', '#34D399', '#F472B6'];
+
+        (function frame() {
+          confetti({
+            particleCount: 5,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: colors
+          });
+          confetti({
+            particleCount: 5,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: colors
+          });
+
+          if (Date.now() < end) {
+            requestAnimationFrame(frame);
+          }
+        }());
+      }
+    }
+  </script>
+</body>
+</html>
