@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Πληροφορική Α΄ Δημοτικού – Μαθησιακά αντικείμενα</title>
+<style>
+:root{--bg:#f8f9fb;--card:#fff;--tx:#1d2433;--mu:#5d6881;--bd:#dde3ee;--ac:#00598a;--ac2:#e6f0f7}
+@media (prefers-color-scheme:dark){:root{--bg:#151a24;--card:#1e2535;--tx:#f4efff;--mu:#b0bbce;--bd:#333f57;--ac:#2a8cd0;--ac2:#1f334a}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx);line-height:1.45}
+header{padding:26px 16px 30px;background:linear-gradient(120deg,#00598a,#a8c732,#ea922c,#bc1930);color:#fff;text-align:center;border-radius:0 0 28px 28px;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+header h1{margin:0;font-size:1.6rem}header p{margin:4px 0 0;opacity:.9;font-size:.92rem}
+header a{color:#fff}
+main{max-width:900px;margin:0 auto;padding:16px}
+.unit{background:var(--card);border:2px solid var(--uc);border-radius:18px;box-shadow:0 4px 0 var(--uc);margin-bottom:14px;overflow:hidden}
+.unit>h2{margin:0;padding:14px 16px;font-size:1.05rem;background:var(--uc);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);display:flex;gap:10px;align-items:center}
+.unit>h2 span.k{background:rgba(255,255,255,.28);color:#fff;border-radius:8px;padding:2px 9px;font-size:.85rem;white-space:nowrap}
+.lessons{list-style:none;margin:0;padding:6px}
+.lessons li{border-radius:10px}.lessons button{width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;padding:10px 12px;border-radius:10px;cursor:pointer;display:flex;gap:12px;align-items:center}
+.lessons button:hover,.lessons button:focus-visible{background:var(--ac2);outline:none}
+.num{flex:none;width:34px;height:34px;border-radius:50%;background:var(--uc);color:#fff;font-weight:700;display:grid;place-items:center}
+.cnt{margin-left:auto;flex:none;font-size:.8rem;color:var(--mu)}.chev{flex:none;transition:transform .2s;color:var(--mu)}li.open>button .chev{transform:rotate(180deg)}li.open>button{background:var(--ac2)}.lessons button:hover,.lessons button:focus-visible{background:var(--ac2)}.acts{display:none;padding:6px 6px 10px 56px}li.open>.acts{display:block}
+.obj{border-left:6px solid var(--uc)!important;display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:10px;text-decoration:none;color:inherit}
+.obj:hover{transform:translateY(-2px);box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.ic{font-size:1.6rem;flex:none}.ot{font-weight:600}.ty{font-size:.82rem;color:var(--mu)}
+.go{margin-left:auto;color:var(--uc);font-weight:600;white-space:nowrap}
+.empty{color:var(--mu);padding:4px 0}
+.obj{margin-bottom:8px}@media(max-width:520px){.acts{padding-left:8px}.go{display:none}}
+</style>
+</head>
+<body>
+<header>
+<h1>🚀 Πληροφορική και ΤΠΕ – Α΄ Δημοτικού 🌟</h1>
+<p>Πάτα σε ένα μάθημα για να ανοίξουν οι δραστηριότητες (QR codes) και πάτα ξανά για να κρυφτούν.</p>
+</header>
+<main>
+<section id="list"></section>
+</main>
+<script>
+const DATA = {
+  "units": [
+    {
+      "t": "Αλγοριθμική – Προγραμματισμός – Ρομποτική",
+      "l": [
+        {
+          "n": 1,
+          "t": "Πώς λύνω ένα πρόβλημα",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10999", "t": "Άσκηση κατηγοριοποίησης. Δουλειές που κάνω καθημερινά (Μέρος 1ο)", "p": 12}
+          ]
+        },
+        {
+          "n": 2,
+          "t": "Η σειρά έχει σημασία!",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/50220", "t": "Παρουσίαση. Ποιο είναι πριν και ποιο μετά;", "p": 13},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10995", "t": "Άσκηση κατηγοριοποίησης. Η σειρά έχει σημασία - Ετοιμάζω την τσάντα μου για το σχολείο", "p": 14},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10997", "t": "Άσκηση σειροθέτησης. Η βαρκούλα", "p": 16},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10998", "t": "Άσκηση σειροθέτησης. Σπιτάκι", "p": 16}
+          ]
+        },
+        {
+          "n": 3,
+          "t": "Φτιάχνω το πρώτο μου πρόγραμμα",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11000", "t": "Παιχνίδι. Δίνοντας εντολές - Ο σκίουρος", "p": 19}
+          ]
+        },
+        {
+          "n": 4,
+          "t": "Πού θα φτάσει η σαρανταποδαρούσα;",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10992", "t": "Παιχνίδι. Βρες το μονοπάτι - Η σαρανταποδαρούσα", "p": 21},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11008", "t": "Άσκηση αντιστοίχισης. Βρες το πρόγραμμα που ταιριάζει", "p": 23}
+          ]
+        },
+        {
+          "n": 5,
+          "t": "Σχεδιάζοντας το μονοπάτι",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10994", "t": "Παιχνίδι. Δίνοντας εντολές - Το παπάκι", "p": 26}
+          ]
+        },
+        {
+          "n": 6,
+          "t": "Προγραμματίζω στον υπολογιστή!",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11005", "t": "Άσκηση αντιστοίχισης. Μαθαίνω το περιβάλλον του Scratchjr", "p": 27},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11003", "t": "Βίντεο. Το πρώτο μου έργο στο Scratchjr", "p": 28},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11007", "t": "Βίντεο. Scratchjr - Το ίδιο αποτέλεσμα. Λιγότερες εντολές", "p": 30},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10993", "t": "Άσκηση αντιστοίχισης. Μαθαίνω να χρησιμοποιώ λιγότερες εντολές", "p": 31}
+          ]
+        },
+        {
+          "n": 7,
+          "t": "Η πρώτη μου ιστορία: Ταξίδι στο φεγγάρι",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11006", "t": "Βίντεο. Η πρώτη μου ιστορία στο Scratchjr", "p": 33},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11001", "t": "Βίντεο. Η πρώτη μου ιστορία στο Scratchjr - Επέκταση", "p": 34},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10996", "t": "Παιχνίδι. Παιχνίδι μνήμης με εντολές του Scratchjr", "p": 34},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11004", "t": "Άσκηση αντιστοίχισης. Ταίριαξε τις εντολές", "p": 34}
+          ]
+        },
+        {
+          "n": 8,
+          "t": "Μαθαίνω για τα ρομπότ!",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10994", "t": "Παιχνίδι. Δίνοντας εντολές - Το παπάκι", "p": 35}
+          ]
+        },
+        {
+          "n": 9,
+          "t": "Προγραμμάτισε το ρομπότ-πασχαλίτσα",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11002", "t": "Βίντεο. Προγραμματίζω το Ρομπότ-Πασχαλίτσα", "p": 39},
+            {"u": "https://photodentro.edu.gr/v/item/ds/8521/11286", "t": "Εφαρμογή. Βασικός προγραμματισμός ρομπότ (Φωτόδεντρο)", "p": 37}
+          ]
+        }
+      ]
+    },
+    {
+      "t": "Υπολογιστικά συστήματα - Ψηφιακές συσκευές - Δίκτυα",
+      "l": [
+        {
+          "n": 10,
+          "t": "Ο υπολογιστής",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10950", "t": "Άσκηση. Χρήσεις υπολογιστή", "p": 44}
+          ]
+        },
+        {
+          "n": 11,
+          "t": "Οι συσκευές του υπολογιστή",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10954", "t": "Εικόνα. Υπολογιστής γραφείου", "p": 46},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10956", "t": "Κουίζ. Ο υπολογιστής και οι συσκευές του", "p": 49},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10967", "t": "Άσκηση. Ονόματα συσκευών υπολογιστή", "p": 49}
+          ]
+        },
+        {
+          "n": 12,
+          "t": "Πώς χρησιμοποιώ τον υπολογιστή;",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10955", "t": "Βίντεο. Άνοιγμα εφαρμογής", "p": 51},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10951", "t": "Βίντεο. Κλείσιμο εφαρμογής", "p": 51}
+          ]
+        },
+        {
+          "n": 13,
+          "t": "Δίκτυα υπολογιστών",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10984", "t": "Βίντεο. Δίκτυα υπολογιστών", "p": 54}
+          ]
+        },
+        {
+          "n": 14,
+          "t": "Τα ψηφιακά δίκτυα στη ζωή μας",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10980", "t": "Διαδραστική εικόνα. Αποστολή ηλεκτρονικού μηνύματος (e-mail)", "p": 57}
+          ]
+        }
+      ]
+    },
+    {
+      "t": "Δεδομένα και ανάλυση δεδομένων",
+      "l": [
+        {
+          "n": 15,
+          "t": "Αρχεία και φάκελοι",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10949", "t": "Διαδραστική εικόνα. Αρχείο ή Φάκελος", "p": 63},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10953", "t": "Κουίζ. Αρχεία", "p": 63}
+          ]
+        },
+        {
+          "n": 16,
+          "t": "Αποθήκευση και αρχεία",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10988", "t": "Βίντεο. Πώς αποθηκεύω σε αρχείο", "p": 65}
+          ]
+        },
+        {
+          "n": 17,
+          "t": "Ο πρώτος μου εννοιολογικός χάρτης",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10987", "t": "Άσκηση. Συνδέω έναν απλό εννοιολογικό χάρτη", "p": 67},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10985", "t": "Άσκηση. Συνδέω τον εννοιολογικό χάρτη", "p": 67},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10991", "t": "Άσκηση. Ταιριάζω προτάσεις με εννοιολογικούς χάρτες", "p": 67},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10990", "t": "Βίντεο. Ζωγραφίζω τον πρώτο μου εννοιολογικό χάρτη", "p": 69}
+          ]
+        },
+        {
+          "n": 18,
+          "t": "Μεγαλώνω τον εννοιολογικό μου χάρτη",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10986", "t": "Άσκηση. Συνδέω τον εννοιολογικό χάρτη", "p": 72}
+          ]
+        }
+      ]
+    },
+    {
+      "t": "Ψηφιακός γραμματισμός",
+      "l": [
+        {
+          "n": 19,
+          "t": "Μαθαίνω το ποντίκι του υπολογιστή",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10960", "t": "Αφίσα. Το πρώτο ποντίκι του υπολογιστή", "p": 74},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10972", "t": "Αφίσα. Το ποντίκι του υπολογιστή", "p": 74},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10966", "t": "Διαδραστική εικόνα. Μαθαίνω το ποντίκι (Εξερεύνηση)", "p": 75},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10963", "t": "Δραστηριότητα. Κατασκευάζω το δικό μου ποντίκι", "p": 76}
+          ]
+        },
+        {
+          "n": 20,
+          "t": "Ο δείκτης του ποντικιού",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11224", "t": "Αφίσα. Ο δείκτης", "p": 77},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10970", "t": "Παιχνίδι. Μαζεύω τα φρούτα", "p": 79}
+          ]
+        },
+        {
+          "n": 21,
+          "t": "Κάνω κλικ με το ποντίκι του υπολογιστή",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10961", "t": "Άσκηση. Μονό κλικ (Εξάσκηση)", "p": 81},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10976", "t": "Άσκηση. Διπλό κλικ (Εξάσκηση)", "p": 81},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10977", "t": "Παιχνίδι. Κάρτες μνήμης", "p": 82}
+          ]
+        },
+        {
+          "n": 22,
+          "t": "Το δεξί κλικ, η ροδέλα κύλισης και η ενέργεια «σύρε»",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10964", "t": "Άσκηση. Δεξί κλικ (Εξάσκηση)", "p": 84},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10978", "t": "Άσκηση. Ροδέλα κύλισης (Εξάσκηση)", "p": 84},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11223", "t": "Παιχνίδι. Παζλ", "p": 85},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11009", "t": "Παρουσίαση. Το ποντίκι του υπολογιστή", "p": 87}
+          ]
+        },
+        {
+          "n": 23,
+          "t": "Γνωρίζω το πληκτρολόγιο",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/11222", "t": "Αφίσα. Η διάταξη των πλήκτρων", "p": 88},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10968", "t": "Παιχνίδι. Παζλ για το πληκτρολόγιο", "p": 88},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10943", "t": "Βίντεο. Ο κέρσορας", "p": 91}
+          ]
+        },
+        {
+          "n": 24,
+          "t": "Πληκτρολογώ κεφαλαία γράμματα και αριθμούς",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10942", "t": "Διαδραστική εικόνα. Σβήνω με το backspace (Εξερεύνηση)", "p": 93},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10965", "t": "Άσκηση. Εισάγω γράμματα και αριθμούς", "p": 94}
+          ]
+        },
+        {
+          "n": 25,
+          "t": "Γράφω τις πρώτες μου λέξεις με το πληκτρολόγιο",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10962", "t": "Άσκηση. Γράφω απλές λέξεις", "p": 95},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10979", "t": "Αφίσα. Το πληκτρολόγιο για Α τάξη", "p": 96},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10981", "t": "Παρουσίαση. Το πληκτρολόγιο για Α΄ τάξη", "p": 96},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10959", "t": "Κουίζ. Αναγνωρίζω τα πλήκτρα", "p": 97},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10982", "t": "Διαδραστική εικόνα. Το πληκτρολόγιο για Α΄ τάξη (Εξερεύνηση)", "p": 97}
+          ]
+        },
+        {
+          "n": 26,
+          "t": "Ιστοσελίδες και ιστότοποι",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10969", "t": "Δραστηριότητα. Ιστοσελίδα για τα ζώα", "p": 98},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10971", "t": "Αφίσα. Κύλιση σε ιστοσελίδες", "p": 99},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10945", "t": "Παρουσίαση. Ο υπερσύνδεσμος", "p": 100},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10983", "t": "Διαδραστική εικόνα. Το κουμπί πίσω στους φυλλομετρητές (Εξερεύνηση)", "p": 100}
+          ]
+        },
+        {
+          "n": 27,
+          "t": "Σελιδοδείκτες και σχολιασμός σε ιστοσελίδες",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10940", "t": "Βίντεο. Προσθήκη σελιδοδείκτη", "p": 102},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10973", "t": "Άσκηση. Προσθήκη σελιδοδείκτη (Εξάσκηση)", "p": 103}
+          ]
+        },
+        {
+          "n": 28,
+          "t": "Η πρώτη μου ζωγραφιά",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10941", "t": "Διαδραστική εικόνα. Εργαλεία ζωγραφικής (Εξερεύνηση)", "p": 106},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10957", "t": "Εφαρμογή. Εφαρμογή ζωγραφικής", "p": 106},
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10946", "t": "Βίντεο. Βασικά εργαλεία ζωγραφικής", "p": 107}
+          ]
+        },
+        {
+          "n": 29,
+          "t": "Περισσότερα εργαλεία στο πρόγραμμα ζωγραφικής",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10947", "t": "Βίντεο. Περισσότερα εργαλεία ζωγραφικής", "p": 108}
+          ]
+        },
+        {
+          "n": 30,
+          "t": "Το Φωτόδεντρο και η Εκπαιδευτική τηλεόραση",
+          "o": [
+            {"u": "https://ebooksdl.cti.gr/view?item=20.500.14040/10958", "t": "Παιχνίδι. Το ψηφιακό επιτραπέζιο για τον προγραμματισμό", "p": 112}
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+// Τα επίσημα χρώματα των 4 ενοτήτων από τη σελίδα περιεχομένων του βιβλίου:
+// Ενότητα 1: Μπλε σκούρο (#00598a)
+// Ενότητα 2: Λαχανί (#a8c732)
+// Ενότητα 3: Πορτοκαλί / Ώχρα (#ea922c)
+// Ενότητα 4: Βυσσινί / Κόκκινο (#bc1930)
+const UC = ['#00598a', '#a8c732', '#ea922c', '#bc1930'];
+
+const $ = s => document.querySelector(s);
+const ICONS = [
+  [/^Βίντεο/, "🎬"],
+  [/^Παιχνίδι|^Εκπαιδευτικό παιχνίδι/, "🎮"],
+  [/^Κουίζ/, "❓"],
+  [/^Τεστ/, "📝"],
+  [/^Άσκηση|^Δραστηριότητα/, "✏️"],
+  [/^Διαδραστικ/, "🖱️"],
+  [/^Εικόνα/, "🖼️"],
+  [/^Αφίσα/, "🪧"],
+  [/ρόλεξο|^Κρυπτ/, "🔤"],
+  [/^Εφαρμογή|Scratchjr|Φωτόδεντρο/, "💻"],
+  [/^Κάρτες/, "🃏"],
+  [/^Παρουσίαση/, "📊"],
+  [/βιβλί|ιστοσελίδα/i, "🌐"]
+];
+
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function icon(t) {
+  for (const [r, i] of ICONS) if (r.test(t)) return i;
+  return "🔗";
+}
+
+function split(t) {
+  const m = t.match(/^((?:Άσκηση|Βίντεο|Παιχνίδι|Εκπαιδευτικό παιχνίδι|Εικόνα|Διαδραστική εικόνα|Τεστ αξιολόγησης|Αφίσα|Παρουσίαση|Εφαρμογή|Δραστηριότητα|Κουίζ)[^.:]{0,35})[.:]\s+(.+)$/);
+  return m ? [m[1], m[2]] : ["", t];
+}
+
+function actHTML(l) {
+  return l.o.length ? l.o.map(o => {
+    const [ty, ti] = split(o.t);
+    return `<a class="obj" href="${esc(o.u)}" target="_blank" rel="noopener noreferrer"><span class="ic">${icon(o.t)}</span><span><div class="ot">${esc(ti)}</div><div class="ty">${ty ? esc(ty) + " · " : ""}σελ. ${o.p}</div></span><span class="go">Άνοιγμα ↗</span></a>`;
+  }).join("") : `<p class="empty">Αυτό το μάθημα δεν έχει QR codes.</p>`;
+}
+
+function renderList() {
+  $("#list").innerHTML = DATA.units.map((u, i) =>
+    `<div class="unit" style="--uc:${UC[i]}"><h2><span class="k">Ενότητα ${i + 1}</span>${esc(u.t)}</h2><ul class="lessons">` +
+    u.l.map(l =>
+      `<li id="m${l.n}"><button aria-expanded="false" aria-controls="a${l.n}" data-n="${l.n}"><span class="num">${l.n}</span><span>${esc(l.t)}</span><span class="cnt">${l.o.length} δραστ.</span><span class="chev">▾</span></button><div class="acts" id="a${l.n}">${actHTML(l)}</div></li>`
+    ).join("") + `</ul></div>`
+  ).join("");
+
+  $("#list").querySelectorAll("button[data-n]").forEach(b => b.onclick = () => {
+    const li = b.parentElement, o = li.classList.toggle("open");
+    b.setAttribute("aria-expanded", o);
+  });
+}
+
+renderList();
+</script>
+</body>
+</html>
+```[cite: 11]
