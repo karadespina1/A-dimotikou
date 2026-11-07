@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #f7f9fc;
+      padding: 16px;
+      color: #333;
+      text-align: center;
+    }
+
+    /* Μεγάλος τίτλος τάξης */
+    .grade-title {
+      font-size: 38px;
+      font-weight: 900;
+      color: #1e3a8a;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .sub-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    /* Υπογραφή δημιουργού */
+    .author-credit {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2563eb;
+      background: #e0e7ff;
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    /* Χειριστήρια επιλογής μαθήματος */
+    .controls-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    select {
+      padding: 11px 16px;
+      font-size: 15px;
+      border-radius: 8px;
+      border: 2px solid #2563eb;
+      background: #ffffff;
+      color: #1e293b;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+      max-width: 480px;
+      width: 100%;
+    }
+
+    button.nav-btn {
+      padding: 11px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: none;
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s ease;
+    }
+
+    button.nav-btn:hover {
+      background: #1d4ed8;
+    }
+
+    button.nav-btn:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .btn-fullscreen {
+      background: #0f172a;
+    }
+
+    .btn-fullscreen:hover {
+      background: #334155;
+    }
+
+    /* Κεντρικό πλαίσιο παιχνιδιού */
+    .iframe-wrapper {
+      position: relative;
+      width: 100%;
+      height: 640px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 3px solid #cbd5e1;
+      background: #ffffff;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Μεγάλος Τίτλος Τάξης -->
+  <div class="grade-title">Α΄ ΔΗΜΟΤΙΚΟΥ</div>
+  <div class="sub-title">🎮 Διαδραστικά Παιχνίδια & Δραστηριότητες Πληροφορικής</div>
+  
+  <!-- Επιμέλεια -->
+  <div class="author-credit">Επιμέλεια: Καραγιαννίδου Δέσποινα</div>
+
+  <!-- Χειριστήρια Παιχνιδιών -->
+  <div class="controls-container">
+    <button class="nav-btn" id="prevBtn" onclick="navigateLesson(-1)">◀ Προηγούμενο</button>
+    
+    <select id="lessonSelect" onchange="onLessonSelected(this.value)">
+      <!-- Γεμίζει αυτόματα με τα 30 μαθήματα της Α' Δημοτικού -->
+    </select>
+
+    <button class="nav-btn" id="nextBtn" onclick="navigateLesson(1)">Επόμενο ▶</button>
+    <button class="nav-btn btn-fullscreen" onclick="goFullscreen()">⛶ Πλήρης Οθόνη</button>
+  </div>
+
+  <!-- Οθόνη Ενσωμάτωσης (iFrame) -->
+  <div class="iframe-wrapper" id="frameContainer">
+    <iframe id="gameScreen" src="" allowfullscreen loading="lazy"></iframe>
+  </div>
+
+  <script>
+    const GITHUB_USER = "karadespina1";
+    const FOLDER = "A-dimotikou";
+
+    // Τα 30 μαθήματα της Α' Δημοτικού
+    const lessonTitles = [
+      "1. Πώς λύνω ένα πρόβλημα", "2. Η σειρά έχει σημασία!", "3. Φτιάχνω το πρώτο μου πρόγραμμα",
+      "4. Πού θα φτάσει η σαρανταποδαρούσα;", "5. Σχεδιάζοντας το μονοπάτι", "6. Προγραμματίζω στον υπολογιστή!",
+      "7. Η πρώτη μου ιστορία: Ταξίδι στο φεγγάρι", "8. Μαθαίνω για τα ρομπότ!", "9. Προγραμμάτισε το ρομπότ-πασχαλίτσα",
+      "10. Ο υπολογιστής", "11. Οι συσκευές του υπολογιστή", "12. Πώς χρησιμοποιώ τον υπολογιστή;",
+      "13. Δίκτυα υπολογιστών", "14. Τα ψηφιακά δίκτυα στη ζωή μας", "15. Αρχεία και φάκελοι",
+      "16. Αποθήκευση και αρχεία", "17. Ο πρώτος μου εννοιολογικός χάρτης", "18. Μεγαλώνω τον εννοιολογικό μου χάρτη",
+      "19. Μαθαίνω το ποντίκι του υπολογιστή", "20. Ο δείκτης του ποντικιού", "21. Κάνω κλικ με το ποντίκι του υπολογιστή",
+      "22. Το δεξί κλικ, η ροδέλα κύλισης και η ενέργεια «σύρε»", "23. Γνωρίζω το πληκτρολόγιο", "24. Πληκτρολογώ κεφαλαία γράμματα και αριθμούς",
+      "25. Γράφω τις πρώτες μου λέξεις με το πληκτρολόγιο", "26. Ιστοσελίδες και ιστότοποι", "27. Σελιδοδείκτες και σχολιασμός σε ιστοσελίδες",
+      "28. Η πρώτη μου ζωγραφιά", "29. Περισσότερα εργαλεία στο πρόγραμμα ζωγραφικής", "30. Το Φωτόδεντρο και η Εκπαιδευτική τηλεόραση"
+    ];
+
+    let currentLessonIndex = 0;
+
+    const lessonSelect = document.getElementById("lessonSelect");
+    const gameScreen = document.getElementById("gameScreen");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    function loadLesson(idx) {
+      currentLessonIndex = idx;
+      lessonSelect.value = idx;
+
+      // Μάθημα 1 (idx = 0)
+      if (idx === 0) {
+        gameScreen.src = `https://${GITHUB_USER}.github.io/${FOLDER}/%CE%9C%CE%AC%CE%B8%CE%B7%CE%BC%CE%B1%201.html`;
+      } else {
+        // Αυτόματο link για τα υπόλοιπα μαθήματα (mathima2_game.html, mathima3_game.html κ.ο.κ.)
+        gameScreen.src = `https://${GITHUB_USER}.github.io/${FOLDER}/mathima${idx + 1}_game.html`;
+      }
+
+      prevBtn.disabled = (currentLessonIndex === 0);
+      nextBtn.disabled = (currentLessonIndex === lessonTitles.length - 1);
+    }
+
+    function onLessonSelected(idx) {
+      loadLesson(parseInt(idx, 10));
+    }
+
+    function navigateLesson(step) {
+      const target = currentLessonIndex + step;
+      if (target >= 0 && target < lessonTitles.length) {
+        loadLesson(target);
+      }
+    }
+
+    function goFullscreen() {
+      const container = document.getElementById("frameContainer");
+      if (container.requestFullscreen) {
+        container.requestFullscreen();
+      } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+      } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen();
+      }
+    }
+
+    // Αρχικοποίηση: γέμισμα του dropdown μενού και φόρτωση του 1ου μαθήματος
+    (function init() {
+      lessonSelect.innerHTML = "";
+      lessonTitles.forEach((lessonTitle, idx) => {
+        const opt = document.createElement("option");
+        opt.value = idx;
+        opt.textContent = lessonTitle;
+        lessonSelect.appendChild(opt);
+      });
+      loadLesson(0);
+    })();
+  </script>
+</body>
+</html>
