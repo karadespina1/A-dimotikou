@@ -37,7 +37,7 @@ footer { color:var(--muted); padding:.7rem 0 1.6rem; font-size:.9rem; }
 :focus-visible { outline:3px solid #6839c3; outline-offset:-3px; }
 [hidden] { display:none !important; }
 @media (max-width: 670px),
-       (hover: none) and (pointer: coarse) and (orientation: portrait) {
+       (max-aspect-ratio: 4/5) {
   body { font-size: 1.25rem; }
   main, .bar, footer { width: calc(100% - 1.5rem); }
   .bar { line-height: 1.4; }
@@ -69,8 +69,8 @@ footer { color:var(--muted); padding:.7rem 0 1.6rem; font-size:.9rem; }
   .card small, footer { font-size: 1rem; }
 }
 /* Keep text readable when a phone fits a wide layout viewport onto its screen. */
-@media (width > 670px) and (hover: none) and (pointer: coarse) and (max-aspect-ratio: 2/3) {
-  html { font-size: clamp(1rem, 4.2vw, 3rem); }
+@media (min-width: 671px) and (max-aspect-ratio: 4/5) {
+  html { font-size: clamp(1rem, 4.4vw, 3rem); }
 }
 </style>
 </head>
